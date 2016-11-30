@@ -8,6 +8,7 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
+
     signingConfigs {
         config {
             keyAlias keystoreProperties['keyAlias']
@@ -16,14 +17,17 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
+
     defaultConfig {
         applicationId "ir.asparsa.hobbytaste"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-        signingConfig signingConfigs.config
+
+        buildConfigField 'String', 'BASE_URL', '"http://hobbytaste.ir/v1/"'
     }
+
     buildTypes {
         debug {
             multiDexEnabled true
@@ -59,5 +63,10 @@ dependencies {
     compile 'io.reactivex:rxjava:1.1.6'
     // Google map
     compile 'com.google.android.gms:play-services:9.8.0'
+    // Retrofit
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+
     testCompile 'junit:junit:4.12'
 }
