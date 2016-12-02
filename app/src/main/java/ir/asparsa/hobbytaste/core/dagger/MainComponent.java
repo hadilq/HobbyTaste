@@ -2,6 +2,7 @@ package ir.asparsa.hobbytaste.core.dagger;
 
 import dagger.Component;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
+import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
 
 import javax.inject.Singleton;
 
@@ -14,4 +15,6 @@ import javax.inject.Singleton;
 public interface MainComponent {
 
     void inject(LaunchActivity launchActivity);
+
+    void inject(MainContentFragment mainContentFragment);
 }

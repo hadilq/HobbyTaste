@@ -2,9 +2,14 @@ package ir.asparsa.hobbytaste.ui.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import ir.asparsa.hobbytaste.R;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.subjects.PublishSubject;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author hadi
@@ -13,7 +18,7 @@ import ir.asparsa.hobbytaste.R;
 public class SplashActivity extends Activity {
 
     // TODO: increase it in release
-    private static final long SPLASH_FINISH_DELAY_TIME = 1000;
+    private static final long SPLASH_FINISH_DELAY_TIME = 1;
 
     @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,10 +27,14 @@ public class SplashActivity extends Activity {
 
     @Override protected void onResume() {
         super.onResume();
-        new Handler().postDelayed(new Runnable() {
-            @Override public void run() {
-                finish();
-            }
-        }, SPLASH_FINISH_DELAY_TIME);
+        Observable
+                .timer(SPLASH_FINISH_DELAY_TIME, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .takeUntil(PublishSubject.create())
+                .subscribe(new Action1<Long>() {
+                    @Override public void call(Long aLong) {
+                        finish();
+                    }
+                });
     }
 }

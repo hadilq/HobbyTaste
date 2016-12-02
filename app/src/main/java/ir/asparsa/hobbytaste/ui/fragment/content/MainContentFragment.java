@@ -6,15 +6,27 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
+import ir.asparsa.hobbytaste.core.manager.RequestManager;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
+import ir.asparsa.hobbytaste.database.model.StoreModel;
+import ir.asparsa.hobbytaste.net.StoreService;
+import rx.Observer;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+
+import javax.inject.Inject;
+import java.util.Collection;
 
 /**
  * @author hadi
@@ -24,7 +36,14 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
 
     private static final String FRAGMENT_TAG = "main";
 
+    @Inject
+    StoreService mStoreService;
+    @Inject
+    RequestManager mRequestManager;
+
     private GoogleMap mMap;
+    private RequestManager.Request<Collection<StoreModel>> mRequest;
+    private Collection<StoreModel> mStores;
 
     public static MainContentFragment instantiate() {
         MainContentFragment fragment = new MainContentFragment();
@@ -34,6 +53,48 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
 
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ApplicationLauncher.mainComponent().inject(this);
+
+        RequestManager.Request<?> request = mRequestManager.get(getClass());
+        if (request == null) {
+            mRequest = new RequestManager.Request<>(
+                    mStoreService.loadStoreModels()
+                            .subscribeOn(Schedulers.newThread())
+                            .observeOn(AndroidSchedulers.mainThread()));
+            mRequest.setRequestSubscription(getSubscribe());
+        } else {
+            mRequest = (RequestManager.Request<Collection<StoreModel>>) request;
+            mRequest.setRequestSubscription(getSubscribe());
+        }
+
+    }
+
+    private Subscription getSubscribe() {
+        return mRequest.getRequestObservable().subscribe(new Observer<Collection<StoreModel>>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                mRequest.received();
+                Toast.makeText(getContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
+            }
+
+            @Override public void onNext(Collection<StoreModel> stores) {
+                mRequest.received();
+                mStores = stores;
+                fillMap();
+            }
+        });
+    }
+
+    private void fillMap() {
+        if (mMap != null && mStores != null) {
+            for (StoreModel store : mStores) {
+                LatLng sydney = new LatLng(store.getLat(), store.getLon());
+                mMap.addMarker(new MarkerOptions().position(sydney).title(store.getTitle()));
+            }
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(35.6940119d, 51.4062329d)));
+        }
     }
 
     @Nullable @Override public View onCreateView(
@@ -51,6 +112,13 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
                     .replace(R.id.content_nested, mapFragment)
                     .commit();
         }
+    }
+
+    @Override public void onDestroyView() {
+        if (!mRequest.isReceived()) {
+            mRequestManager.put(getClass(), mRequest);
+        }
+        super.onDestroyView();
     }
 
     @Override protected String setHeaderTitle() {
@@ -77,11 +145,6 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(35.6940119d,51.4062329d);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-        MapUtil.zoom(mMap, sydney);
+        fillMap();
     }
 }
