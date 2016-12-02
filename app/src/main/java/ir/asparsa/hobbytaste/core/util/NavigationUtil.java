@@ -1,12 +1,13 @@
 package ir.asparsa.hobbytaste.core.util;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.fragment.BaseFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.BaseContentFragment;
+import junit.framework.Assert;
 
 /**
  * @author hadi
@@ -14,8 +15,9 @@ import ir.asparsa.hobbytaste.ui.fragment.content.BaseContentFragment;
  */
 public class NavigationUtil {
 
-    public static void startFragment(@NonNull FragmentActivity activity, @NonNull BaseContentFragment fragment) {
-        activity.getSupportFragmentManager()
+    public static void startContentFragment(
+            @NonNull FragmentManager fragmentManager, @NonNull BaseContentFragment fragment) {
+        fragmentManager
                 .beginTransaction()
                 .replace(R.id.content, fragment, fragment.getFragmentTag())
                 .addToBackStack(fragment.getFragmentTag())
@@ -28,15 +30,33 @@ public class NavigationUtil {
                 .commit();
     }
 
-    public static void popBackStack(@NonNull FragmentActivity activity) {
-        activity.getSupportFragmentManager().popBackStack();
+    public static void popBackStack(@NonNull FragmentManager activeFragmentManager) {
+        activeFragmentManager.popBackStack();
     }
 
-    public static Fragment findTopFragment(@NonNull FragmentActivity activity) {
-        return activity.getSupportFragmentManager().findFragmentById(R.id.content);
+    @Nullable
+    public static BaseContentFragment findTopFragment(
+            @NonNull FragmentManager fragmentManager, boolean assertFragment) {
+
+        Fragment fragment = fragmentManager.findFragmentById(R.id.content);
+        if (fragment instanceof BaseContentFragment) {
+            return (BaseContentFragment) fragment;
+        }
+        if (fragment != null && assertFragment) {
+            Assert.fail("Fragment is not a content! It's " + (fragment == null ? null : fragment.getClass()));
+        }
+        return null;
     }
 
-    public static Fragment getActiveFragment(FragmentManager fragmentManager) {
+    public static Fragment getActiveFragment(@NonNull FragmentManager fragmentManager) {
         return fragmentManager.findFragmentById(R.id.content_nested);
+    }
+
+    public static BaseContentFragment getActiveContentFragment(@NonNull FragmentManager fragmentManager) {
+        Fragment fragment = fragmentManager.findFragmentById(R.id.content);
+        if (fragment instanceof BaseContentFragment) {
+            return (BaseContentFragment) fragment;
+        }
+        return null;
     }
 }

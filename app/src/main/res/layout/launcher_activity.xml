@@ -6,25 +6,35 @@
         android:layout_height="match_parent"
         android:fitsSystemWindows="true">
 
-    <LinearLayout
+    <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
         <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:layout_alignParentTop="true"
                 android:background="?attr/colorPrimary"
                 android:elevation="4dp"
                 android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
-        <FrameLayout
-                android:id="@+id/content"
+        <android.support.design.widget.BottomNavigationView
+                android:id="@+id/bottom_navigation_view"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                app:itemIconTint="@color/bottom_navigation_item_background_colors"
+                app:itemTextColor="@color/bottom_navigation_item_background_colors"
+                app:menu="@menu/menu_bottom_navigation"/>
 
-    </LinearLayout>
+        <android.support.v4.view.ViewPager
+                android:id="@+id/view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/toolbar"
+                android:layout_above="@id/bottom_navigation_view"/>
+    </RelativeLayout>
 
 </android.support.design.widget.CoordinatorLayout>

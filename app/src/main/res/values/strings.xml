@@ -2,6 +2,7 @@
     <string name="app_name">Hobby Taste</string>
     <string name="action_settings">Settings</string>
     <string name="title_main">اصلی</string>
+    <string name="title_settings">تنظیمات</string>
     <string name="connection_error">مشکلی در برقراری ارتباط بوجود آمده‌است</string>
 
 </resources>
