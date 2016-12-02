@@ -33,7 +33,7 @@ import java.util.Map;
 
     @RequestMapping(method = RequestMethod.POST)
     Map<String, String> authorization() {
-        AccountModel account = new AccountModel("UNKNOWN", "ROLE_USER");
+        AccountModel account = new AccountModel("UNKNOWN", "USER");
         account = accountRepository.save(account);
 
         return Collections.singletonMap("token", jwtTokenUtil.generateToken(account));

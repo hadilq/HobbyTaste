@@ -18,9 +18,9 @@ import java.util.Arrays;
 @SpringBootApplication
 public class Application {
 
-    private Double lat = 35.6940119d;
+    private Double lat = 35.6942119d;
     private Double lon = 51.4062329d;
-    private Double delta = 0.00004d;
+    private Double delta = 0.0004d;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -33,7 +33,7 @@ public class Application {
         if (storeRepository.findAll().size() == 0) {
 
             return (evt) -> Arrays.asList(
-                    "Marryam,Habiba,Hadi,Mohamad".split(","))
+                    "Marryam,Hadi,Habiba,Mohamad".split(","))
                     .forEach(
                             a -> {
                                 StoreModel store = new StoreModel(lat, lon, a);
