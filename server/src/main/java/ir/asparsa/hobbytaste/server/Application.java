@@ -18,9 +18,9 @@ import java.util.Arrays;
 @SpringBootApplication
 public class Application {
 
-    private Double lat = 35.6942119d;
+    private Double lat = 35.7952119d;
     private Double lon = 51.4062329d;
-    private Double delta = 0.0004d;
+    private Double delta = 0.01d;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

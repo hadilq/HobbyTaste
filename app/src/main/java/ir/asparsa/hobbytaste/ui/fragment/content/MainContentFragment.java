@@ -12,21 +12,20 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.logger.L;
-import ir.asparsa.hobbytaste.core.manager.RequestManager;
+import ir.asparsa.hobbytaste.core.manager.RefreshManager;
+import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
-import ir.asparsa.hobbytaste.net.StoreService;
 import rx.Observer;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 import javax.inject.Inject;
+import java.util.ArrayDeque;
 import java.util.Collection;
 
 /**
@@ -38,13 +37,15 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
     private static final String FRAGMENT_TAG = "main";
 
     @Inject
-    StoreService mStoreService;
+    RefreshManager mRefreshManager;
     @Inject
-    RequestManager mRequestManager;
+    StoresManager mStoresManager;
 
     private GoogleMap mMap;
-    private RequestManager.Request<Collection<StoreModel>> mRequest;
     private Collection<StoreModel> mStores;
+    private Collection<Marker> mMarkers = new ArrayDeque<>();
+    private Observer<Collection<StoreModel>> mObserver;
+    private boolean mIsCameraMovedBefore = false;
 
     public static MainContentFragment instantiate() {
         MainContentFragment fragment = new MainContentFragment();
@@ -56,49 +57,55 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
 
-        RequestManager.Request<?> request = mRequestManager.get(getClass());
-        if (request == null) {
-            mRequest = new RequestManager.Request<>(
-                    mStoreService.loadStoreModels()
-                            .subscribeOn(Schedulers.newThread())
-                            .observeOn(AndroidSchedulers.mainThread()));
-            mRequest.setRequestSubscription(getSubscribe());
-        } else {
-            mRequest = (RequestManager.Request<Collection<StoreModel>>) request;
-            mRequest.setRequestSubscription(getSubscribe());
+        mStoresManager.getStores().subscribe(getObserver());
+
+        mRefreshManager.addStoresObserver(getObserver());
+        mRefreshManager.refreshStores();
+    }
+
+    private Observer<Collection<StoreModel>> getObserver() {
+        if (mObserver == null) {
+            mObserver = new Observer<Collection<StoreModel>>() {
+                @Override public void onCompleted() {
+                }
+
+                @Override public void onError(Throwable e) {
+                    L.i(MainContentFragment.class, "Error on get stores");
+                    Toast.makeText(getContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
+                }
+
+                @Override public void onNext(Collection<StoreModel> stores) {
+                    L.i(MainContentFragment.class, "Stores successfully received");
+                    if (mMarkers.size() != 0) {
+                        removeMarkers(mMarkers);
+                    }
+                    mStores = stores;
+                    fillMap();
+                }
+            };
         }
-
+        return mObserver;
     }
 
-    private Subscription getSubscribe() {
-        return mRequest.getRequestObservable().subscribe(new Observer<Collection<StoreModel>>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-                mRequest.received();
-                L.i(MainContentFragment.class, "Error on get stores");
-                Toast.makeText(getContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
-            }
-
-            @Override public void onNext(Collection<StoreModel> stores) {
-                mRequest.received();
-                L.i(MainContentFragment.class, "Stores successfully received");
-                mStores = stores;
-                fillMap();
-            }
-        });
+    private void removeMarkers(Collection<Marker> mMarkers) {
+        for (Marker marker : mMarkers) {
+            marker.remove();
+        }
     }
+
 
     private void fillMap() {
         if (mMap != null && mStores != null) {
             for (StoreModel store : mStores) {
                 LatLng sydney = new LatLng(store.getLat(), store.getLon());
-                mMap.addMarker(new MarkerOptions().position(sydney).title(store.getTitle()));
+                mMarkers.add(mMap.addMarker(new MarkerOptions().position(sydney).title(store.getTitle())));
             }
             LatLng latLng = new LatLng(35.6940119d, 51.4062329d);
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            MapUtil.zoom(mMap, latLng);
+            if (!mIsCameraMovedBefore) {
+                mIsCameraMovedBefore = true;
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                MapUtil.zoom(mMap, latLng);
+            }
         }
     }
 
@@ -117,13 +124,6 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
                     .replace(R.id.content_nested, mapFragment)
                     .commit();
         }
-    }
-
-    @Override public void onDestroyView() {
-        if (!mRequest.isReceived()) {
-            mRequestManager.put(getClass(), mRequest);
-        }
-        super.onDestroyView();
     }
 
     @Override protected String setHeaderTitle() {
