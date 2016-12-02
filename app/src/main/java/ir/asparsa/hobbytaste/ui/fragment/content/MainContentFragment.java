@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
+import ir.asparsa.hobbytaste.core.logger.L;
 import ir.asparsa.hobbytaste.core.manager.RequestManager;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
@@ -76,11 +77,13 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
 
             @Override public void onError(Throwable e) {
                 mRequest.received();
+                L.i(MainContentFragment.class, "Error on get stores");
                 Toast.makeText(getContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
             }
 
             @Override public void onNext(Collection<StoreModel> stores) {
                 mRequest.received();
+                L.i(MainContentFragment.class, "Stores successfully received");
                 mStores = stores;
                 fillMap();
             }
@@ -93,7 +96,9 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
                 LatLng sydney = new LatLng(store.getLat(), store.getLon());
                 mMap.addMarker(new MarkerOptions().position(sydney).title(store.getTitle()));
             }
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(35.6940119d, 51.4062329d)));
+            LatLng latLng = new LatLng(35.6940119d, 51.4062329d);
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            MapUtil.zoom(mMap, latLng);
         }
     }
 
