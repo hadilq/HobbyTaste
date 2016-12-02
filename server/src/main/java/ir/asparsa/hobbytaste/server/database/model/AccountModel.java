@@ -28,17 +28,24 @@ public class AccountModel implements Serializable {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "authorizationKey")
-    private String authorizationKey;
+    @Column(name = "role")
+    private String role;
 
     AccountModel() { // jpa only
     }
 
-    public AccountModel(String name, String password) {
-        this.username = name;
-        this.password = password;
+    public AccountModel(String token) {
+        this.username = token;
     }
 
+    public AccountModel(Long id) {
+        this.id = id;
+    }
+
+    public AccountModel(String username, String role) {
+        this.username = username;
+        this.role = role;
+    }
 
     public Long getId() {
         return id;
@@ -52,8 +59,8 @@ public class AccountModel implements Serializable {
         return username;
     }
 
-    public String getAuthorizationKey() {
-        return authorizationKey;
+    public String getRole() {
+        return role;
     }
 
     @Override
@@ -72,12 +79,13 @@ public class AccountModel implements Serializable {
     public int hashCode() {
         return new HashCodeBuilder().append(getUsername()).append(getId()).toHashCode();
     }
+
     @Override public String toString() {
         return "AccountModel{" +
                "id=" + id +
                ", password='" + password + '\'' +
                ", username='" + username + '\'' +
-               ", authorizationKey='" + authorizationKey + '\'' +
+               ", role='" + role + '\'' +
                '}';
     }
 }

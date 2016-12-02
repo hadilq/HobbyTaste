@@ -3,6 +3,7 @@ package ir.asparsa.hobbytaste.server.controller;
 import ir.asparsa.hobbytaste.server.database.model.StoreModel;
 import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
 import ir.asparsa.hobbytaste.server.database.repository.StoreRepository;
+import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,7 @@ import java.util.Collection;
  * @since 11/30/2016 AD
  */
 @RestController
-@RequestMapping("/stores") class StoresRestController {
+@RequestMapping(WebSecurityConfig.ENTRY_POINT_API + "/stores") class StoresRestController {
 
     private final static Logger logger = LoggerFactory.getLogger(StoresRestController.class);
 
