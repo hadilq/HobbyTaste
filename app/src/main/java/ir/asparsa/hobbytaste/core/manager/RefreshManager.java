@@ -1,13 +1,14 @@
 package ir.asparsa.hobbytaste.core.manager;
 
 import ir.asparsa.hobbytaste.database.model.StoreModel;
-import rx.Observable;
-import rx.Observer;
+import rx.Subscriber;
+import rx.observables.ConnectableObservable;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Deque;
 
 /**
  * @author hadi
@@ -16,23 +17,21 @@ import java.util.Collection;
 @Singleton
 public class RefreshManager {
 
-    private final StoresManager mStoresManager;
-    private final Collection<Observer<Collection<StoreModel>>> mStoreObservers = new ArrayDeque<>();
+    @Inject
+    StoresManager mStoresManager;
 
     @Inject
-    public RefreshManager(StoresManager storesManager) {
-        mStoresManager = storesManager;
-        addStoresObserver(mStoresManager.getObserver());
+    public RefreshManager() {
     }
 
-    public void addStoresObserver(Observer<Collection<StoreModel>> observer) {
-        mStoreObservers.add(observer);
-    }
-
-    public void refreshStores() {
-        Observable<Collection<StoreModel>> observable = mStoresManager.getRefreshable();
-        for (Observer<Collection<StoreModel>> storeObserver : mStoreObservers) {
+    public void refreshStores(Subscriber<Collection<StoreModel>> observer) {
+        Deque<Subscriber<Collection<StoreModel>>> storesObservers = new ArrayDeque<>();
+        storesObservers.add(observer);
+        storesObservers.add(mStoresManager.getObserver());
+        ConnectableObservable<Collection<StoreModel>> observable = mStoresManager.getRefreshable();
+        for (Subscriber<Collection<StoreModel>> storeObserver : storesObservers) {
             observable.subscribe(storeObserver);
         }
+        observable.connect();
     }
 }

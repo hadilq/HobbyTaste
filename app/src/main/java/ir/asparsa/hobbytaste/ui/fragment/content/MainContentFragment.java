@@ -17,14 +17,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.logger.L;
+import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.manager.RefreshManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
-import rx.Observer;
+import retrofit2.adapter.rxjava.HttpException;
+import rx.Subscriber;
 
 import javax.inject.Inject;
+import java.net.HttpURLConnection;
 import java.util.ArrayDeque;
 import java.util.Collection;
 
@@ -36,6 +39,9 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
 
     private static final String FRAGMENT_TAG = "main";
 
+
+    @Inject
+    AuthorizationManager mAuthorizationManager;
     @Inject
     RefreshManager mRefreshManager;
     @Inject
@@ -44,7 +50,6 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
     private GoogleMap mMap;
     private Collection<StoreModel> mStores;
     private Collection<Marker> mMarkers = new ArrayDeque<>();
-    private Observer<Collection<StoreModel>> mObserver;
     private boolean mIsCameraMovedBefore = false;
 
     public static MainContentFragment instantiate() {
@@ -57,34 +62,41 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
 
-        mStoresManager.getStores().subscribe(getObserver());
+        mStoresManager.getStores().subscribe(getSubscriber());
 
-        mRefreshManager.addStoresObserver(getObserver());
-        mRefreshManager.refreshStores();
+        mRefreshManager.refreshStores(getSubscriber());
     }
 
-    private Observer<Collection<StoreModel>> getObserver() {
-        if (mObserver == null) {
-            mObserver = new Observer<Collection<StoreModel>>() {
-                @Override public void onCompleted() {
-                }
+    private Subscriber<Collection<StoreModel>> getSubscriber() {
+        return new Subscriber<Collection<StoreModel>>() {
+            @Override public void onCompleted() {
+                L.i(MainContentFragment.class, "Refresh request gets completed");
+            }
 
-                @Override public void onError(Throwable e) {
-                    L.i(MainContentFragment.class, "Error on get stores");
-                    Toast.makeText(getContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
-                }
-
-                @Override public void onNext(Collection<StoreModel> stores) {
-                    L.i(MainContentFragment.class, "Stores successfully received");
-                    if (mMarkers.size() != 0) {
-                        removeMarkers(mMarkers);
+            @Override public void onError(Throwable e) {
+                L.w(MainContentFragment.class, "Refresh request gets error", e);
+                Toast.makeText(getContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
+                if (e instanceof HttpException) {
+                    if (((HttpException) e).code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                        L.i(MainContentFragment.class, "Reauthorize");
+                        mAuthorizationManager.setToken("");
+                        mRefreshManager.refreshStores(getSubscriber());
                     }
-                    mStores = stores;
-                    fillMap();
                 }
-            };
-        }
-        return mObserver;
+            }
+
+            @Override public void onNext(Collection<StoreModel> stores) {
+                L.i(MainContentFragment.class, "Stores successfully received: " + stores);
+                if (stores.size() == 0) {
+                    return;
+                }
+                mStores = stores;
+                if (mMarkers.size() != 0) {
+                    removeMarkers(mMarkers);
+                }
+                fillMap();
+            }
+        };
     }
 
     private void removeMarkers(Collection<Marker> mMarkers) {

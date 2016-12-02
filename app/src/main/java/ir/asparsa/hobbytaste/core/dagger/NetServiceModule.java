@@ -9,10 +9,7 @@ import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.net.AuthenticateService;
 import ir.asparsa.hobbytaste.net.StoreService;
 import junit.framework.Assert;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -20,6 +17,7 @@ import rx.Observer;
 
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -30,8 +28,8 @@ import java.util.concurrent.TimeUnit;
 @Module
 public class NetServiceModule {
 
-    private static final long CONNECT_TIMEOUT_MILLIS = 30;
-    private static final long READ_TIMEOUT_MILLIS = 30;
+    private static final long CONNECT_TIMEOUT_SECOND = 30;
+    private static final long READ_TIMEOUT_SECOND = 30;
 
     @Provides
     @Singleton
@@ -45,8 +43,27 @@ public class NetServiceModule {
     Retrofit providesRetrofit(final AuthorizationManager authorizationManager) {
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         httpClient
-                .connectTimeout(CONNECT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
-                .readTimeout(READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+                .connectTimeout(CONNECT_TIMEOUT_SECOND, TimeUnit.SECONDS)
+                .readTimeout(READ_TIMEOUT_SECOND, TimeUnit.SECONDS)
+                .authenticator(new Authenticator() {
+                    @Override public Request authenticate(Route route, Response response) throws IOException {
+                        if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                            authorizationManager.setToken("");
+                            authorize(authorizationManager);
+                            if (!authorizationManager.isAuthenticated()) {
+                                return response.request();
+                            }
+
+                            Request original = response.request();
+                            return original.newBuilder()
+                                    .header("Authenticate", authorizationManager.getToken())
+                                    .header("Accept", "application/json")
+                                    .method(original.method(), original.body())
+                                    .build();
+                        }
+                        return null;
+                    }
+                })
                 .addInterceptor(new Interceptor() {
                     @Override public Response intercept(Chain chain) throws IOException {
                         Request original = chain.request();

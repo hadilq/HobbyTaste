@@ -5,9 +5,10 @@ import ir.asparsa.hobbytaste.database.dao.StoreDao;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.net.StoreService;
 import rx.Observable;
-import rx.Observer;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.observables.ConnectableObservable;
 import rx.schedulers.Schedulers;
 
 import javax.inject.Inject;
@@ -38,24 +39,31 @@ public class StoresManager {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<Collection<StoreModel>> getRefreshable() {
+    public ConnectableObservable<Collection<StoreModel>> getRefreshable() {
         return mStoreService
                 .loadStoreModels()
-                .retry()
                 .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread())
+                .share()
+                .replay();
     }
 
 
-    public Observer<Collection<StoreModel>> getObserver() {
-        return new Observer<Collection<StoreModel>>() {
+    public Subscriber<Collection<StoreModel>> getObserver() {
+        return new Subscriber<Collection<StoreModel>>() {
             @Override public void onCompleted() {
+                L.i(StoresManager.class, "Refresh request gets completed");
             }
 
             @Override public void onError(Throwable e) {
+                L.w(StoresManager.class, "Refresh request gets error", e);
             }
 
             @Override public void onNext(Collection<StoreModel> stores) {
+                L.i(StoresManager.class, "Stores successfully received: " + stores);
+                if (stores.size() == 0) {
+                    return;
+                }
                 mStoreDao.queryForAll().subscribe(removeOldStores(stores));
             }
         };
@@ -64,40 +72,24 @@ public class StoresManager {
     private Action1<? super List<StoreModel>> removeOldStores(final Collection<StoreModel> stores) {
         return new Action1<List<StoreModel>>() {
             @Override public void call(List<StoreModel> oldStores) {
-                Action1<? super Integer> onNext = addNewStores(stores, oldStores.size());
-                for (StoreModel oldStore : oldStores) {
-                    mStoreDao.delete(oldStore).subscribe(onNext);
-                }
+                mStoreDao.deleteAll(oldStores).subscribe(addNewStores(stores));
             }
         };
     }
 
-    private Action1<? super Integer> addNewStores(final Collection<StoreModel> stores, final long count) {
+    private Action1<? super Integer> addNewStores(final Collection<StoreModel> stores) {
         return new Action1<Integer>() {
-            private int index = 0;
-
             @Override public void call(Integer integer) {
-                if (index++ == count) {
-                    Action1<? super Integer> onNext = finishAction(stores.size());
-                    for (StoreModel store : stores) {
-                        mStoreDao.create(store).subscribe(onNext);
-                    }
-                }
+                mStoreDao.createAll(stores).subscribe(finishAction());
             }
         };
     }
 
-    private Action1<? super Integer> finishAction(final int count) {
+    private Action1<? super Integer> finishAction() {
         return new Action1<Integer>() {
-            private int index = 0;
-
             @Override public void call(Integer integer) {
-                if (index++ == count) {
-                    L.i(StoresManager.class, "Stores completely saved");
-                }
+                L.i(StoresManager.class, "Stores completely saved");
             }
         };
     }
-
-
 }

@@ -8,6 +8,7 @@ import rx.Observable;
 import rx.Subscriber;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -59,11 +60,45 @@ public abstract class AbsDao<T extends BaseModel, ID> {
         });
     }
 
+    public Observable<Integer> createAll(final Collection<T> data) {
+        return Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override public void call(Subscriber<? super Integer> subscriber) {
+                try {
+                    int result = 0;
+                    for (T t : data) {
+                        result += getDao().create(t);
+                    }
+                    subscriber.onNext(result);
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
+
     public Observable<Integer> delete(final T data) {
         return Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override public void call(Subscriber<? super Integer> subscriber) {
                 try {
                     subscriber.onNext(getDao().delete(data));
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
+
+    public Observable<Integer> deleteAll(final Collection<T> data) {
+        return Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override public void call(Subscriber<? super Integer> subscriber) {
+                try {
+                    int result = 0;
+                    for (T t : data) {
+                        result += getDao().delete(data);
+                    }
+                    subscriber.onNext(result);
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);
