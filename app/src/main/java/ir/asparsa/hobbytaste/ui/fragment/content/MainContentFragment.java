@@ -99,12 +99,16 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
 
     private void fillMap() {
         if (mMap != null && mStores != null) {
+            double accumulatedLat = 0d;
+            double accumulatedLon = 0d;
             for (StoreModel store : mStores) {
+                accumulatedLat += store.getLat();
+                accumulatedLon += store.getLon();
                 LatLng sydney = new LatLng(store.getLat(), store.getLon());
                 mMarkers.add(mMap.addMarker(new MarkerOptions().position(sydney).title(store.getTitle())));
             }
-            LatLng latLng = new LatLng(35.6940119d, 51.4062329d);
             if (!mIsCameraMovedBefore) {
+                LatLng latLng = new LatLng(accumulatedLat / mStores.size(), accumulatedLon / mStores.size());
                 mIsCameraMovedBefore = true;
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                 MapUtil.zoom(mMap, latLng);
