@@ -24,17 +24,18 @@ import ir.asparsa.hobbytaste.database.model.StoreModel;
 import rx.Subscriber;
 
 import javax.inject.Inject;
-import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author hadi
  * @since 6/23/2016 AD
  */
-public class MainContentFragment extends BaseContentFragment implements OnMapReadyCallback {
+public class MainContentFragment extends BaseContentFragment
+        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private static final String FRAGMENT_TAG = "main";
-
 
     @Inject
     AuthorizationManager mAuthorizationManager;
@@ -44,8 +45,8 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
     StoresManager mStoresManager;
 
     private GoogleMap mMap;
-    private Collection<StoreModel> mStores;
-    private Collection<Marker> mMarkers = new ArrayDeque<>();
+    private List<StoreModel> mStores;
+    private List<Marker> mMarkers = new ArrayList<>();
     private boolean mIsCameraMovedBefore = false;
 
     public static MainContentFragment instantiate() {
@@ -79,7 +80,7 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
                 if (stores.size() == 0) {
                     return;
                 }
-                mStores = stores;
+                mStores = new ArrayList<>(stores);
                 if (mMarkers.size() != 0) {
                     removeMarkers(mMarkers);
                 }
@@ -101,13 +102,17 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
             double accumulatedLon = 0d;
             BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.placeholder);
 
+            mMarkers.clear();
             for (StoreModel store : mStores) {
                 accumulatedLat += store.getLat();
                 accumulatedLon += store.getLon();
-                LatLng sydney = new LatLng(store.getLat(), store.getLon());
+                LatLng latLng = new LatLng(store.getLat(), store.getLon());
 
-                Marker marker = mMap.addMarker(new MarkerOptions().position(sydney).title(store.getTitle()));
-                marker.setIcon(icon);
+                Marker marker = mMap.addMarker(
+                        new MarkerOptions()
+                                .position(latLng)
+                                .title(store.getTitle())
+                                .icon(icon));
                 mMarkers.add(marker);
             }
             if (!mIsCameraMovedBefore) {
@@ -116,6 +121,7 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                 MapUtil.zoom(mMap, latLng);
             }
+            mMap.setOnMarkerClickListener(this);
         }
     }
 
@@ -126,14 +132,22 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Fragment fragment = NavigationUtil.getActiveFragment(getFragmentManager());
-        if (!(fragment instanceof SupportMapFragment)) {
-            SupportMapFragment mapFragment = SupportMapFragment.newInstance();
-            mapFragment.getMapAsync(this);
-            getFragmentManager().beginTransaction()
+        Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
+        SupportMapFragment mapFragment;
+        if (fragment instanceof SupportMapFragment) {
+            mapFragment = (SupportMapFragment) fragment;
+        } else {
+            mapFragment = SupportMapFragment.newInstance();
+            getChildFragmentManager().beginTransaction()
                     .replace(R.id.content_nested, mapFragment)
                     .commit();
         }
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override public void onDestroyView() {
+        mIsCameraMovedBefore = false;
+        super.onDestroyView();
     }
 
     @Override protected String setHeaderTitle() {
@@ -161,5 +175,18 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         fillMap();
+    }
+
+    @Override public boolean onMarkerClick(Marker marker) {
+        for (Marker mMarker : mMarkers) {
+            if (marker.equals(mMarker)) {
+                NavigationUtil.startContentFragment(
+                        getFragmentManager(),
+                        StoreDetailsContentFragment.instantiate(mStores.get(mMarkers.indexOf(mMarker)))
+                );
+                return true;
+            }
+        }
+        return false;
     }
 }

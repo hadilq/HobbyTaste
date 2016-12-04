@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.core.manager;
 
+import com.j256.ormlite.dao.Dao;
 import ir.asparsa.hobbytaste.core.logger.L;
 import ir.asparsa.hobbytaste.database.dao.StoreDao;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
@@ -85,9 +86,9 @@ public class StoresManager {
         };
     }
 
-    private Action1<? super Integer> finishAction() {
-        return new Action1<Integer>() {
-            @Override public void call(Integer integer) {
+    private Action1<? super Collection<Dao.CreateOrUpdateStatus>> finishAction() {
+        return new Action1<Collection<Dao.CreateOrUpdateStatus>>() {
+            @Override public void call(Collection<Dao.CreateOrUpdateStatus> statuses) {
                 L.i(StoresManager.class, "Stores completely saved");
             }
         };

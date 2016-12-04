@@ -13,19 +13,36 @@ import java.io.Serializable;
 @Entity
 @Table(name = "stores")
 public class StoreModel implements Serializable {
+    public interface Columns {
+        String ID = "id";
+        String LAT = "lat";
+        String LON = "lon";
+        String TITLE = "title";
+        String DESCRIPTION = "description";
+        String RATE = "rate";
+        String BANNER_URL = "banner";
+        String ICON_URL = "icon";
+    }
 
     @Id
     @GeneratedValue
     private Long id;
 
-    @Column(name = "lon")
+    @Column(name = Columns.LAT)
+    private Double lat;
+    @Column(name = Columns.LON)
     private Double lon;
 
-    @Column(name = "lat")
-    private Double lat;
-
-    @Column(name = "title")
+    @Column(name = Columns.TITLE)
     private String title;
+    @Column(name = Columns.DESCRIPTION)
+    private String description;
+    @Column(name = Columns.RATE)
+    private float rate;
+    @Column(name = Columns.BANNER_URL)
+    private String bannerUrl;
+    @Column(name = Columns.ICON_URL)
+    private String iconUrl;
 
     StoreModel() {
     }
@@ -34,6 +51,18 @@ public class StoreModel implements Serializable {
         this.lon = lon;
         this.lat = lat;
         this.title = title;
+    }
+
+    public StoreModel(
+            Double lat, Double lon, String title, String description, float rate, String bannerUrl,
+            String iconUrl) {
+        this.lat = lat;
+        this.lon = lon;
+        this.title = title;
+        this.description = description;
+        this.rate = rate;
+        this.bannerUrl = bannerUrl;
+        this.iconUrl = iconUrl;
     }
 
     public Long getId() {
@@ -50,6 +79,22 @@ public class StoreModel implements Serializable {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public float getRate() {
+        return rate;
+    }
+
+    public String getBannerUrl() {
+        return bannerUrl;
+    }
+
+    public String getIconUrl() {
+        return iconUrl;
     }
 
     @Override
@@ -73,9 +118,13 @@ public class StoreModel implements Serializable {
     @Override public String toString() {
         return "StoreModel{" +
                "id=" + id +
-               ", lon=" + lon +
                ", lat=" + lat +
+               ", lon=" + lon +
                ", title='" + title + '\'' +
+               ", description='" + description + '\'' +
+               ", rate=" + rate +
+               ", bannerUrl='" + bannerUrl + '\'' +
+               ", iconUrl='" + iconUrl + '\'' +
                '}';
     }
 }

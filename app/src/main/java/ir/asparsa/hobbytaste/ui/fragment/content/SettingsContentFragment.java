@@ -9,6 +9,8 @@ import ir.asparsa.hobbytaste.R;
  */
 public class SettingsContentFragment extends BaseContentFragment {
 
+    private static final String FRAGMENT_TAG = "settings";
+
     public static SettingsContentFragment instantiate() {
 
         Bundle bundle = new Bundle();
@@ -18,7 +20,6 @@ public class SettingsContentFragment extends BaseContentFragment {
         return fragment;
     }
 
-    private static final String FRAGMENT_TAG = "main";
 
     @Override protected String setHeaderTitle() {
         return getString(R.string.title_settings);

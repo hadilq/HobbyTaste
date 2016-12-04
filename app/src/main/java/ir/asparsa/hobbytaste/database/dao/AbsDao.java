@@ -8,6 +8,7 @@ import rx.Observable;
 import rx.Subscriber;
 
 import java.sql.SQLException;
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.List;
 
@@ -47,11 +48,11 @@ public abstract class AbsDao<T extends BaseModel, ID> {
         });
     }
 
-    public Observable<Integer> create(final T data) {
-        return Observable.create(new Observable.OnSubscribe<Integer>() {
-            @Override public void call(Subscriber<? super Integer> subscriber) {
+    public Observable<Dao.CreateOrUpdateStatus> create(final T data) {
+        return Observable.create(new Observable.OnSubscribe<Dao.CreateOrUpdateStatus>() {
+            @Override public void call(Subscriber<? super Dao.CreateOrUpdateStatus> subscriber) {
                 try {
-                    subscriber.onNext(getDao().create(data));
+                    subscriber.onNext(getDao().createOrUpdate(data));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);
@@ -60,15 +61,15 @@ public abstract class AbsDao<T extends BaseModel, ID> {
         });
     }
 
-    public Observable<Integer> createAll(final Collection<T> data) {
-        return Observable.create(new Observable.OnSubscribe<Integer>() {
-            @Override public void call(Subscriber<? super Integer> subscriber) {
+    public Observable<Collection<Dao.CreateOrUpdateStatus>> createAll(final Collection<T> data) {
+        return Observable.create(new Observable.OnSubscribe<Collection<Dao.CreateOrUpdateStatus>>() {
+            @Override public void call(Subscriber<? super Collection<Dao.CreateOrUpdateStatus>> subscriber) {
                 try {
-                    int result = 0;
+                    Collection<Dao.CreateOrUpdateStatus> collection = new ArrayDeque<>();
                     for (T t : data) {
-                        result += getDao().create(t);
+                        collection.add(getDao().createOrUpdate(t));
                     }
-                    subscriber.onNext(result);
+                    subscriber.onNext(collection);
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);
