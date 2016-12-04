@@ -45,47 +45,38 @@ public class NetServiceModule {
         httpClient
                 .connectTimeout(CONNECT_TIMEOUT_SECOND, TimeUnit.SECONDS)
                 .readTimeout(READ_TIMEOUT_SECOND, TimeUnit.SECONDS)
+                .addInterceptor(new Interceptor() {
+                    @Override public Response intercept(Chain chain) throws IOException {
+                        return chain.proceed(buildRequest(chain.request(), authorizationManager));
+                    }
+                })
                 .authenticator(new Authenticator() {
                     @Override public Request authenticate(Route route, Response response) throws IOException {
                         if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                             authorizationManager.setToken("");
-                            authorize(authorizationManager);
-                            if (!authorizationManager.isAuthenticated()) {
-                                return response.request();
-                            }
-
-                            Request original = response.request();
-                            return original.newBuilder()
-                                    .header("Authenticate", authorizationManager.getToken())
-                                    .header("Accept", "application/json")
-                                    .method(original.method(), original.body())
-                                    .build();
+                            return buildRequest(response.request(), authorizationManager);
                         }
                         return null;
-                    }
-                })
-                .addInterceptor(new Interceptor() {
-                    @Override public Response intercept(Chain chain) throws IOException {
-                        Request original = chain.request();
-                        if (!authorizationManager.isAuthenticated()) {
-                            authorize(authorizationManager);
-                            if (!authorizationManager.isAuthenticated()) {
-                                return chain.proceed(original);
-                            }
-                        }
-
-                        Request.Builder requestBuilder = original.newBuilder()
-                                .header("Authorization", authorizationManager.getToken())
-                                .header("Accept", "application/json")
-                                .method(original.method(), original.body());
-
-                        Request request = requestBuilder.build();
-                        return chain.proceed(request);
                     }
                 });
 
         return getRetrofitBuilder()
                 .client(httpClient.build())
+                .build();
+    }
+
+    private Request buildRequest(Request original, AuthorizationManager authorizationManager) {
+        if (!authorizationManager.isAuthenticated()) {
+            authorize(authorizationManager);
+            if (!authorizationManager.isAuthenticated()) {
+                return original;
+            }
+        }
+
+        return original.newBuilder()
+                .header("Authorization", authorizationManager.getToken())
+                .header("Accept", "application/json")
+                .method(original.method(), original.body())
                 .build();
     }
 
