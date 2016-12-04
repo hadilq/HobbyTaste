@@ -12,10 +12,10 @@ import ir.asparsa.hobbytaste.ui.fragment.content.SettingsContentFragment;
  */
 public class SettingContainerFragment extends BaseContainerFragment {
 
-    public static SettingContainerFragment instantiate(int page) {
+    public static SettingContainerFragment instantiate(int pos) {
 
         Bundle bundle = new Bundle();
-        bundle.putInt(BUNDLE_KEY_PAGE, page);
+        bundle.putInt(BUNDLE_KEY_POSITION, pos);
         SettingContainerFragment fragment = new SettingContainerFragment();
         fragment.setArguments(bundle);
         return fragment;

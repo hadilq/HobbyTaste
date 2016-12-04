@@ -17,7 +17,7 @@ import junit.framework.Assert;
  */
 public abstract class BaseContainerFragment extends BaseFragment {
 
-    public static final String BUNDLE_KEY_PAGE = "BUNDLE_KEY_PAGE";
+    public static final String BUNDLE_KEY_POSITION = "BUNDLE_KEY_POSITION";
 
     @Nullable @Override public View onCreateView(
             LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -29,7 +29,7 @@ public abstract class BaseContainerFragment extends BaseFragment {
 
         FragmentActivity activity = getActivity();
         if (activity instanceof LaunchActivity) {
-            ((LaunchActivity) activity).addContainer(this, getArguments().getInt(BUNDLE_KEY_PAGE));
+            ((LaunchActivity) activity).addContainer(this, getArguments().getInt(BUNDLE_KEY_POSITION));
         } else {
             Assert.fail("No other activity than LaunchActivity is allowed");
         }

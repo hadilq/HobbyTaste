@@ -117,11 +117,11 @@ public class LaunchActivity extends AppCompatActivity implements FragmentManager
     }
 
     private FragmentManager getActiveFragmentManager() {
-        return mContainers[mPagerAdapter.posToPage(mViewPager.getCurrentItem())].getChildFragmentManager();
+        return mContainers[mViewPager.getCurrentItem()].getChildFragmentManager();
     }
 
-    public void addContainer(@NonNull BaseContainerFragment fragment, int page) {
-        mContainers[page] = fragment;
+    public void addContainer(@NonNull BaseContainerFragment fragment, int pos) {
+        mContainers[pos] = fragment;
         fragment.getChildFragmentManager().addOnBackStackChangedListener(this);
     }
 }

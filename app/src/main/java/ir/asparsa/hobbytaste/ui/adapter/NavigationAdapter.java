@@ -43,9 +43,9 @@ public class NavigationAdapter extends FragmentPagerAdapter {
         int page = posToPage(pos);
         switch (page) {
             case PAGE_MAIN:
-                return MainContainerFragment.instantiate(page);
+                return MainContainerFragment.instantiate(pos);
             case PAGE_SETTINGS:
-                return SettingContainerFragment.instantiate(page);
+                return SettingContainerFragment.instantiate(pos);
         }
         return null;
     }
