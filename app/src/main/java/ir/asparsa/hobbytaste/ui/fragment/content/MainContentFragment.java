@@ -23,11 +23,9 @@ import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
-import retrofit2.adapter.rxjava.HttpException;
 import rx.Subscriber;
 
 import javax.inject.Inject;
-import java.net.HttpURLConnection;
 import java.util.ArrayDeque;
 import java.util.Collection;
 
@@ -76,13 +74,6 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
             @Override public void onError(Throwable e) {
                 L.w(MainContentFragment.class, "Refresh request gets error", e);
                 Toast.makeText(getContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
-                if (e instanceof HttpException) {
-                    if (((HttpException) e).code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                        L.i(MainContentFragment.class, "Reauthorize");
-                        mAuthorizationManager.setToken("");
-                        mRefreshManager.refreshStores(getSubscriber());
-                    }
-                }
             }
 
             @Override public void onNext(Collection<StoreModel> stores) {
