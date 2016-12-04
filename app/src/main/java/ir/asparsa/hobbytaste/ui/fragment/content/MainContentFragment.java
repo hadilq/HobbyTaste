@@ -11,9 +11,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.*;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.logger.L;
@@ -101,11 +99,16 @@ public class MainContentFragment extends BaseContentFragment implements OnMapRea
         if (mMap != null && mStores != null) {
             double accumulatedLat = 0d;
             double accumulatedLon = 0d;
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.placeholder);
+
             for (StoreModel store : mStores) {
                 accumulatedLat += store.getLat();
                 accumulatedLon += store.getLon();
                 LatLng sydney = new LatLng(store.getLat(), store.getLon());
-                mMarkers.add(mMap.addMarker(new MarkerOptions().position(sydney).title(store.getTitle())));
+
+                Marker marker = mMap.addMarker(new MarkerOptions().position(sydney).title(store.getTitle()));
+                marker.setIcon(icon);
+                mMarkers.add(marker);
             }
             if (!mIsCameraMovedBefore) {
                 LatLng latLng = new LatLng(accumulatedLat / mStores.size(), accumulatedLon / mStores.size());
