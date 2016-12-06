@@ -147,6 +147,9 @@ public class MainContentFragment extends BaseContentFragment
 
     @Override public void onDestroyView() {
         mIsCameraMovedBefore = false;
+        for (Marker marker : mMarkers) {
+            marker.remove();
+        }
         super.onDestroyView();
     }
 
