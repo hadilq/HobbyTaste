@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">client-core</string>
+    <string name="try_again_message">لطفا دوباره تلاش نمایید</string>
+</resources>
