@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    compile(project(':common'))
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-hateoas')
     compile('org.springframework.boot:spring-boot-starter-security')

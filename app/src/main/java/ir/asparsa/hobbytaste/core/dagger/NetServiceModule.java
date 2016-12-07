@@ -3,6 +3,7 @@ package ir.asparsa.hobbytaste.core.dagger;
 import android.text.TextUtils;
 import dagger.Module;
 import dagger.Provides;
+import ir.asparsa.common.net.dto.AuthenticateDto;
 import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.core.logger.L;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
@@ -18,7 +19,6 @@ import rx.Observer;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -86,7 +86,7 @@ public class NetServiceModule {
                 .authenticate()
                 .retry(5)
                 .toBlocking()
-                .subscribe(new Observer<Map<String, String>>() {
+                .subscribe(new Observer<AuthenticateDto>() {
                     @Override public void onCompleted() {
                     }
 
@@ -94,8 +94,8 @@ public class NetServiceModule {
                         L.i(NetServiceModule.class, "Error on authentication!");
                     }
 
-                    @Override public void onNext(Map<String, String> tokenDto) {
-                        String token = tokenDto.get("token");
+                    @Override public void onNext(AuthenticateDto authenticateDto) {
+                        String token = authenticateDto.getToken();
                         L.i(NetServiceModule.class, "Token: " + token);
                         Assert.assertFalse(TextUtils.isEmpty(token));
                         authorizationManager.setToken(token);

@@ -1,9 +1,8 @@
 package ir.asparsa.hobbytaste.net;
 
+import ir.asparsa.common.net.dto.AuthenticateDto;
 import retrofit2.http.POST;
 import rx.Observable;
-
-import java.util.Map;
 
 /**
  * @author hadi
@@ -11,5 +10,5 @@ import java.util.Map;
  */
 public interface AuthenticateService {
     @POST("authenticate")
-    Observable<Map<String, String>> authenticate();
+    Observable<AuthenticateDto> authenticate();
 }

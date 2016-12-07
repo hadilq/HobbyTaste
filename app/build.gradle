@@ -52,6 +52,7 @@ dependencies {
         exclude group: 'com.jakewharton'
         exclude group: 'io.reactivex'
     }
+    compile(project(':common'))
     compile 'com.android.support:appcompat-v7:25.0.1'
     compile 'com.android.support:design:25.0.1'
     compile 'com.android.support:support-v4:25.0.1'
