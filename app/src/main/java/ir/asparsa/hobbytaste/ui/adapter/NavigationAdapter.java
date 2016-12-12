@@ -22,12 +22,8 @@ public class NavigationAdapter extends FragmentPagerAdapter {
 
     private final int[] mPosToPag = new int[PAGE_COUNT];
 
-    private final FragmentManager.OnBackStackChangedListener mOnBackStackChangedListener;
-
-    public NavigationAdapter(
-            FragmentManager fm, FragmentManager.OnBackStackChangedListener onBackStackChangedListener) {
+    public NavigationAdapter(FragmentManager fm) {
         super(fm);
-        this.mOnBackStackChangedListener = onBackStackChangedListener;
 
         if (LanguageUtil.isRTL()) {
             mPosToPag[POS_FIRST] = PAGE_SETTINGS;
@@ -52,10 +48,6 @@ public class NavigationAdapter extends FragmentPagerAdapter {
 
     @Override public int getCount() {
         return PAGE_COUNT;
-    }
-
-    @Override public Object instantiateItem(ViewGroup container, int position) {
-        return super.instantiateItem(container, position);
     }
 
     public int posToPage(int pos) {

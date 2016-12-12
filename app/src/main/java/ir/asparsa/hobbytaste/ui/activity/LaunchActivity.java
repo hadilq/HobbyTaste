@@ -52,7 +52,7 @@ public class LaunchActivity extends AppCompatActivity implements FragmentManager
 
         ButterKnife.bind(this);
         mToolbar.setTitleTextColor(getResources().getColor(R.color.toolbar_title));
-        mPagerAdapter = new NavigationAdapter(getSupportFragmentManager(), this);
+        mPagerAdapter = new NavigationAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(mPagerAdapter.pageToPos(NavigationAdapter.PAGE_MAIN));
         mViewPager.setOnTouchListener(new View.OnTouchListener() {
