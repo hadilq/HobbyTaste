@@ -6,6 +6,6 @@
     <dimen name="font_size_medium">20sp</dimen>
     <dimen name="font_size_big">23sp</dimen>
 
-    <dimen name="try_again_height">60dp</dimen>
+    <dimen name="try_again_height">100dp</dimen>
 
 </resources>

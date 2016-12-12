@@ -1,4 +1,4 @@
-package ir.asparsa.hobbytaste.core.logger;
+package ir.asparsa.android.core.logger;
 
 import android.util.Log;
 

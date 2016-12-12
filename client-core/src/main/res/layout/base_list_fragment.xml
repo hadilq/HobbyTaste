@@ -8,9 +8,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-    <ir.asparsa.accounter.ui.view.TryAgainView
+    <ir.asparsa.android.ui.view.TryAgainView
             android:id="@+id/try_again"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-
 </RelativeLayout>

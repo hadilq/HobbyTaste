@@ -84,11 +84,13 @@ public class TryAgainView extends RelativeLayout {
         mOnTryAgainLayout.setVisibility(VISIBLE);
     }
 
-    public void setExtraView(View view) {
-        mExtraLayout.addView(view, new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-        ));
+    public void setExtraView(@Nullable View view) {
+        if (view != null) {
+            mExtraLayout.addView(view, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+            ));
+        }
         mExtraLayout.setVisibility(View.GONE);
     }
 

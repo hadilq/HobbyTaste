@@ -8,7 +8,8 @@ import android.util.Log;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
-import ir.asparsa.hobbytaste.core.model.BaseModel;
+import ir.asparsa.android.core.model.BaseModel;
+import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 
 import javax.inject.Inject;
@@ -32,7 +33,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     // name of the database file for your application -- change to something appropriate for your app
     private static final String DATABASE_NAME = "hobby.db";
     // any time you make changes to your database objects, you may have to increase the database version
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     @IntDef({Models.STORE})
     @Retention(RetentionPolicy.SOURCE)
@@ -41,11 +42,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public interface Models {
         int STORE = 0;
+        int BANNER = 0;
     }
 
     public static final SparseArrayCompat<Class<? extends BaseModel>> MODELS_LIST =
             new SparseArrayCompat<Class<? extends BaseModel>>() {{
                 put(Models.STORE, StoreModel.class);
+                put(Models.BANNER, BannerModel.class);
             }};
 
     @Inject

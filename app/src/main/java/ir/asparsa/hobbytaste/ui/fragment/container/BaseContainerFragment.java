@@ -6,9 +6,9 @@ import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import ir.asparsa.android.ui.fragment.BaseFragment;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
-import ir.asparsa.hobbytaste.ui.fragment.BaseFragment;
 import junit.framework.Assert;
 
 /**

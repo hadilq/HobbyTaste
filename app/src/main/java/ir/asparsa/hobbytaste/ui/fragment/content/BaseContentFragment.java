@@ -5,8 +5,8 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import ir.asparsa.android.ui.fragment.BaseFragment;
 import ir.asparsa.hobbytaste.R;
-import ir.asparsa.hobbytaste.ui.fragment.BaseFragment;
 
 /**
  * @author hadi

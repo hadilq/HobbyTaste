@@ -1,6 +1,6 @@
 package ir.asparsa.hobbytaste.server.security;
 
-import ir.asparsa.hobbytaste.server.security.exception.JwtTokenMissingException;
+import ir.asparsa.hobbytaste.server.exception.JwtTokenMissingException;
 import ir.asparsa.hobbytaste.server.security.model.JwtAuthenticationToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;

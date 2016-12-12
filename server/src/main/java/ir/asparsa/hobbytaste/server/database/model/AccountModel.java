@@ -14,7 +14,7 @@ import java.io.Serializable;
 
 
 @Entity
-@Table(name = "account")
+@Table(name = "accounts")
 public class AccountModel implements Serializable {
 
     @Id

@@ -1,4 +1,4 @@
-package ir.asparsa.hobbytaste.server.security.exception;
+package ir.asparsa.hobbytaste.server.exception;
 
 import org.springframework.security.core.AuthenticationException;
 

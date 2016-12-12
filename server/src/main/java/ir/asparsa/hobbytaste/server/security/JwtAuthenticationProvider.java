@@ -2,7 +2,7 @@ package ir.asparsa.hobbytaste.server.security;
 
 
 import ir.asparsa.hobbytaste.server.database.model.AccountModel;
-import ir.asparsa.hobbytaste.server.security.exception.JwtTokenMalformedException;
+import ir.asparsa.hobbytaste.server.exception.JwtTokenMalformedException;
 import ir.asparsa.hobbytaste.server.security.model.AuthenticatedUser;
 import ir.asparsa.hobbytaste.server.security.model.JwtAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;

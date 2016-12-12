@@ -1,7 +1,9 @@
 package ir.asparsa.hobbytaste.net;
 
-import ir.asparsa.hobbytaste.database.model.StoreModel;
+import ir.asparsa.common.net.dto.StoreDetailsDto;
+import ir.asparsa.common.net.dto.StoreLightDto;
 import retrofit2.http.GET;
+import retrofit2.http.Query;
 import rx.Observable;
 
 import java.util.Collection;
@@ -12,5 +14,8 @@ import java.util.Collection;
  */
 public interface StoreService {
     @GET("stores")
-    Observable<Collection<StoreModel>> loadStoreModels();
+    Observable<Collection<StoreLightDto>> loadStoreLightModels();
+
+    @GET("store/details")
+    Observable<StoreDetailsDto> loadStoreDetailsModels(@Query("id") Long id);
 }

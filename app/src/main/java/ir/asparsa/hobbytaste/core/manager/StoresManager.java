@@ -1,19 +1,23 @@
 package ir.asparsa.hobbytaste.core.manager;
 
 import com.j256.ormlite.dao.Dao;
-import ir.asparsa.hobbytaste.core.logger.L;
+import ir.asparsa.common.net.dto.StoreLightDto;
+import ir.asparsa.android.core.logger.L;
+import ir.asparsa.hobbytaste.database.dao.BannerDao;
 import ir.asparsa.hobbytaste.database.dao.StoreDao;
+import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.net.StoreService;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
 import rx.observables.ConnectableObservable;
 import rx.schedulers.Schedulers;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.List;
 
@@ -28,6 +32,8 @@ public class StoresManager {
     StoreService mStoreService;
     @Inject
     StoreDao mStoreDao;
+    @Inject
+    BannerDao mBannerDao;
 
     @Inject
     public StoresManager() {
@@ -35,14 +41,14 @@ public class StoresManager {
 
     public Observable<List<StoreModel>> getStores() {
         return mStoreDao
-                .queryForAll()
+                .queryAllStores(mBannerDao)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public ConnectableObservable<Collection<StoreModel>> getRefreshable() {
+    public ConnectableObservable<Collection<StoreLightDto>> getRefreshable() {
         return mStoreService
-                .loadStoreModels()
+                .loadStoreLightModels()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .share()
@@ -50,8 +56,8 @@ public class StoresManager {
     }
 
 
-    public Subscriber<Collection<StoreModel>> getObserver() {
-        return new Subscriber<Collection<StoreModel>>() {
+    public Subscriber<Collection<StoreLightDto>> getObserver() {
+        return new Subscriber<Collection<StoreLightDto>>() {
             @Override public void onCompleted() {
                 L.i(StoresManager.class, "Refresh request gets completed");
             }
@@ -60,35 +66,96 @@ public class StoresManager {
                 L.w(StoresManager.class, "Refresh request gets error", e);
             }
 
-            @Override public void onNext(Collection<StoreModel> stores) {
+            @Override public void onNext(Collection<StoreLightDto> stores) {
                 L.i(StoresManager.class, "Stores successfully received: " + stores);
                 if (stores.size() == 0) {
                     return;
                 }
-                mStoreDao.queryForAll().subscribe(removeOldStores(stores));
+                Collection<StoreModel> collection = new ArrayDeque<>();
+                for (StoreLightDto store : stores) {
+                    collection.add(StoreModel.instantiate(store));
+                }
+                mStoreDao.queryAllStores(mBannerDao).subscribe(removeOldBanners(collection));
             }
         };
     }
 
-    private Action1<? super List<StoreModel>> removeOldStores(final Collection<StoreModel> stores) {
-        return new Action1<List<StoreModel>>() {
-            @Override public void call(List<StoreModel> oldStores) {
+    private Observer<? super List<StoreModel>> removeOldBanners(final Collection<StoreModel> stores) {
+        return new Observer<List<StoreModel>>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+            }
+
+            @Override public void onNext(List<StoreModel> oldStores) {
+                Collection<BannerModel> oldBanners = new ArrayDeque<>();
+                for (StoreModel oldStore : oldStores) {
+                    oldBanners.addAll(oldStore.getBanners());
+                }
+                mBannerDao.deleteAll(oldBanners).subscribe(removeOldStores(oldStores, stores));
+            }
+        };
+    }
+
+    private Observer<? super Integer> removeOldStores(
+            final List<StoreModel> oldStores, final Collection<StoreModel> stores) {
+        return new Observer<Integer>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+            }
+
+            @Override public void onNext(Integer integer) {
                 mStoreDao.deleteAll(oldStores).subscribe(addNewStores(stores));
             }
         };
     }
 
-    private Action1<? super Integer> addNewStores(final Collection<StoreModel> stores) {
-        return new Action1<Integer>() {
-            @Override public void call(Integer integer) {
-                mStoreDao.createAll(stores).subscribe(finishAction());
+    private Observer<? super Integer> addNewStores(final Collection<StoreModel> stores) {
+        final Collection<BannerModel> banners = new ArrayDeque<>();
+        for (StoreModel store : stores) {
+            banners.addAll(store.getBanners());
+        }
+        return new Observer<Integer>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+
+            }
+
+            @Override public void onNext(Integer integer) {
+                mStoreDao.createAll(stores).subscribe(addNewBanners(banners));
             }
         };
     }
 
-    private Action1<? super Collection<Dao.CreateOrUpdateStatus>> finishAction() {
-        return new Action1<Collection<Dao.CreateOrUpdateStatus>>() {
-            @Override public void call(Collection<Dao.CreateOrUpdateStatus> statuses) {
+    private Observer<? super Collection<Dao.CreateOrUpdateStatus>> addNewBanners(
+            final Collection<BannerModel> banners) {
+        return new Observer<Collection<Dao.CreateOrUpdateStatus>>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+            }
+
+            @Override public void onNext(Collection<Dao.CreateOrUpdateStatus> statuses) {
+                mBannerDao.createAll(banners).subscribe(finishAction());
+            }
+        };
+    }
+
+    private Observer<? super Collection<Dao.CreateOrUpdateStatus>> finishAction() {
+        return new Observer<Collection<Dao.CreateOrUpdateStatus>>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+            }
+
+            @Override public void onNext(Collection<Dao.CreateOrUpdateStatus> statuses) {
                 L.i(StoresManager.class, "Stores completely saved");
             }
         };

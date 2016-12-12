@@ -1,4 +1,4 @@
-package ir.asparsa.android.ui.fragment.list;
+package ir.asparsa.android.ui.fragment.recycler;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,13 +15,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.android.R;
 import ir.asparsa.android.R2;
-import ir.asparsa.android.ui.adapter.RecyclerListAdapter;
-import ir.asparsa.android.ui.data.BaseRecyclerData;
-import ir.asparsa.android.ui.data.TryAgainData;
 import ir.asparsa.android.ui.fragment.BaseFragment;
-import ir.asparsa.android.ui.holder.BaseViewHolder;
-import ir.asparsa.android.ui.holder.TryAgainViewHolder;
-import ir.asparsa.android.ui.provider.BaseListProvider;
+import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
+import ir.asparsa.android.ui.list.data.BaseRecyclerData;
+import ir.asparsa.android.ui.list.data.TryAgainData;
+import ir.asparsa.android.ui.list.holder.BaseViewHolder;
+import ir.asparsa.android.ui.list.holder.TryAgainViewHolder;
+import ir.asparsa.android.ui.list.provider.BaseListProvider;
 import ir.asparsa.android.ui.view.TryAgainView;
 
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.List;
  * @author hadi
  * @since 6/23/2016 AD
  */
-public abstract class BaseListFragment extends BaseFragment {
+public abstract class BaseRecyclerFragment extends BaseFragment {
 
     private static final String BUNDLE_KEY_SCROLL_POSITION = "BUNDLE_KEY_SCROLL_POSITION";
     private static final String BUNDLE_KEY_NEXT_OFFSET = "BUNDLE_KEY_NEXT_OFFSET";
@@ -53,7 +53,9 @@ public abstract class BaseListFragment extends BaseFragment {
     TryAgainView mTryAgainView;
 
 
-    @Nullable @Override public View onCreateView(
+    @Nullable
+    @Override
+    public View onCreateView(
             LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.base_list_fragment, container, false);
 
@@ -61,7 +63,8 @@ public abstract class BaseListFragment extends BaseFragment {
 
         mTryAgainView.setExtraView(getEmptyView());
         mOnTryAgainListener = new TryAgainView.OnTryAgainListener() {
-            @Override public void tryAgain() {
+            @Override
+            public void tryAgain() {
                 provideDataAndStart();
             }
         };
@@ -71,7 +74,7 @@ public abstract class BaseListFragment extends BaseFragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setOnScrollListener(new LoadingListener());
 
-        mAdapter = new RecyclerListAdapter(getViewHoldersList(), getItemClickListener());
+        mAdapter = new RecyclerListAdapter(mRecyclerView, mLayoutManager, savedInstanceState, getViewHoldersList(), getItemClickListener());
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -80,7 +83,8 @@ public abstract class BaseListFragment extends BaseFragment {
         return rootView;
     }
 
-    @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mNextOffset = 0;
         mScrollPosition = getArguments().getInt(BUNDLE_KEY_SCROLL_POSITION, 0);
@@ -91,7 +95,8 @@ public abstract class BaseListFragment extends BaseFragment {
         provideDataAndStart();
     }
 
-    @Override public void onDestroyView() {
+    @Override
+    public void onDestroyView() {
         getArguments().putInt(BUNDLE_KEY_SCROLL_POSITION, mLayoutManager.findFirstVisibleItemPosition());
         getArguments().putLong(BUNDLE_KEY_NEXT_OFFSET, mNextOffset);
         super.onDestroyView();
@@ -99,7 +104,9 @@ public abstract class BaseListFragment extends BaseFragment {
 
     private void provideDataAndStart() {
         provideData();
-        mTryAgainView.start();
+        if (mAdapter.isEmpty()) {
+            mTryAgainView.start();
+        }
     }
 
     private void provideData() {
@@ -107,6 +114,7 @@ public abstract class BaseListFragment extends BaseFragment {
         mNextOffset += mLimit;
     }
 
+    @Nullable
     protected abstract View getEmptyView();
 
     protected SparseArrayCompat<Class<? extends BaseViewHolder>> getViewHoldersList() {
@@ -145,24 +153,24 @@ public abstract class BaseListFragment extends BaseFragment {
                 mRecyclerView.setVisibility(View.GONE);
                 mTryAgainView.showExtraView();
             } else {
-                if (mAdapter.isEmpty()) {
-                    mTryAgainView.finish();
-                }
                 if (mLimit > LIMIT_DEFAULT) {
                     mLimit = LIMIT_DEFAULT;
                 }
                 mRecyclerView.setVisibility(View.VISIBLE);
+
                 List<BaseRecyclerData> list = mAdapter.getList();
                 if (!list.isEmpty() && list.get(list.size() - 1).getViewType() == TryAgainData.VIEW_TYPE) {
                     list.remove(list.size() - 1);
                 }
                 list.addAll(data);
                 mAdapter.notifyDataSetChanged();
+
                 mLoading = !endOfList;
                 if (mLoading) {
                     list.add(new TryAgainData(true, mOnTryAgainListener));
                     mHandler.post(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             checkIfReadyToProvide();
                         }
                     });
@@ -171,10 +179,14 @@ public abstract class BaseListFragment extends BaseFragment {
                     // No need of scroll position any more
                     mScrollPosition = -1;
                     mHandler.post(new Runnable() {
-                        @Override public void run() {
+                        @Override
+                        public void run() {
                             mLayoutManager.scrollToPosition(mScrollPosition);
                         }
                     });
+                }
+                if (!mAdapter.isEmpty()) {
+                    mTryAgainView.finish();
                 }
             }
         }
@@ -197,4 +209,59 @@ public abstract class BaseListFragment extends BaseFragment {
         void onItemClick(View view, BaseRecyclerData data, int position);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mAdapter != null) {
+            mAdapter.onResume();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (mAdapter != null) {
+            mAdapter.onStart();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mAdapter != null) {
+            mAdapter.onPause();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAdapter != null) {
+            mAdapter.onStop();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mAdapter != null) {
+            mAdapter.onSaveInstanceState(outState);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mAdapter != null) {
+            mAdapter.onDestroy();
+        }
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (mAdapter != null) {
+            mAdapter.onLowMemory();
+        }
+    }
 }

@@ -4,9 +4,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import ir.asparsa.hobbytaste.core.model.BaseModel;
+import ir.asparsa.android.core.model.BaseModel;
+import ir.asparsa.common.net.dto.BannerDto;
+import ir.asparsa.common.net.dto.StoreLightDto;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author hadi
@@ -21,12 +26,10 @@ public class StoreModel extends BaseModel implements Parcelable {
         String TITLE = "title";
         String DESCRIPTION = "description";
         String RATE = "rate";
-        String BANNER_URL = "banner";
-        String ICON_URL = "icon";
     }
 
-    @DatabaseField(columnName = Columns.ID, generatedId = true)
-    private int id;
+    @DatabaseField(id = true, columnName = Columns.ID, canBeNull = false)
+    private Long id;
 
     @DatabaseField(columnName = Columns.LAT, canBeNull = false)
     private Double lat;
@@ -39,15 +42,31 @@ public class StoreModel extends BaseModel implements Parcelable {
     private String description;
     @DatabaseField(columnName = Columns.RATE)
     private float rate;
-    @DatabaseField(columnName = Columns.BANNER_URL)
-    private String bannerUrl;
-    @DatabaseField(columnName = Columns.ICON_URL)
-    private String iconUrl;
+
+    private List<BannerModel> banners;
 
     public StoreModel() {
     }
 
-    public int getId() {
+    public static StoreModel instantiate(StoreLightDto storeLightDto) {
+        StoreModel storeModel = new StoreModel();
+        storeModel.id = storeLightDto.getId();
+        storeModel.lat = storeLightDto.getLat();
+        storeModel.lon = storeLightDto.getLon();
+        storeModel.title = storeLightDto.getTitle();
+        storeModel.rate = storeLightDto.getRate();
+        List<BannerModel> banners = new ArrayList<>();
+        if (storeLightDto.getBanners() != null && storeLightDto.getBanners().size() != 0) {
+            for (BannerDto bannerDto : storeLightDto.getBanners()) {
+                banners.add(
+                        new BannerModel(bannerDto.getMainUrl(), bannerDto.getThumbnailUrl(), storeLightDto.getId()));
+            }
+        }
+        storeModel.banners = banners;
+        return storeModel;
+    }
+
+    public Long getId() {
         return id;
     }
 
@@ -71,50 +90,13 @@ public class StoreModel extends BaseModel implements Parcelable {
         return rate;
     }
 
-    public String getBannerUrl() {
-        return bannerUrl;
+    public List<BannerModel> getBanners() {
+        return banners;
     }
 
-    public String getIconUrl() {
-        return iconUrl;
+    public void setBanners(List<BannerModel> banners) {
+        this.banners = banners;
     }
-
-
-    @Override public int describeContents() {
-        return 0;
-    }
-
-    @Override public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.id);
-        dest.writeValue(this.lon);
-        dest.writeValue(this.lat);
-        dest.writeString(this.title);
-        dest.writeString(this.description);
-        dest.writeFloat(this.rate);
-        dest.writeString(this.bannerUrl);
-        dest.writeString(this.iconUrl);
-    }
-
-    protected StoreModel(Parcel in) {
-        this.id = in.readInt();
-        this.lon = (Double) in.readValue(Double.class.getClassLoader());
-        this.lat = (Double) in.readValue(Double.class.getClassLoader());
-        this.title = in.readString();
-        this.description = in.readString();
-        this.rate = in.readFloat();
-        this.bannerUrl = in.readString();
-        this.iconUrl = in.readString();
-    }
-
-    public static final Creator<StoreModel> CREATOR = new Creator<StoreModel>() {
-        @Override public StoreModel createFromParcel(Parcel source) {
-            return new StoreModel(source);
-        }
-
-        @Override public StoreModel[] newArray(int size) {
-            return new StoreModel[size];
-        }
-    };
 
     @Override
     public boolean equals(final Object otherObj) {
@@ -142,8 +124,38 @@ public class StoreModel extends BaseModel implements Parcelable {
                ", title='" + title + '\'' +
                ", description='" + description + '\'' +
                ", rate=" + rate +
-               ", bannerUrl='" + bannerUrl + '\'' +
-               ", iconUrl='" + iconUrl + '\'' +
                '}';
     }
+
+    @Override public int describeContents() {
+        return 0;
+    }
+
+    @Override public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(this.id);
+        dest.writeValue(this.lat);
+        dest.writeValue(this.lon);
+        dest.writeString(this.title);
+        dest.writeString(this.description);
+        dest.writeFloat(this.rate);
+    }
+
+    protected StoreModel(Parcel in) {
+        this.id = (Long) in.readValue(Long.class.getClassLoader());
+        this.lat = (Double) in.readValue(Double.class.getClassLoader());
+        this.lon = (Double) in.readValue(Double.class.getClassLoader());
+        this.title = in.readString();
+        this.description = in.readString();
+        this.rate = in.readFloat();
+    }
+
+    public static final Creator<StoreModel> CREATOR = new Creator<StoreModel>() {
+        @Override public StoreModel createFromParcel(Parcel source) {
+            return new StoreModel(source);
+        }
+
+        @Override public StoreModel[] newArray(int size) {
+            return new StoreModel[size];
+        }
+    };
 }

@@ -1,4 +1,4 @@
-package ir.asparsa.android.ui.data;
+package ir.asparsa.android.ui.list.data;
 
 
 import ir.asparsa.android.R;

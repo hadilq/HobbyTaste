@@ -1,11 +1,12 @@
-package ir.asparsa.android.ui.holder;
+package ir.asparsa.android.ui.list.holder;
 
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.android.R2;
-import ir.asparsa.android.ui.data.TryAgainData;
+import ir.asparsa.android.ui.list.data.TryAgainData;
 import ir.asparsa.android.ui.view.TryAgainView;
 
 /**
@@ -17,12 +18,13 @@ public class TryAgainViewHolder extends BaseViewHolder<TryAgainData> {
     @BindView(R2.id.try_again_view)
     TryAgainView mTryAgainView;
 
-    public TryAgainViewHolder(View itemView) {
-        super(itemView);
+    public TryAgainViewHolder(View itemView, Bundle savedInstanceState) {
+        super(itemView, savedInstanceState);
         ButterKnife.bind(this, itemView);
     }
 
-    @Override public void onBindView(TryAgainData data) {
+    @Override
+    public void onBindView(TryAgainData data) {
         mTryAgainView.setTryAgainListener(data.getOnTryAgainListener());
         if (data.start()) {
             mTryAgainView.start();

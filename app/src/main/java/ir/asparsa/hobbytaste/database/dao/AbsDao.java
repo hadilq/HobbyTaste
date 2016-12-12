@@ -2,7 +2,7 @@ package ir.asparsa.hobbytaste.database.dao;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
-import ir.asparsa.hobbytaste.core.model.BaseModel;
+import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.hobbytaste.database.DatabaseHelper;
 import rx.Observable;
 import rx.Subscriber;

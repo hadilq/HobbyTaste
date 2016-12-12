@@ -5,7 +5,7 @@ import dagger.Module;
 import dagger.Provides;
 import ir.asparsa.common.net.dto.AuthenticateDto;
 import ir.asparsa.hobbytaste.BuildConfig;
-import ir.asparsa.hobbytaste.core.logger.L;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.net.AuthenticateService;
 import ir.asparsa.hobbytaste.net.StoreService;

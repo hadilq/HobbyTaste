@@ -1,10 +1,16 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
+import ir.asparsa.common.net.dto.BannerDto;
+import ir.asparsa.common.net.dto.StoreDetailsDto;
+import ir.asparsa.common.net.dto.StoreLightDto;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author hadi
@@ -20,8 +26,7 @@ public class StoreModel implements Serializable {
         String TITLE = "title";
         String DESCRIPTION = "description";
         String RATE = "rate";
-        String BANNER_URL = "banner";
-        String ICON_URL = "icon";
+        String BANNERS = "banners";
     }
 
     @Id
@@ -38,31 +43,36 @@ public class StoreModel implements Serializable {
     @Column(name = Columns.DESCRIPTION)
     private String description;
     @Column(name = Columns.RATE)
-    private float rate;
-    @Column(name = Columns.BANNER_URL)
-    private String bannerUrl;
-    @Column(name = Columns.ICON_URL)
-    private String iconUrl;
+    private Float rate;
+
+    @OneToMany(mappedBy = "store", fetch = FetchType.EAGER)
+    @Column(name = Columns.BANNERS)
+    private Collection<BannerModel> banners;
 
     StoreModel() {
     }
 
-    public StoreModel(Double lat, Double lon, String title) {
-        this.lon = lon;
-        this.lat = lat;
-        this.title = title;
-    }
-
     public StoreModel(
-            Double lat, Double lon, String title, String description, float rate, String bannerUrl,
-            String iconUrl) {
+            Double lat, Double lon, String title, String description, Float rate) {
         this.lat = lat;
         this.lon = lon;
         this.title = title;
         this.description = description;
         this.rate = rate;
-        this.bannerUrl = bannerUrl;
-        this.iconUrl = iconUrl;
+    }
+
+    public StoreLightDto lightConvert() {
+        List<BannerDto> bannerDtos = new ArrayList<>();
+        if (banners != null && banners.size() != 0) {
+            for (BannerModel banner : banners) {
+                bannerDtos.add(new BannerDto(banner.getMainUrl(), banner.getThumbnailUrl()));
+            }
+        }
+        return new StoreLightDto(id, lat, lon, title, rate, bannerDtos);
+    }
+
+    public StoreDetailsDto detailsConvert() {
+        return new StoreDetailsDto(description);
     }
 
     public Long getId() {
@@ -85,16 +95,16 @@ public class StoreModel implements Serializable {
         return description;
     }
 
-    public float getRate() {
+    public Float getRate() {
         return rate;
     }
 
-    public String getBannerUrl() {
-        return bannerUrl;
+    public Collection<BannerModel> getBanners() {
+        return banners;
     }
 
-    public String getIconUrl() {
-        return iconUrl;
+    public void setBanners(Collection<BannerModel> banners) {
+        this.banners = banners;
     }
 
     @Override
@@ -123,8 +133,7 @@ public class StoreModel implements Serializable {
                ", title='" + title + '\'' +
                ", description='" + description + '\'' +
                ", rate=" + rate +
-               ", bannerUrl='" + bannerUrl + '\'' +
-               ", iconUrl='" + iconUrl + '\'' +
+               ", banners=" + banners +
                '}';
     }
 }

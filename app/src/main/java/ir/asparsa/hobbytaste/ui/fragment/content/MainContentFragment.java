@@ -12,9 +12,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
+import ir.asparsa.common.net.dto.StoreLightDto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
-import ir.asparsa.hobbytaste.core.logger.L;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.manager.RefreshManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
@@ -24,6 +25,7 @@ import ir.asparsa.hobbytaste.database.model.StoreModel;
 import rx.Subscriber;
 
 import javax.inject.Inject;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -59,13 +61,29 @@ public class MainContentFragment extends BaseContentFragment
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
 
-        mStoresManager.getStores().subscribe(getSubscriber());
+        mStoresManager.getStores().subscribe(getDatabaseSubscriber());
 
-        mRefreshManager.refreshStores(getSubscriber());
+        mRefreshManager.refreshStores(getNetSubscriber());
     }
 
-    private Subscriber<Collection<StoreModel>> getSubscriber() {
+    private Subscriber<Collection<StoreModel>> getDatabaseSubscriber() {
         return new Subscriber<Collection<StoreModel>>() {
+            @Override public void onCompleted() {
+                L.i(MainContentFragment.class, "Refresh request gets completed");
+            }
+
+            @Override public void onError(Throwable e) {
+                L.w(MainContentFragment.class, "Database gets error", e);
+            }
+
+            @Override public void onNext(Collection<StoreModel> stores) {
+                onSuccessfullyReceived(stores);
+            }
+        };
+    }
+
+    private Subscriber<Collection<StoreLightDto>> getNetSubscriber() {
+        return new Subscriber<Collection<StoreLightDto>>() {
             @Override public void onCompleted() {
                 L.i(MainContentFragment.class, "Refresh request gets completed");
             }
@@ -75,18 +93,27 @@ public class MainContentFragment extends BaseContentFragment
                 Toast.makeText(getContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
             }
 
-            @Override public void onNext(Collection<StoreModel> stores) {
-                L.i(MainContentFragment.class, "Stores successfully received: " + stores);
-                if (stores.size() == 0) {
-                    return;
+            @Override public void onNext(Collection<StoreLightDto> stores) {
+
+                Collection<StoreModel> collection = new ArrayDeque<>();
+                for (StoreLightDto store : stores) {
+                    collection.add(StoreModel.instantiate(store));
                 }
-                mStores = new ArrayList<>(stores);
-                if (mMarkers.size() != 0) {
-                    removeMarkers(mMarkers);
-                }
-                fillMap();
+                onSuccessfullyReceived(collection);
             }
         };
+    }
+
+    private void onSuccessfullyReceived(Collection<StoreModel> stores) {
+        L.i(MainContentFragment.class, "Stores successfully received: " + stores);
+        if (stores.size() == 0) {
+            return;
+        }
+        mStores = new ArrayList<>(stores);
+        if (mMarkers.size() != 0) {
+            removeMarkers(mMarkers);
+        }
+        fillMap();
     }
 
     private void removeMarkers(Collection<Marker> mMarkers) {

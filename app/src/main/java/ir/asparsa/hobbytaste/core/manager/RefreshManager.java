@@ -1,6 +1,6 @@
 package ir.asparsa.hobbytaste.core.manager;
 
-import ir.asparsa.hobbytaste.database.model.StoreModel;
+import ir.asparsa.common.net.dto.StoreLightDto;
 import rx.Subscriber;
 import rx.observables.ConnectableObservable;
 
@@ -24,12 +24,12 @@ public class RefreshManager {
     public RefreshManager() {
     }
 
-    public void refreshStores(Subscriber<Collection<StoreModel>> observer) {
-        Deque<Subscriber<Collection<StoreModel>>> storesObservers = new ArrayDeque<>();
+    public void refreshStores(Subscriber<Collection<StoreLightDto>> observer) {
+        Deque<Subscriber<Collection<StoreLightDto>>> storesObservers = new ArrayDeque<>();
         storesObservers.add(observer);
         storesObservers.add(mStoresManager.getObserver());
-        ConnectableObservable<Collection<StoreModel>> observable = mStoresManager.getRefreshable();
-        for (Subscriber<Collection<StoreModel>> storeObserver : storesObservers) {
+        ConnectableObservable<Collection<StoreLightDto>> observable = mStoresManager.getRefreshable();
+        for (Subscriber<Collection<StoreLightDto>> storeObserver : storesObservers) {
             observable.subscribe(storeObserver);
         }
         observable.connect();
