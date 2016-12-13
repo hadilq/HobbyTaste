@@ -4,10 +4,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.IntDef;
 import android.support.v4.util.SparseArrayCompat;
-import android.util.Log;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
@@ -42,7 +42,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     public interface Models {
         int STORE = 0;
-        int BANNER = 0;
+        int BANNER = 1;
     }
 
     public static final SparseArrayCompat<Class<? extends BaseModel>> MODELS_LIST =
@@ -61,15 +61,18 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
      * the tables that will store your data.
      */
     @Override
-    public void onCreate(SQLiteDatabase db, ConnectionSource connectionSource) {
+    public void onCreate(
+            SQLiteDatabase db,
+            ConnectionSource connectionSource
+    ) {
         try {
-            Log.i(DatabaseHelper.class.getName(), "onCreate");
+            L.i(DatabaseHelper.class, "onCreate");
             for (int i = 0; i < MODELS_LIST.size(); i++) {
                 Class<? extends BaseModel> clazz = MODELS_LIST.get(MODELS_LIST.keyAt(i));
                 TableUtils.createTable(connectionSource, clazz);
             }
         } catch (SQLException e) {
-            Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
+            L.e(DatabaseHelper.class, "Can't create database", e);
             throw new RuntimeException(e);
         }
 
@@ -80,18 +83,22 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
      * the various data to match the new version number.
      */
     @Override
-    public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
+    public void onUpgrade(
+            SQLiteDatabase db,
+            ConnectionSource connectionSource,
+            int oldVersion,
+            int newVersion
+    ) {
         try {
-            Log.i(DatabaseHelper.class.getName(), "onUpgrade");
+            L.i(DatabaseHelper.class, "onUpgrade");
             for (int i = 0; i < MODELS_LIST.size(); i++) {
                 Class<? extends BaseModel> clazz = MODELS_LIST.get(MODELS_LIST.keyAt(i));
                 TableUtils.dropTable(connectionSource, clazz, true);
             }
-//            TableUtils.dropTable(connectionSource, VendorModel.class, true);
             // after we drop the old databases, we create the new ones
             onCreate(db, connectionSource);
         } catch (SQLException e) {
-            Log.e(DatabaseHelper.class.getName(), "Can't drop databases", e);
+            L.e(DatabaseHelper.class, "Can't drop databases", e);
             throw new RuntimeException(e);
         }
     }

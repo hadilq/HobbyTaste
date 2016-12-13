@@ -1,8 +1,8 @@
 package ir.asparsa.hobbytaste.core.manager;
 
 import com.j256.ormlite.dao.Dao;
-import ir.asparsa.common.net.dto.StoreLightDto;
 import ir.asparsa.android.core.logger.L;
+import ir.asparsa.common.net.dto.StoreLightDto;
 import ir.asparsa.hobbytaste.database.dao.BannerDao;
 import ir.asparsa.hobbytaste.database.dao.StoreDao;
 import ir.asparsa.hobbytaste.database.model.BannerModel;
@@ -86,6 +86,7 @@ public class StoresManager {
             }
 
             @Override public void onError(Throwable e) {
+                L.i(StoresManager.class, "Stores cannot remove old banners", e);
             }
 
             @Override public void onNext(List<StoreModel> oldStores) {
@@ -99,12 +100,15 @@ public class StoresManager {
     }
 
     private Observer<? super Integer> removeOldStores(
-            final List<StoreModel> oldStores, final Collection<StoreModel> stores) {
+            final List<StoreModel> oldStores,
+            final Collection<StoreModel> stores
+    ) {
         return new Observer<Integer>() {
             @Override public void onCompleted() {
             }
 
             @Override public void onError(Throwable e) {
+                L.i(StoresManager.class, "Stores cannot remove old stores", e);
             }
 
             @Override public void onNext(Integer integer) {
@@ -114,31 +118,33 @@ public class StoresManager {
     }
 
     private Observer<? super Integer> addNewStores(final Collection<StoreModel> stores) {
-        final Collection<BannerModel> banners = new ArrayDeque<>();
-        for (StoreModel store : stores) {
-            banners.addAll(store.getBanners());
-        }
         return new Observer<Integer>() {
             @Override public void onCompleted() {
             }
 
             @Override public void onError(Throwable e) {
-
+                L.i(StoresManager.class, "Stores cannot add new stores", e);
             }
 
             @Override public void onNext(Integer integer) {
+                Collection<BannerModel> banners = new ArrayDeque<>();
+                for (StoreModel store : stores) {
+                    banners.addAll(store.getBanners());
+                }
                 mStoreDao.createAll(stores).subscribe(addNewBanners(banners));
             }
         };
     }
 
     private Observer<? super Collection<Dao.CreateOrUpdateStatus>> addNewBanners(
-            final Collection<BannerModel> banners) {
+            final Collection<BannerModel> banners
+    ) {
         return new Observer<Collection<Dao.CreateOrUpdateStatus>>() {
             @Override public void onCompleted() {
             }
 
             @Override public void onError(Throwable e) {
+                L.i(StoresManager.class, "Stores cannot add new banners", e);
             }
 
             @Override public void onNext(Collection<Dao.CreateOrUpdateStatus> statuses) {
@@ -153,6 +159,7 @@ public class StoresManager {
             }
 
             @Override public void onError(Throwable e) {
+                L.i(StoresManager.class, "Stores cannot finish action", e);
             }
 
             @Override public void onNext(Collection<Dao.CreateOrUpdateStatus> statuses) {
