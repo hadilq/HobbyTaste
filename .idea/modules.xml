@@ -2,11 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/HobbyTaste.iml" filepath="$PROJECT_DIR$/.idea/modules/HobbyTaste.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/client-core/client-core.iml" filepath="$PROJECT_DIR$/.idea/modules/client-core/client-core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common/common.iml" filepath="$PROJECT_DIR$/.idea/modules/common/common.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/server/server.iml" filepath="$PROJECT_DIR$/.idea/modules/server/server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HobbyTaste.iml" filepath="$PROJECT_DIR$/HobbyTaste.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/client-core/client-core.iml" filepath="$PROJECT_DIR$/client-core/client-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/server/server.iml" filepath="$PROJECT_DIR$/server/server.iml" />
     </modules>
   </component>
 </project>
