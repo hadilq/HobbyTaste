@@ -9,6 +9,7 @@ import ir.asparsa.common.net.dto.StoreDetailsDto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.net.StoreService;
+import ir.asparsa.hobbytaste.ui.list.data.GalleryData;
 import ir.asparsa.hobbytaste.ui.list.data.StoreMapData;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.observables.ConnectableObservable;
@@ -16,7 +17,6 @@ import rx.schedulers.Schedulers;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,11 +31,17 @@ public class StoreDetailsProvider extends BaseListProvider<StoreDetailsDto> {
     public StoreDetailsProvider(
             @NonNull RecyclerListAdapter adapter,
             @NonNull BaseRecyclerFragment.OnInsertData insertData,
-            @NonNull StoreModel store) {
+            @NonNull final StoreModel store
+    ) {
         super(adapter, insertData);
         ApplicationLauncher.mainComponent().inject(this);
 
-        insertData.OnDataInserted(false, Collections.singletonList(new StoreMapData(store)));
+        insertData.OnDataInserted(false, new ArrayList<BaseRecyclerData>() {{
+            add(new StoreMapData(store));
+            if (store.getBanners() != null && store.getBanners().size() != 0) {
+                add(new GalleryData(store.getBanners()));
+            }
+        }});
     }
 
     @Override protected boolean isEndOfList(StoreDetailsDto listModel) {
@@ -43,13 +49,17 @@ public class StoreDetailsProvider extends BaseListProvider<StoreDetailsDto> {
     }
 
     @Override protected List<BaseRecyclerData> convertToListData(
-            StoreDetailsDto listModel) {
+            StoreDetailsDto listModel
+    ) {
         List<BaseRecyclerData> list = new ArrayList<>();
 //        list.add()
         return list;
     }
 
-    @Override public void provideData(long limit, long offset) {
+    @Override public void provideData(
+            long limit,
+            long offset
+    ) {
 //        ConnectableObservable<StoreDetailsDto> observable = getRefreshable();
 //        observable.subscribe(this);
 //        observable.connect();

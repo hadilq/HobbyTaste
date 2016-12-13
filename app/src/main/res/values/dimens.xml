@@ -5,5 +5,7 @@
     <dimen name="font_size_big">23sp</dimen>
 
     <dimen name="store_map_height">200dp</dimen>
+    <dimen name="gallery_height">200dp</dimen>
+    <dimen name="shot_height">184dp</dimen>
 
 </resources>

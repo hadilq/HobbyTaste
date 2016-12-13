@@ -52,7 +52,19 @@ public class Application {
                         "https://www.gravatar.com/avatar/7c27855c6a5e53fb3ec289e0f152b230?s=32&d=identicon&r=PG",
                         store
                 );
-                banner = storeBannerRepository.save(banner);
+                storeBannerRepository.save(banner);
+                banner = new BannerModel(
+                        "https://www.gravatar.com/avatar/69a1b4f750ece89db0e49c94519f1a7d?s=32&d=identicon&r=PG&f=1",
+                        "https://www.gravatar.com/avatar/69a1b4f750ece89db0e49c94519f1a7d?s=32&d=identicon&r=PG&f=1",
+                        store
+                );
+                storeBannerRepository.save(banner);
+                banner = new BannerModel(
+                        "https://www.gravatar.com/avatar/a6581beaebdfd38f2e73d3a520e33d22?s=32&d=identicon&r=PG",
+                        "https://www.gravatar.com/avatar/a6581beaebdfd38f2e73d3a520e33d22?s=32&d=identicon&r=PG",
+                        store
+                );
+                storeBannerRepository.save(banner);
                 lat -= delta;
 
                 store = storeRepository.save(new StoreModel(
@@ -63,7 +75,19 @@ public class Application {
                         "https://www.gravatar.com/avatar/430a6af757fa56045c6bdf2d1a6931db?s=48&d=identicon&r=PG",
                         store
                 );
-                banner = storeBannerRepository.save(banner);
+                storeBannerRepository.save(banner);
+                banner = new BannerModel(
+                        "https://www.gravatar.com/avatar/69a1b4f750ece89db0e49c94519f1a7d?s=32&d=identicon&r=PG&f=1",
+                        "https://www.gravatar.com/avatar/69a1b4f750ece89db0e49c94519f1a7d?s=32&d=identicon&r=PG&f=1",
+                        store
+                );
+                storeBannerRepository.save(banner);
+                banner = new BannerModel(
+                        "https://www.gravatar.com/avatar/a6581beaebdfd38f2e73d3a520e33d22?s=32&d=identicon&r=PG",
+                        "https://www.gravatar.com/avatar/a6581beaebdfd38f2e73d3a520e33d22?s=32&d=identicon&r=PG",
+                        store
+                );
+                storeBannerRepository.save(banner);
                 lat -= delta;
 
                 store = storeRepository.save(new StoreModel(
@@ -75,7 +99,19 @@ public class Application {
                         "https://www.gravatar.com/avatar/0263c4c9036955a2d9768bf6a35a8345?s=32&d=identicon&r=PG",
                         store
                 );
-                banner = storeBannerRepository.save(banner);
+                storeBannerRepository.save(banner);
+                banner = new BannerModel(
+                        "https://www.gravatar.com/avatar/69a1b4f750ece89db0e49c94519f1a7d?s=32&d=identicon&r=PG&f=1",
+                        "https://www.gravatar.com/avatar/69a1b4f750ece89db0e49c94519f1a7d?s=32&d=identicon&r=PG&f=1",
+                        store
+                );
+                storeBannerRepository.save(banner);
+                banner = new BannerModel(
+                        "https://www.gravatar.com/avatar/a6581beaebdfd38f2e73d3a520e33d22?s=32&d=identicon&r=PG",
+                        "https://www.gravatar.com/avatar/a6581beaebdfd38f2e73d3a520e33d22?s=32&d=identicon&r=PG",
+                        store
+                );
+                storeBannerRepository.save(banner);
                 lat -= delta;
 
                 store = storeRepository.save(new StoreModel(
@@ -86,7 +122,19 @@ public class Application {
                         "https://www.gravatar.com/avatar/500f5fef2e950bb076c66bc570c6f4f9?s=32&d=identicon&r=PG&f=1",
                         store
                 );
-                banner = storeBannerRepository.save(banner);
+                storeBannerRepository.save(banner);
+                banner = new BannerModel(
+                        "https://www.gravatar.com/avatar/69a1b4f750ece89db0e49c94519f1a7d?s=32&d=identicon&r=PG&f=1",
+                        "https://www.gravatar.com/avatar/69a1b4f750ece89db0e49c94519f1a7d?s=32&d=identicon&r=PG&f=1",
+                        store
+                );
+                storeBannerRepository.save(banner);
+                banner = new BannerModel(
+                        "https://www.gravatar.com/avatar/a6581beaebdfd38f2e73d3a520e33d22?s=32&d=identicon&r=PG",
+                        "https://www.gravatar.com/avatar/a6581beaebdfd38f2e73d3a520e33d22?s=32&d=identicon&r=PG",
+                        store
+                );
+                storeBannerRepository.save(banner);
 
             };
 
