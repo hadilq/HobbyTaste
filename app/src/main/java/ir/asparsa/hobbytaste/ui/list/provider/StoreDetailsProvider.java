@@ -10,6 +10,7 @@ import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.net.StoreService;
 import ir.asparsa.hobbytaste.ui.list.data.GalleryData;
+import ir.asparsa.hobbytaste.ui.list.data.RatingData;
 import ir.asparsa.hobbytaste.ui.list.data.StoreMapData;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.observables.ConnectableObservable;
@@ -41,6 +42,7 @@ public class StoreDetailsProvider extends BaseListProvider<StoreDetailsDto> {
             if (store.getBanners() != null && store.getBanners().size() != 0) {
                 add(new GalleryData(store.getBanners()));
             }
+            add(new RatingData(store.getRate()));
         }});
     }
 

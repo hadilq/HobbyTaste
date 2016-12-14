@@ -10,8 +10,10 @@ import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.android.ui.list.provider.BaseListProvider;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.list.data.GalleryData;
+import ir.asparsa.hobbytaste.ui.list.data.RatingData;
 import ir.asparsa.hobbytaste.ui.list.data.StoreMapData;
 import ir.asparsa.hobbytaste.ui.list.holder.GalleryViewHolder;
+import ir.asparsa.hobbytaste.ui.list.holder.RatingViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.StoreMapViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
 import junit.framework.Assert;
@@ -41,12 +43,14 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment {
         SparseArrayCompat<Class<? extends BaseViewHolder>> array = super.getViewHoldersList();
         array.put(StoreMapData.VIEW_TYPE, StoreMapViewHolder.class.asSubclass(BaseViewHolder.class));
         array.put(GalleryData.VIEW_TYPE, GalleryViewHolder.class.asSubclass(BaseViewHolder.class));
+        array.put(RatingData.VIEW_TYPE, RatingViewHolder.class.asSubclass(BaseViewHolder.class));
         return array;
     }
 
     @Override
     protected BaseListProvider provideDataList(
-            RecyclerListAdapter adapter, OnInsertData insertData
+            RecyclerListAdapter adapter,
+            OnInsertData insertData
     ) {
         StoreModel store = getArguments().getParcelable(BUNDLE_KEY_STORE);
         if (store == null) {
@@ -60,7 +64,11 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment {
     protected OnItemClickListener getItemClickListener() {
         return new OnItemClickListener() {
             @Override
-            public void onItemClick(View view, BaseRecyclerData data, int position) {
+            public void onItemClick(
+                    View view,
+                    BaseRecyclerData data,
+                    int position
+            ) {
 
             }
         };
