@@ -26,7 +26,7 @@ public class NavigationUtil {
 
     public static void startNestedFragment(@NonNull FragmentManager fragmentManager, @NonNull BaseFragment fragment) {
         fragmentManager.beginTransaction()
-                .replace(R.id.content_nested, fragment)
+                .replace(R.id.content_nested, fragment, fragment.getTagName())
                 .commit();
     }
 
