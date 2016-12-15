@@ -29,6 +29,8 @@ public class StoreDetailsProvider extends BaseListProvider<StoreDetailsDto> {
     @Inject
     StoreService mStoreService;
 
+    private final StoreModel mStore;
+
     public StoreDetailsProvider(
             @NonNull RecyclerListAdapter adapter,
             @NonNull BaseRecyclerFragment.OnInsertData insertData,
@@ -36,13 +38,14 @@ public class StoreDetailsProvider extends BaseListProvider<StoreDetailsDto> {
     ) {
         super(adapter, insertData);
         ApplicationLauncher.mainComponent().inject(this);
+        this.mStore = store;
 
-        insertData.OnDataInserted(false, new ArrayList<BaseRecyclerData>() {{
-            add(new StoreMapData(store));
-            if (store.getBanners() != null && store.getBanners().size() != 0) {
-                add(new GalleryData(store.getBanners()));
+        mOnInsertData.OnDataInserted(false, new ArrayList<BaseRecyclerData>() {{
+            add(new StoreMapData(mStore));
+            if (mStore.getBanners() != null && mStore.getBanners().size() != 0) {
+                add(new GalleryData(mStore.getBanners()));
             }
-            add(new RatingData(store.getRate()));
+            add(new RatingData(mStore.getRate()));
         }});
     }
 
@@ -62,6 +65,7 @@ public class StoreDetailsProvider extends BaseListProvider<StoreDetailsDto> {
             long limit,
             long offset
     ) {
+
 //        ConnectableObservable<StoreDetailsDto> observable = getRefreshable();
 //        observable.subscribe(this);
 //        observable.connect();
