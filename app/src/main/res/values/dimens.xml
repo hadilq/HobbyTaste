@@ -7,9 +7,17 @@
     <dimen name="store_map_height">200dp</dimen>
     <dimen name="gallery_height">200dp</dimen>
     <dimen name="shot_height">184dp</dimen>
+    <dimen name="text_view_height">90dp</dimen>
 
-    <dimen name="horizontal_margin_half">4dp</dimen>
-    <dimen name="horizontal_margin">8dp</dimen>
-    <dimen name="horizontal_margin_double">16dp</dimen>
+    <dimen name="dialog_width">300dp</dimen>
+
+    <dimen name="horizontal_margin_half">16dp</dimen>
+    <dimen name="horizontal_margin">32dp</dimen>
+    <dimen name="horizontal_margin_double">64dp</dimen>
+
+    <dimen name="vertical_margin_half">16dp</dimen>
+    <dimen name="vertical_margin">32dp</dimen>
+    <dimen name="vertical_margin_double">64dp</dimen>
+
 
 </resources>

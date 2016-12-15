@@ -3,6 +3,8 @@ package ir.asparsa.hobbytaste.core.dagger;
 import dagger.Component;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
 import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
+import ir.asparsa.hobbytaste.ui.fragment.recycler.SettingsRecyclerFragment;
+import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
 
 import javax.inject.Singleton;
@@ -20,4 +22,8 @@ public interface MainComponent {
     void inject(MainContentFragment mainContentFragment);
 
     void inject(StoreDetailsProvider storeDetailsProvider);
+
+    void inject(SettingsRecyclerFragment settingsRecyclerFragment);
+
+    void inject(SettingsProvider settingsProvider);
 }

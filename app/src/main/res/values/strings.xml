@@ -5,5 +5,9 @@
     <string name="title_settings">تنظیمات</string>
     <string name="title_store_details">فروشگاه</string>
     <string name="connection_error">مشکلی در برقراری ارتباط بوجود آمده‌است</string>
+    <string name="hint_username">لطفا نام‌کاربری دلخواه خود را وارد نمایید</string>
+    <string name="username">نام‌کاربری</string>
+    <string name="commit">باشه</string>
+    <string name="username_title">نام‌کاربری شما</string>
 
 </resources>

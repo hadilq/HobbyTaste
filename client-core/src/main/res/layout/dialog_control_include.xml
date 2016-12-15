@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Button
+            android:id="@+id/commit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/font_size_small"
+            android:background="?android:attr/selectableItemBackground"/>
+
+    <Button
+            android:id="@+id/neutral"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/commit"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/font_size_small"
+            android:background="?android:attr/selectableItemBackground"/>
+
+    <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/neutral"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/font_size_small"
+            android:background="?android:attr/selectableItemBackground"/>
+
+
+</merge>
