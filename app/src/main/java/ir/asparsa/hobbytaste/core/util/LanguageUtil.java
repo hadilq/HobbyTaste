@@ -1,6 +1,6 @@
 package ir.asparsa.hobbytaste.core.util;
 
-import android.app.Application;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 
@@ -30,13 +30,15 @@ public class LanguageUtil {
         return faLocale;
     }
 
-    public static void setupDefaultLocale(@NonNull Application application) {
+    public static void setupDefaultLocale(
+            @NonNull Context context
+    ) {
         Locale.setDefault(getLocale());
         Configuration config = new Configuration();
         config.locale = getLocale();
-        application.getBaseContext().getResources().updateConfiguration(
+        context.getResources().updateConfiguration(
                 config,
-                application.getBaseContext().getResources().getDisplayMetrics()
+                context.getResources().getDisplayMetrics()
         );
     }
 

@@ -15,6 +15,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
+import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import ir.asparsa.hobbytaste.core.util.LaunchUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.ui.adapter.NavigationAdapter;
@@ -47,6 +48,7 @@ public class LaunchActivity extends AppCompatActivity implements FragmentManager
 
     @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LanguageUtil.setupDefaultLocale(this);
         setContentView(R.layout.launcher_activity);
         ApplicationLauncher.mainComponent().inject(this);
 
