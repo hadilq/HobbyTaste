@@ -21,7 +21,7 @@ import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.data.TryAgainData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.android.ui.list.holder.TryAgainViewHolder;
-import ir.asparsa.android.ui.list.provider.BaseListProvider;
+import ir.asparsa.android.ui.list.provider.AbsListProvider;
 import ir.asparsa.android.ui.view.TryAgainView;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
     private static final long LIMIT_DEFAULT = 20;
 
     private RecyclerListAdapter mAdapter;
-    private BaseListProvider mProvider;
+    private AbsListProvider mProvider;
     private LinearLayoutManager mLayoutManager;
     private TryAgainView.OnTryAgainListener mOnTryAgainListener;
 
@@ -56,7 +56,10 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(
-            LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState
+    ) {
         View rootView = inflater.inflate(R.layout.base_list_fragment, container, false);
 
         ButterKnife.bind(this, rootView);
@@ -74,7 +77,8 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setOnScrollListener(new LoadingListener());
 
-        mAdapter = new RecyclerListAdapter(mRecyclerView, mLayoutManager, savedInstanceState, getViewHoldersList(), getItemClickListener());
+        mAdapter = new RecyclerListAdapter(
+                mRecyclerView, mLayoutManager, savedInstanceState, getViewHoldersList(), getOnEventListener());
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -84,7 +88,10 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(
+            View view,
+            @Nullable Bundle savedInstanceState
+    ) {
         super.onViewCreated(view, savedInstanceState);
         mNextOffset = 0;
         mScrollPosition = getArguments().getInt(BUNDLE_KEY_SCROLL_POSITION, 0);
@@ -123,13 +130,20 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
         }};
     }
 
-    protected abstract BaseListProvider provideDataList(RecyclerListAdapter adapter, OnInsertData insertData);
+    protected abstract AbsListProvider provideDataList(
+            RecyclerListAdapter adapter,
+            OnInsertData insertData
+    );
 
-    protected abstract OnItemClickListener getItemClickListener();
+    protected abstract OnEventListener getOnEventListener();
 
     private class LoadingListener extends RecyclerView.OnScrollListener {
         @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+        public void onScrolled(
+                RecyclerView recyclerView,
+                int dx,
+                int dy
+        ) {
             if (dy > 0) { //check for scroll down
                 checkIfReadyToProvide();
             }
@@ -148,7 +162,10 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
     }
 
     public class OnInsertData {
-        public void OnDataInserted(boolean endOfList, @NonNull List<? extends BaseRecyclerData> data) {
+        public void OnDataInserted(
+                boolean endOfList,
+                @NonNull List<? extends BaseRecyclerData> data
+        ) {
             if (mAdapter.isEmpty() && data.isEmpty()) {
                 mRecyclerView.setVisibility(View.GONE);
                 mTryAgainView.showExtraView();
@@ -205,8 +222,12 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
         }
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(View view, BaseRecyclerData data, int position);
+    public interface OnEventListener {
+
+        void onEvent(
+                int subscriber,
+                @Nullable Bundle bundle
+        );
     }
 
     @Override

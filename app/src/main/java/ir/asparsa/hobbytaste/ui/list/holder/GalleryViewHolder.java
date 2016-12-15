@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.squareup.picasso.Picasso;
+import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.database.model.BannerModel;
@@ -31,9 +32,10 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
 
     public GalleryViewHolder(
             View itemView,
+            BaseRecyclerFragment.OnEventListener onEventListener,
             Bundle savedInstanceState
     ) {
-        super(itemView, savedInstanceState);
+        super(itemView, onEventListener, savedInstanceState);
         ButterKnife.bind(this, itemView);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(

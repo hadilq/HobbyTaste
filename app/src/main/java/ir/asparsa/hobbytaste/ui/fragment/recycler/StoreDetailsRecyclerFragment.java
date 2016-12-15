@@ -1,13 +1,14 @@
 package ir.asparsa.hobbytaste.ui.fragment.recycler;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.util.SparseArrayCompat;
 import android.view.View;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
-import ir.asparsa.android.ui.list.provider.BaseListProvider;
+import ir.asparsa.android.ui.list.provider.AbsListProvider;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.list.data.GalleryData;
 import ir.asparsa.hobbytaste.ui.list.data.RatingData;
@@ -48,7 +49,7 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment {
     }
 
     @Override
-    protected BaseListProvider provideDataList(
+    protected AbsListProvider provideDataList(
             RecyclerListAdapter adapter,
             OnInsertData insertData
     ) {
@@ -61,13 +62,11 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment {
     }
 
     @Override
-    protected OnItemClickListener getItemClickListener() {
-        return new OnItemClickListener() {
-            @Override
-            public void onItemClick(
-                    View view,
-                    BaseRecyclerData data,
-                    int position
+    protected OnEventListener getOnEventListener() {
+        return new OnEventListener() {
+            @Override public void onEvent(
+                    int subscriber,
+                    @Nullable Bundle bundle
             ) {
 
             }

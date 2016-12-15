@@ -4,8 +4,7 @@ import android.support.annotation.NonNull;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
-import junit.framework.Assert;
-import rx.Subscriber;
+import rx.Observer;
 
 import java.util.List;
 
@@ -13,17 +12,13 @@ import java.util.List;
  * @author hadi
  * @since 6/24/2016 AD
  */
-public abstract class BaseListProvider<MODEL> extends Subscriber<MODEL> {
-
-    protected final RecyclerListAdapter mAdapter;
-    protected final BaseRecyclerFragment.OnInsertData mOnInsertData;
+public abstract class BaseListProvider<MODEL> extends AbsListProvider implements Observer<MODEL> {
 
     public BaseListProvider(
-            @NonNull RecyclerListAdapter adapter, @NonNull BaseRecyclerFragment.OnInsertData insertData) {
-        Assert.assertNotNull(adapter);
-        Assert.assertNotNull(insertData);
-        mAdapter = adapter;
-        mOnInsertData = insertData;
+            @NonNull RecyclerListAdapter adapter,
+            @NonNull BaseRecyclerFragment.OnInsertData insertData
+    ) {
+        super(adapter, insertData);
     }
 
     @Override public void onError(Throwable error) {
@@ -40,6 +35,4 @@ public abstract class BaseListProvider<MODEL> extends Subscriber<MODEL> {
     protected abstract boolean isEndOfList(MODEL listModel);
 
     protected abstract List<BaseRecyclerData> convertToListData(MODEL listModel);
-
-    public abstract void provideData(long limit, long offset);
 }

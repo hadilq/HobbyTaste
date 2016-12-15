@@ -32,23 +32,27 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
     private final RecyclerView mRecyclerView;
     private List<BaseRecyclerData> list = new ArrayList<>();
     private final SparseArrayCompat<Class<? extends BaseViewHolder>> mHoldersMap;
-    private final BaseRecyclerFragment.OnItemClickListener mOnClickListener;
+    private final BaseRecyclerFragment.OnEventListener mOnEventListener;
 
     public RecyclerListAdapter(
             @NonNull RecyclerView recyclerView,
             @NonNull LinearLayoutManager layoutManager,
             @Nullable Bundle savedInstanceState,
             @NonNull SparseArrayCompat<Class<? extends BaseViewHolder>> holdersMap,
-            @Nullable BaseRecyclerFragment.OnItemClickListener onClickListener) {
+            @Nullable BaseRecyclerFragment.OnEventListener onEventListener
+    ) {
         this.mRecyclerView = recyclerView;
         this.mLayoutManager = layoutManager;
         this.mHoldersMap = holdersMap;
-        this.mOnClickListener = onClickListener;
+        this.mOnEventListener = onEventListener;
         this.mSavedInstanceState = savedInstanceState;
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(
+            ViewGroup parent,
+            int viewType
+    ) {
         BaseViewHolder baseViewHolder = null;
         for (int pos = 0; pos < mHoldersMap.size(); pos++) {
             int key = mHoldersMap.keyAt(pos);
@@ -59,20 +63,20 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
                 Class<? extends BaseViewHolder> clazz = mHoldersMap.get(key);
                 Constructor<? extends BaseViewHolder> constructor;
                 try {
-                    constructor = clazz.getConstructor(View.class, Bundle.class);
-                    baseViewHolder = constructor.newInstance(view, mSavedInstanceState);
+                    constructor = clazz
+                            .getConstructor(View.class, BaseRecyclerFragment.OnEventListener.class, Bundle.class);
+                    baseViewHolder = constructor.newInstance(view, mOnEventListener, mSavedInstanceState);
                 } catch (NoSuchMethodException e) {
-                    L.e(this.getClass(), "View Holder don't have necessary constructor: " + clazz.getName());
-                    e.printStackTrace();
+                    L.e(this.getClass(), "View Holder don't have necessary constructor: " + clazz.getName(), e);
                     continue;
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    L.e(this.getClass(), "View Holder don't have necessary constructor: " + clazz.getName(), e);
                     continue;
                 } catch (InstantiationException e) {
-                    e.printStackTrace();
+                    L.e(this.getClass(), "View Holder don't have necessary constructor: " + clazz.getName(), e);
                     continue;
                 } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                    L.e(this.getClass(), "View Holder don't have necessary constructor: " + clazz.getName(), e);
                     continue;
                 }
                 break;
@@ -82,26 +86,19 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
         if (baseViewHolder == null) {
             // Shouldn't happen
             L.w(this.getClass(), "baseViewHolder become null!");
-            baseViewHolder = new EmptyViewHolder(new View(parent.getContext()), mSavedInstanceState);
+            baseViewHolder = new EmptyViewHolder(new View(parent.getContext()), mOnEventListener, mSavedInstanceState);
         }
         return baseViewHolder;
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+    public void onBindViewHolder(
+            RecyclerView.ViewHolder holder,
+            final int position
+    ) {
         if (holder instanceof BaseViewHolder) {
             BaseViewHolder baseHolder = (BaseViewHolder) holder;
             final BaseRecyclerData data = list.get(position);
-            if (mOnClickListener != null) {
-                baseHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mOnClickListener.onItemClick(v, data, position);
-                    }
-                });
-            } else {
-                baseHolder.itemView.setOnClickListener(null);
-            }
 
             onBindData(baseHolder, data);
         } else {
@@ -110,7 +107,10 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
     }
 
     @SuppressWarnings("unchecked")// The type is right by generic types
-    private void onBindData(BaseViewHolder baseHolder, BaseRecyclerData data) {
+    private void onBindData(
+            BaseViewHolder baseHolder,
+            BaseRecyclerData data
+    ) {
         baseHolder.onBindView(data);
     }
 

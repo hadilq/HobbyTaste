@@ -10,6 +10,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.*;
 import ir.asparsa.android.core.logger.L;
+import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
@@ -32,8 +33,12 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
     private Marker mMarker;
     private boolean mIsCameraMovedBefore = false;
 
-    public StoreMapViewHolder(View itemView, Bundle savedInstanceState) {
-        super(itemView, savedInstanceState);
+    public StoreMapViewHolder(
+            View itemView,
+            BaseRecyclerFragment.OnEventListener onEventListener,
+            Bundle savedInstanceState
+    ) {
+        super(itemView, onEventListener, savedInstanceState);
         ButterKnife.bind(this, itemView);
 
         mMapView.onCreate(savedInstanceState);

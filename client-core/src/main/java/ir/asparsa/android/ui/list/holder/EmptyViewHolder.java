@@ -2,6 +2,7 @@ package ir.asparsa.android.ui.list.holder;
 
 import android.os.Bundle;
 import android.view.View;
+import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 
 /**
@@ -10,8 +11,12 @@ import ir.asparsa.android.ui.list.data.BaseRecyclerData;
  */
 public class EmptyViewHolder extends BaseViewHolder {
 
-    public EmptyViewHolder(View itemView, Bundle savedInstanceState) {
-        super(itemView, savedInstanceState);
+    public EmptyViewHolder(
+            View itemView,
+            BaseRecyclerFragment.OnEventListener onEventListener,
+            Bundle savedInstanceState
+    ) {
+        super(itemView, onEventListener, savedInstanceState);
     }
 
     @Override
