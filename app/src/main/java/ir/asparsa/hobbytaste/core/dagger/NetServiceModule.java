@@ -3,9 +3,9 @@ package ir.asparsa.hobbytaste.core.dagger;
 import android.text.TextUtils;
 import dagger.Module;
 import dagger.Provides;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.common.net.dto.AuthenticateDto;
 import ir.asparsa.hobbytaste.BuildConfig;
-import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.net.AuthenticateService;
 import ir.asparsa.hobbytaste.net.StoreService;
@@ -51,7 +51,10 @@ public class NetServiceModule {
                     }
                 })
                 .authenticator(new Authenticator() {
-                    @Override public Request authenticate(Route route, Response response) throws IOException {
+                    @Override public Request authenticate(
+                            Route route,
+                            Response response
+                    ) throws IOException {
                         if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
                             authorizationManager.setToken("");
                             return buildRequest(response.request(), authorizationManager);
@@ -65,7 +68,10 @@ public class NetServiceModule {
                 .build();
     }
 
-    private Request buildRequest(Request original, AuthorizationManager authorizationManager) {
+    private Request buildRequest(
+            Request original,
+            AuthorizationManager authorizationManager
+    ) {
         if (!authorizationManager.isAuthenticated()) {
             authorize(authorizationManager);
             if (!authorizationManager.isAuthenticated()) {
@@ -74,10 +80,10 @@ public class NetServiceModule {
         }
 
         return original.newBuilder()
-                .header("Authorization", authorizationManager.getToken())
-                .header("Accept", "application/json")
-                .method(original.method(), original.body())
-                .build();
+                       .header("Authorization", authorizationManager.getToken())
+                       .header("Accept", "application/json")
+                       .method(original.method(), original.body())
+                       .build();
     }
 
     private void authorize(final AuthorizationManager authorizationManager) {
@@ -99,6 +105,7 @@ public class NetServiceModule {
                         L.i(NetServiceModule.class, "Token: " + token);
                         Assert.assertFalse(TextUtils.isEmpty(token));
                         authorizationManager.setToken(token);
+                        authorizationManager.setUsername(authenticateDto.getUsername());
                     }
                 });
 

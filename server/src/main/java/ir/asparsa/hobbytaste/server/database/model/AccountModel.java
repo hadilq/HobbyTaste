@@ -42,7 +42,10 @@ public class AccountModel implements Serializable {
         this.id = id;
     }
 
-    public AccountModel(String username, String role) {
+    public AccountModel(
+            String username,
+            String role
+    ) {
         this.username = username;
         this.role = role;
     }
@@ -61,6 +64,10 @@ public class AccountModel implements Serializable {
 
     public String getRole() {
         return role;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override

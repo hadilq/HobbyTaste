@@ -6,12 +6,21 @@ package ir.asparsa.common.net.dto;
  */
 public class AuthenticateDto {
     private String token;
+    private String username;
 
-    public AuthenticateDto(String token) {
+    public AuthenticateDto(
+            String token,
+            String username
+    ) {
         this.token = token;
+        this.username = username;
     }
 
     public String getToken() {
         return token;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

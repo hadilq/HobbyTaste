@@ -9,6 +9,6 @@ import rx.Observable;
  * @since 12/2/2016 AD
  */
 public interface AuthenticateService {
-    @POST("authenticate")
+    @POST("user/authenticate")
     Observable<AuthenticateDto> authenticate();
 }

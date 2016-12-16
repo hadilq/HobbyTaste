@@ -29,6 +29,7 @@ public class CorePreferencesManager {
         return NOT_VERSIONED + key;
     }
 
+    @NonNull
     private SharedPreferences getProperSharedPreferences(@NonNull String key) {
         if (key.startsWith(VERSIONED)) {
             return mVersionedSharedPreferences;

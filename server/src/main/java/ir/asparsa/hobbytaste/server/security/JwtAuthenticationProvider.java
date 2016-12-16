@@ -25,7 +25,7 @@ import java.util.List;
 public class JwtAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
     @Autowired
-    private JwtTokenUtil jwtTokenValidator;
+    private JwtTokenUtil jwtTokenUtil;
 
     @Override
     public boolean supports(Class<?> authentication) {
@@ -34,17 +34,22 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
 
     @Override
     protected void additionalAuthenticationChecks(
-            UserDetails userDetails, UsernamePasswordAuthenticationToken authentication)
+            UserDetails userDetails,
+            UsernamePasswordAuthenticationToken authentication
+    )
             throws AuthenticationException {
     }
 
     @Override
-    protected UserDetails retrieveUser(String username, UsernamePasswordAuthenticationToken authentication)
+    protected UserDetails retrieveUser(
+            String username,
+            UsernamePasswordAuthenticationToken authentication
+    )
             throws AuthenticationException {
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
         String token = jwtAuthenticationToken.getToken();
 
-        AccountModel parsedUser = jwtTokenValidator.parseToken(token);
+        AccountModel parsedUser = jwtTokenUtil.parseToken(token);
 
         if (parsedUser == null) {
             throw new JwtTokenMalformedException("JWT token is not valid");

@@ -6,6 +6,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import ir.asparsa.hobbytaste.server.database.model.AccountModel;
 import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,6 +24,7 @@ import java.util.Optional;
 @Component
 public class JwtTokenUtil {
 
+    private final static Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
 
     @Value("${jwt.secret}")
     private String secret;
@@ -37,20 +41,25 @@ public class JwtTokenUtil {
      */
     public AccountModel parseToken(String token) {
         try {
-            Claims body = Jwts.parser()
-                    .setSigningKey(secret)
-                    .parseClaimsJws(token)
-                    .getBody();
+            if (StringUtils.isEmpty(token)) {
+                return null;
+            }
 
-//            u = new AccountModel(
-//                    body.getSubject(),
-//                    Long.parseLong((String) body.get("userId")),
-//                    (String) body.get("role")
-//            );
+            Claims body = Jwts.parser()
+                              .setSigningKey(secret)
+                              .parseClaimsJws(token)
+                              .getBody();
 
             Optional<AccountModel> account =
                     accountRepository.findById(Long.parseLong((String) body.get("userId")));
             if (account.isPresent()) {
+                String username = body.getSubject();
+                logger.info("Username of token is " + username + " and username of database is " +
+                            account.get().getUsername());
+                if (!StringUtils.isEmpty(username) && !username.equals(account.get().getUsername())) {
+                    return null;
+                }
+
                 return account.get();
             }
         } catch (JwtException e) {
@@ -74,8 +83,8 @@ public class JwtTokenUtil {
         claims.put("role", u.getRole());
 
         return Jwts.builder()
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
+                   .setClaims(claims)
+                   .signWith(SignatureAlgorithm.HS512, secret)
+                   .compact();
     }
 }

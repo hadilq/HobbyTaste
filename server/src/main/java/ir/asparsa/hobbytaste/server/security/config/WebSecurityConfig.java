@@ -28,7 +28,7 @@ import java.util.List;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String ENTRY_POINT_API = "/api/v1";
-    public static final String ENTRY_POINT_AUTHENTICATE = ENTRY_POINT_API + "/authenticate";
+    public static final String ENTRY_POINT_AUTHENTICATE = ENTRY_POINT_API + "/user/authenticate";
     public static final String ENTRY_POINT_TOKEN_BASED_AUTH = ENTRY_POINT_API + "/**";
 
     @Autowired

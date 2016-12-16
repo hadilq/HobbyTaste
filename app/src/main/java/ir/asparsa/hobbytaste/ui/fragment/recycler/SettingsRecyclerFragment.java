@@ -11,7 +11,7 @@ import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.android.ui.list.provider.AbsListProvider;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
-import ir.asparsa.hobbytaste.core.manager.AccountManager;
+import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.SetUsernameDialogFragment;
 import ir.asparsa.hobbytaste.ui.list.data.UsernameData;
 import ir.asparsa.hobbytaste.ui.list.holder.UserNameViewHolder;
@@ -25,7 +25,7 @@ import javax.inject.Inject;
 public class SettingsRecyclerFragment extends BaseRecyclerFragment {
 
     @Inject
-    AccountManager mAccountManager;
+    AuthorizationManager mAuthorizationManager;
 
     public static SettingsRecyclerFragment instantiate() {
         Bundle bundle = new Bundle();
@@ -73,7 +73,7 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment {
 
     private void onUsernameClick() {
         SetUsernameDialogFragment.instantiate(
-                mAccountManager.getUsername(),
+                mAuthorizationManager.getUsername(),
                 new SetUsernameDialogFragment.OnSetUsernameDialogResultEvent(getTagName())
         ).show(getFragmentManager());
     }
