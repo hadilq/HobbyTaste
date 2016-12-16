@@ -30,7 +30,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
     private final Bundle mSavedInstanceState;
     private final LinearLayoutManager mLayoutManager;
     private final RecyclerView mRecyclerView;
-    private List<BaseRecyclerData> list = new ArrayList<>();
+    private List<BaseRecyclerData> mList = new ArrayList<>();
     private final SparseArrayCompat<Class<? extends BaseViewHolder>> mHoldersMap;
     private final BaseRecyclerFragment.OnEventListener mOnEventListener;
 
@@ -98,7 +98,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
     ) {
         if (holder instanceof BaseViewHolder) {
             BaseViewHolder baseHolder = (BaseViewHolder) holder;
-            final BaseRecyclerData data = list.get(position);
+            final BaseRecyclerData data = mList.get(position);
 
             onBindData(baseHolder, data);
         } else {
@@ -116,20 +116,20 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return mList.size();
     }
 
     @Override
     public int getItemViewType(int position) {
-        return list.get(position).getViewType();
+        return mList.get(position).getViewType();
     }
 
     public List<BaseRecyclerData> getList() {
-        return list;
+        return mList;
     }
 
     public boolean isEmpty() {
-        return list.isEmpty();
+        return mList.isEmpty();
     }
 
     public void onResume() {
@@ -193,5 +193,26 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
                 ((BaseViewHolder) holder).onLowMemory();
             }
         }
+    }
+
+    public List<Integer> findViewHolder(Class<? extends BaseViewHolder> clazz) {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < getItemCount(); ++i) {
+            RecyclerView.ViewHolder holder = mRecyclerView.findViewHolderForAdapterPosition(i);
+            if (clazz.isInstance(holder)) {
+                list.add(i);
+            }
+        }
+        return list;
+    }
+
+    public List<BaseRecyclerData> findData(Class<? extends BaseRecyclerData> clazz) {
+        List<BaseRecyclerData> list = new ArrayList<>();
+        for (BaseRecyclerData data : mList) {
+            if (clazz.isInstance(data)) {
+                list.add((BaseRecyclerData) data);
+            }
+        }
+        return list;
     }
 }

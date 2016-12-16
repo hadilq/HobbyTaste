@@ -8,6 +8,7 @@ import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
+import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.android.ui.list.provider.AbsListProvider;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
@@ -90,6 +91,17 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment {
             SetUsernameDialogFragment.OnSetUsernameDialogResultEvent usernameEvent
                     = (SetUsernameDialogFragment.OnSetUsernameDialogResultEvent) event;
             L.i(this.getClass(), "username event received: " + usernameEvent.getUsername());
+            L.i(this.getClass(), "token changed: " + usernameEvent.getToken());
+            mAuthorizationManager.setUsername(usernameEvent.getUsername());
+            mAuthorizationManager.setToken(usernameEvent.getToken());
+
+            for (BaseRecyclerData data : mAdapter.findData(UsernameData.class)) {
+                ((UsernameData) data).setUsername(usernameEvent.getUsername());
+            }
+
+            for (Integer index : mAdapter.findViewHolder(UserNameViewHolder.class)) {
+                mAdapter.notifyItemChanged(index);
+            }
         }
     }
 }

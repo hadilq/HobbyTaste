@@ -36,7 +36,7 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
     private static final String BUNDLE_KEY_NEXT_OFFSET = "BUNDLE_KEY_NEXT_OFFSET";
     private static final long LIMIT_DEFAULT = 20;
 
-    private RecyclerListAdapter mAdapter;
+    protected RecyclerListAdapter mAdapter;
     private AbsListProvider mProvider;
     private LinearLayoutManager mLayoutManager;
     private TryAgainView.OnTryAgainListener mOnTryAgainListener;

@@ -9,5 +9,6 @@
     <string name="username">نام‌کاربری</string>
     <string name="commit">باشه</string>
     <string name="username_title">نام‌کاربری شما</string>
+    <string name="username_is_empty">نام‌کابری شما خالی است</string>
 
 </resources>

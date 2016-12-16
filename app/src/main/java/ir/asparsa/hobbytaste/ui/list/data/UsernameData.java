@@ -10,7 +10,7 @@ public class UsernameData extends BaseRecyclerData {
 
     public static final int VIEW_TYPE = R.layout.username;
 
-    private final String mUsername;
+    private String mUsername;
 
     public UsernameData(String username) {
         this.mUsername = username;
@@ -18,6 +18,10 @@ public class UsernameData extends BaseRecyclerData {
 
     public String getUsername() {
         return mUsername;
+    }
+
+    public void setUsername(String username) {
+        this.mUsername = username;
     }
 
     @Override public int getViewType() {

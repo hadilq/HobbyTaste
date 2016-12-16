@@ -7,8 +7,8 @@ import ir.asparsa.android.core.logger.L;
 import ir.asparsa.common.net.dto.AuthenticateDto;
 import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
-import ir.asparsa.hobbytaste.net.AuthenticateService;
 import ir.asparsa.hobbytaste.net.StoreService;
+import ir.asparsa.hobbytaste.net.UserService;
 import junit.framework.Assert;
 import okhttp3.*;
 import retrofit2.Retrofit;
@@ -37,6 +37,11 @@ public class NetServiceModule {
         return retrofit.create(StoreService.class);
     }
 
+    @Provides
+    @Singleton
+    UserService provideUserService(Retrofit retrofit) {
+        return retrofit.create(UserService.class);
+    }
 
     @Provides
     @Singleton
@@ -88,7 +93,7 @@ public class NetServiceModule {
 
     private void authorize(final AuthorizationManager authorizationManager) {
         Retrofit retrofit = getRetrofitBuilder().build();
-        retrofit.create(AuthenticateService.class)
+        retrofit.create(UserService.class)
                 .authenticate()
                 .retry(5)
                 .toBlocking()

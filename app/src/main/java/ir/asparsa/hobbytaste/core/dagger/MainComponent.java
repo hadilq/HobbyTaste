@@ -3,6 +3,7 @@ package ir.asparsa.hobbytaste.core.dagger;
 import dagger.Component;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
 import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
+import ir.asparsa.hobbytaste.ui.fragment.dialog.SetUsernameDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.SettingsRecyclerFragment;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
@@ -26,4 +27,6 @@ public interface MainComponent {
     void inject(SettingsRecyclerFragment settingsRecyclerFragment);
 
     void inject(SettingsProvider settingsProvider);
+
+    void inject(SetUsernameDialogFragment setUsernameDialogFragment);
 }
