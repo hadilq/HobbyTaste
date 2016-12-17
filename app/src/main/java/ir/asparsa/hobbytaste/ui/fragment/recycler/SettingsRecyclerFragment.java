@@ -17,6 +17,7 @@ import ir.asparsa.hobbytaste.ui.fragment.dialog.SetUsernameDialogFragment;
 import ir.asparsa.hobbytaste.ui.list.data.UsernameData;
 import ir.asparsa.hobbytaste.ui.list.holder.UserNameViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
+import rx.Observer;
 
 import javax.inject.Inject;
 
@@ -51,16 +52,17 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment {
         return new SettingsProvider(adapter, insertData);
     }
 
-    @Override protected OnEventListener getOnEventListener() {
-        return new OnEventListener() {
-            @Override public void onEvent(
-                    int subscriber,
-                    @Nullable Bundle bundle
-            ) {
-                switch (subscriber) {
-                    case BaseViewHolder.EVENT_CLICK_USERNAME:
-                        onUsernameClick();
-                        break;
+    @Override protected <T extends Event> Observer<T> getObserver() {
+        return new Observer<T>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+            }
+
+            @Override public void onNext(T t) {
+                if (t instanceof UserNameViewHolder.UsernameClick) {
+                    onUsernameClick(((UserNameViewHolder.UsernameClick) t).getUsername());
                 }
             }
         };
@@ -72,9 +74,9 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment {
         return array;
     }
 
-    private void onUsernameClick() {
+    private void onUsernameClick(String username) {
         SetUsernameDialogFragment.instantiate(
-                mAuthorizationManager.getUsername(),
+                username,
                 new SetUsernameDialogFragment.OnSetUsernameDialogResultEvent(getTagName())
         ).show(getFragmentManager());
     }

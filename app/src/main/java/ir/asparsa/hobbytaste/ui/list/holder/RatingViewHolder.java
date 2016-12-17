@@ -5,10 +5,10 @@ import android.view.View;
 import android.widget.RatingBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.list.data.RatingData;
+import rx.Observer;
 
 /**
  * Created by hadi on 12/14/2016 AD.
@@ -20,10 +20,10 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
 
     public RatingViewHolder(
             View itemView,
-            BaseRecyclerFragment.OnEventListener onEventListener,
+            Observer observer,
             Bundle savedInstanceState
     ) {
-        super(itemView, onEventListener, savedInstanceState);
+        super(itemView, observer, savedInstanceState);
         ButterKnife.bind(this, itemView);
     }
 

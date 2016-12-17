@@ -6,9 +6,9 @@ import android.view.View;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.android.R2;
-import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.data.TryAgainData;
 import ir.asparsa.android.ui.view.TryAgainView;
+import rx.Observer;
 
 /**
  * @author hadi
@@ -21,10 +21,10 @@ public class TryAgainViewHolder extends BaseViewHolder<TryAgainData> {
 
     public TryAgainViewHolder(
             View itemView,
-            BaseRecyclerFragment.OnEventListener onEventListener,
+            Observer observer,
             Bundle savedInstanceState
     ) {
-        super(itemView, onEventListener, savedInstanceState);
+        super(itemView, observer, savedInstanceState);
         ButterKnife.bind(this, itemView);
     }
 

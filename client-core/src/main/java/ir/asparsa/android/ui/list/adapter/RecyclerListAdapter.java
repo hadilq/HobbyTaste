@@ -10,11 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import ir.asparsa.android.core.logger.L;
-import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.android.ui.list.holder.EmptyViewHolder;
 import junit.framework.Assert;
+import rx.Observer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -32,19 +32,19 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
     private final RecyclerView mRecyclerView;
     private List<BaseRecyclerData> mList = new ArrayList<>();
     private final SparseArrayCompat<Class<? extends BaseViewHolder>> mHoldersMap;
-    private final BaseRecyclerFragment.OnEventListener mOnEventListener;
+    private final Observer mObserver;
 
     public RecyclerListAdapter(
             @NonNull RecyclerView recyclerView,
             @NonNull LinearLayoutManager layoutManager,
             @Nullable Bundle savedInstanceState,
             @NonNull SparseArrayCompat<Class<? extends BaseViewHolder>> holdersMap,
-            @Nullable BaseRecyclerFragment.OnEventListener onEventListener
+            @Nullable Observer observer
     ) {
         this.mRecyclerView = recyclerView;
         this.mLayoutManager = layoutManager;
         this.mHoldersMap = holdersMap;
-        this.mOnEventListener = onEventListener;
+        this.mObserver = observer;
         this.mSavedInstanceState = savedInstanceState;
     }
 
@@ -64,8 +64,8 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
                 Constructor<? extends BaseViewHolder> constructor;
                 try {
                     constructor = clazz
-                            .getConstructor(View.class, BaseRecyclerFragment.OnEventListener.class, Bundle.class);
-                    baseViewHolder = constructor.newInstance(view, mOnEventListener, mSavedInstanceState);
+                            .getConstructor(View.class, Observer.class, Bundle.class);
+                    baseViewHolder = constructor.newInstance(view, mObserver, mSavedInstanceState);
                 } catch (NoSuchMethodException e) {
                     L.e(this.getClass(), "View Holder don't have necessary constructor: " + clazz.getName(), e);
                     continue;
@@ -86,7 +86,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
         if (baseViewHolder == null) {
             // Shouldn't happen
             L.w(this.getClass(), "baseViewHolder become null!");
-            baseViewHolder = new EmptyViewHolder(new View(parent.getContext()), mOnEventListener, mSavedInstanceState);
+            baseViewHolder = new EmptyViewHolder(new View(parent.getContext()), mObserver, mSavedInstanceState);
         }
         return baseViewHolder;
     }

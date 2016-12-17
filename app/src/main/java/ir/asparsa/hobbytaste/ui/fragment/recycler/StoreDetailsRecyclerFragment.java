@@ -1,12 +1,10 @@
 package ir.asparsa.hobbytaste.ui.fragment.recycler;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.util.SparseArrayCompat;
 import android.view.View;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
-import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.android.ui.list.provider.AbsListProvider;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
@@ -18,6 +16,7 @@ import ir.asparsa.hobbytaste.ui.list.holder.RatingViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.StoreMapViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
 import junit.framework.Assert;
+import rx.Observer;
 
 /**
  * @author hadi
@@ -61,14 +60,15 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment {
         return new StoreDetailsProvider(adapter, insertData, store);
     }
 
-    @Override
-    protected OnEventListener getOnEventListener() {
-        return new OnEventListener() {
-            @Override public void onEvent(
-                    int subscriber,
-                    @Nullable Bundle bundle
-            ) {
+    @Override protected <T extends Event> Observer<T> getObserver() {
+        return new Observer<T>() {
+            @Override public void onCompleted() {
+            }
 
+            @Override public void onError(Throwable e) {
+            }
+
+            @Override public void onNext(T t) {
             }
         };
     }

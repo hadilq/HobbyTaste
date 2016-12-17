@@ -23,6 +23,7 @@ import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.android.ui.list.holder.TryAgainViewHolder;
 import ir.asparsa.android.ui.list.provider.AbsListProvider;
 import ir.asparsa.android.ui.view.TryAgainView;
+import rx.Observer;
 
 import java.util.List;
 
@@ -78,7 +79,7 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
         mRecyclerView.setOnScrollListener(new LoadingListener());
 
         mAdapter = new RecyclerListAdapter(
-                mRecyclerView, mLayoutManager, savedInstanceState, getViewHoldersList(), getOnEventListener());
+                mRecyclerView, mLayoutManager, savedInstanceState, getViewHoldersList(), getObserver());
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -135,7 +136,7 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
             OnInsertData insertData
     );
 
-    protected abstract OnEventListener getOnEventListener();
+    protected abstract <T extends Event> Observer<T> getObserver();
 
     private class LoadingListener extends RecyclerView.OnScrollListener {
         @Override
@@ -222,12 +223,7 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
         }
     }
 
-    public interface OnEventListener {
-
-        void onEvent(
-                int subscriber,
-                @Nullable Bundle bundle
-        );
+    public interface Event {
     }
 
     @Override
