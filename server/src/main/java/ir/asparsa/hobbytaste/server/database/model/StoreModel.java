@@ -27,6 +27,7 @@ public class StoreModel implements Serializable {
         String DESCRIPTION = "description";
         String RATE = "rate";
         String BANNERS = "banners";
+        String COMMENTS = "comments";
     }
 
     @Id
@@ -53,7 +54,12 @@ public class StoreModel implements Serializable {
     }
 
     public StoreModel(
-            Double lat, Double lon, String title, String description, Float rate) {
+            Double lat,
+            Double lon,
+            String title,
+            String description,
+            Float rate
+    ) {
         this.lat = lat;
         this.lon = lon;
         this.title = title;

@@ -1,24 +1,23 @@
 package ir.asparsa.hobbytaste.server.controller;
 
-import ir.asparsa.common.net.dto.StoreDetailsDto;
-import ir.asparsa.common.net.dto.StoreLightDto;
+import ir.asparsa.common.net.dto.*;
+import ir.asparsa.hobbytaste.server.database.model.CommentModel;
 import ir.asparsa.hobbytaste.server.database.model.StoreModel;
 import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
-import ir.asparsa.hobbytaste.server.database.repository.StoreBannerRepository;
+import ir.asparsa.hobbytaste.server.database.repository.StoreCommentRepository;
 import ir.asparsa.hobbytaste.server.database.repository.StoreRepository;
 import ir.asparsa.hobbytaste.server.exception.StoreNotFoundException;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author hadi
@@ -31,15 +30,16 @@ import java.util.Optional;
 
     private final AccountRepository accountRepository;
     private final StoreRepository storeRepository;
-    private final StoreBannerRepository storeBannerRepository;
+    private final StoreCommentRepository storeCommentRepository;
 
     @Autowired StoresRestController(
             AccountRepository accountRepository,
             StoreRepository storeRepository,
-            StoreBannerRepository storeBannerRepository) {
+            StoreCommentRepository storeCommentRepository
+    ) {
         this.accountRepository = accountRepository;
         this.storeRepository = storeRepository;
-        this.storeBannerRepository = storeBannerRepository;
+        this.storeCommentRepository = storeCommentRepository;
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -51,12 +51,63 @@ import java.util.Optional;
         return collection;
     }
 
-    @RequestMapping(value = "/details", method = RequestMethod.GET)
-    StoreDetailsDto readStoreDetails(@RequestParam("id") Long id) {
+    @RequestMapping(value = "/{storeId}/details", method = RequestMethod.GET)
+    StoreDetailsDto readStoreDetails(@PathVariable("storeId") Long id) {
         Optional<StoreModel> storeModel = storeRepository.findById(id);
-        if (storeModel.isPresent()) {
-            return storeModel.get().detailsConvert();
+        if (!storeModel.isPresent()) {
+            throw new StoreNotFoundException();
         }
-        throw new StoreNotFoundException();
+        return storeModel.get().detailsConvert();
+    }
+
+    @RequestMapping(value = "/{storeId}/comments", method = RequestMethod.POST)
+    PageDto<StoreCommentDto> readStoreCommentsList(
+            @PathVariable("storeId") Long id,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size
+    ) {
+
+        Optional<StoreModel> storeModel = storeRepository.findById(id);
+        if (!storeModel.isPresent()) {
+            throw new StoreNotFoundException();
+        }
+
+        Pageable pageable = new PageRequest(page, size, Sort.Direction.DESC);
+        Page<CommentModel> comments = storeCommentRepository.findByStore(storeModel.get(), pageable);
+
+        List<StoreCommentDto> list = new ArrayList<>();
+
+        for (CommentModel comment : comments) {
+            list.add(new StoreCommentDto(comment.getRate(), comment.getDescription()));
+        }
+
+        return new PageDto<>(comments.getTotalElements(), list);
+    }
+
+    @RequestMapping(value = "/comments", method = RequestMethod.POST)
+    List<StoreCommentDto> readStoreComments(@RequestParam("ids") List<Long> ids) {
+        List<StoreCommentDto> list = new ArrayList<>();
+
+        for (Long id : ids) {
+            Optional<CommentModel> comment = storeCommentRepository.findById(id);
+            if (comment.isPresent()) {
+                list.add(new StoreCommentDto(comment.get().getRate(), comment.get().getDescription()));
+            }
+        }
+        return list;
+    }
+
+    @RequestMapping(value = "/{storeId}/comments", method = RequestMethod.PUT)
+    ResponseDto saveStoreComments(
+            @PathVariable("storeId") Long id,
+            @RequestBody StoreCommentDto comment
+    ) {
+
+        Optional<StoreModel> storeModel = storeRepository.findById(id);
+        if (!storeModel.isPresent()) {
+            throw new StoreNotFoundException();
+        }
+        storeCommentRepository.save(new CommentModel(comment.getDescription(), comment.getRate(), storeModel.get()));
+        return new ResponseDto();
     }
 }
