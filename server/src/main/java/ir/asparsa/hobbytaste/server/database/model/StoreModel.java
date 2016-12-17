@@ -1,8 +1,7 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
 import ir.asparsa.common.net.dto.BannerDto;
-import ir.asparsa.common.net.dto.StoreDetailsDto;
-import ir.asparsa.common.net.dto.StoreLightDto;
+import ir.asparsa.common.net.dto.StoreDto;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -67,18 +66,14 @@ public class StoreModel implements Serializable {
         this.rate = rate;
     }
 
-    public StoreLightDto lightConvert() {
-        List<BannerDto> bannerDtos = new ArrayList<>();
-        if (banners != null && banners.size() != 0) {
-            for (BannerModel banner : banners) {
-                bannerDtos.add(new BannerDto(banner.getMainUrl(), banner.getThumbnailUrl()));
+    public StoreDto convertToDto() {
+        List<BannerDto> banners = new ArrayList<>();
+        if (this.banners != null && this.banners.size() != 0) {
+            for (BannerModel banner : this.banners) {
+                banners.add(new BannerDto(banner.getMainUrl(), banner.getThumbnailUrl()));
             }
         }
-        return new StoreLightDto(id, lat, lon, title, rate, bannerDtos);
-    }
-
-    public StoreDetailsDto detailsConvert() {
-        return new StoreDetailsDto(description);
+        return new StoreDto(id, lat, lon, title, rate, description, banners);
     }
 
     public Long getId() {

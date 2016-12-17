@@ -1,6 +1,9 @@
 package ir.asparsa.hobbytaste.server.controller;
 
-import ir.asparsa.common.net.dto.*;
+import ir.asparsa.common.net.dto.PageDto;
+import ir.asparsa.common.net.dto.ResponseDto;
+import ir.asparsa.common.net.dto.StoreCommentDto;
+import ir.asparsa.common.net.dto.StoreDto;
 import ir.asparsa.hobbytaste.server.database.model.CommentModel;
 import ir.asparsa.hobbytaste.server.database.model.StoreModel;
 import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
@@ -43,21 +46,12 @@ import java.util.*;
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    Collection<StoreLightDto> readStores() {
-        Collection<StoreLightDto> collection = new LinkedList<>();
+    Collection<StoreDto> readStores() {
+        Collection<StoreDto> collection = new LinkedList<>();
         for (StoreModel storeModel : storeRepository.findAll()) {
-            collection.add(storeModel.lightConvert());
+            collection.add(storeModel.convertToDto());
         }
         return collection;
-    }
-
-    @RequestMapping(value = "/{storeId}/details", method = RequestMethod.GET)
-    StoreDetailsDto readStoreDetails(@PathVariable("storeId") Long id) {
-        Optional<StoreModel> storeModel = storeRepository.findById(id);
-        if (!storeModel.isPresent()) {
-            throw new StoreNotFoundException();
-        }
-        return storeModel.get().detailsConvert();
     }
 
     @RequestMapping(value = "/{storeId}/comments", method = RequestMethod.POST)

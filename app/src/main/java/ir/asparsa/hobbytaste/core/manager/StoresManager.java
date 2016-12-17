@@ -2,7 +2,7 @@ package ir.asparsa.hobbytaste.core.manager;
 
 import com.j256.ormlite.dao.Dao;
 import ir.asparsa.android.core.logger.L;
-import ir.asparsa.common.net.dto.StoreLightDto;
+import ir.asparsa.common.net.dto.StoreDto;
 import ir.asparsa.hobbytaste.database.dao.BannerDao;
 import ir.asparsa.hobbytaste.database.dao.StoreDao;
 import ir.asparsa.hobbytaste.database.model.BannerModel;
@@ -11,9 +11,12 @@ import ir.asparsa.hobbytaste.net.StoreService;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.observables.ConnectableObservable;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
+import rx.subjects.SerializedSubject;
+import rx.subjects.Subject;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -35,29 +38,43 @@ public class StoresManager {
     @Inject
     BannerDao mBannerDao;
 
+    private final Subject<Collection<StoreModel>, Collection<StoreModel>> mSubject = new SerializedSubject<>(
+            PublishSubject.<Collection<StoreModel>>create());
+
     @Inject
     public StoresManager() {
     }
 
-    public Observable<List<StoreModel>> getStores() {
+    public Subscription subscribe(Observer<Collection<StoreModel>> observer) {
+        return mSubject.subscribe(observer);
+    }
+
+    public Observable<List<StoreModel>> getStoresObservable() {
         return mStoreDao
                 .queryAllStores(mBannerDao)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public ConnectableObservable<Collection<StoreLightDto>> getRefreshable() {
+    public Observable<Collection<StoreDto>> getServiceObservable() {
         return mStoreService
                 .loadStoreLightModels()
+                .retry(5)
                 .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .share()
-                .replay();
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
+    public RefreshManager.Refreshable getRefreshable() {
+        return new RefreshManager.Refreshable() {
 
-    public Subscriber<Collection<StoreLightDto>> getObserver() {
-        return new Subscriber<Collection<StoreLightDto>>() {
+            @Override public void refresh() {
+                getServiceObservable().subscribe(getObserver());
+            }
+        };
+    }
+
+    public Subscriber<Collection<StoreDto>> getObserver() {
+        return new Subscriber<Collection<StoreDto>>() {
             @Override public void onCompleted() {
                 L.i(StoresManager.class, "Refresh request gets completed");
             }
@@ -66,13 +83,13 @@ public class StoresManager {
                 L.w(StoresManager.class, "Refresh request gets error", e);
             }
 
-            @Override public void onNext(Collection<StoreLightDto> stores) {
+            @Override public void onNext(Collection<StoreDto> stores) {
                 L.i(StoresManager.class, "Stores successfully received: " + stores);
                 if (stores.size() == 0) {
                     return;
                 }
                 Collection<StoreModel> collection = new ArrayDeque<>();
-                for (StoreLightDto store : stores) {
+                for (StoreDto store : stores) {
                     collection.add(StoreModel.instantiate(store));
                 }
                 mStoreDao.queryAllStores(mBannerDao).subscribe(removeOldBanners(collection));
@@ -164,6 +181,7 @@ public class StoresManager {
 
             @Override public void onNext(Collection<Dao.CreateOrUpdateStatus> statuses) {
                 L.i(StoresManager.class, "Stores completely saved");
+                getStoresObservable().subscribe(mSubject);
             }
         };
     }

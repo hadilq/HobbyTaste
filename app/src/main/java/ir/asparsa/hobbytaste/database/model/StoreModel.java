@@ -6,7 +6,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.common.net.dto.BannerDto;
-import ir.asparsa.common.net.dto.StoreLightDto;
+import ir.asparsa.common.net.dto.StoreDto;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -48,13 +48,14 @@ public class StoreModel extends BaseModel implements Parcelable {
     public StoreModel() {
     }
 
-    public static StoreModel instantiate(StoreLightDto storeLightDto) {
+    public static StoreModel instantiate(StoreDto storeLightDto) {
         StoreModel storeModel = new StoreModel();
         storeModel.id = storeLightDto.getId();
         storeModel.lat = storeLightDto.getLat();
         storeModel.lon = storeLightDto.getLon();
         storeModel.title = storeLightDto.getTitle();
         storeModel.rate = storeLightDto.getRate();
+        storeModel.description = storeLightDto.getDescription();
         List<BannerModel> banners = new ArrayList<>();
         if (storeLightDto.getBanners() != null && storeLightDto.getBanners().size() != 0) {
             for (BannerDto bannerDto : storeLightDto.getBanners()) {
@@ -131,7 +132,10 @@ public class StoreModel extends BaseModel implements Parcelable {
         return 0;
     }
 
-    @Override public void writeToParcel(Parcel dest, int flags) {
+    @Override public void writeToParcel(
+            Parcel dest,
+            int flags
+    ) {
         dest.writeValue(this.id);
         dest.writeValue(this.lat);
         dest.writeValue(this.lon);

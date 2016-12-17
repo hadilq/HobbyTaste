@@ -6,7 +6,7 @@ import java.util.List;
  * @author hadi
  * @since 12/7/2016 AD
  */
-public class StoreLightDto {
+public class StoreDto {
 
     private Long id;
 
@@ -15,15 +15,24 @@ public class StoreLightDto {
 
     private String title;
     private float rate;
+    private String description;
     private List<BannerDto> banners;
 
-    public StoreLightDto(
-            Long id, Double lat, Double lon, String title, float rate, List<BannerDto> banners) {
+    public StoreDto(
+            Long id,
+            Double lat,
+            Double lon,
+            String title,
+            float rate,
+            String description,
+            List<BannerDto> banners
+    ) {
         this.id = id;
         this.lat = lat;
         this.lon = lon;
         this.title = title;
         this.rate = rate;
+        this.description = description;
         this.banners = banners;
     }
 
@@ -49,5 +58,9 @@ public class StoreLightDto {
 
     public List<BannerDto> getBanners() {
         return banners;
+    }
+
+    public String getDescription() {
+        return description;
     }
 }

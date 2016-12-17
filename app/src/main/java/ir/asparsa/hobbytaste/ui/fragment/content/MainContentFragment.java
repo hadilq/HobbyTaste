@@ -6,16 +6,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
-import ir.asparsa.common.net.dto.StoreLightDto;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
-import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.manager.RefreshManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
@@ -23,9 +21,9 @@ import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import rx.Subscriber;
+import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,6 +48,7 @@ public class MainContentFragment extends BaseContentFragment
     private List<StoreModel> mStores;
     private List<Marker> mMarkers = new ArrayList<>();
     private boolean mIsCameraMovedBefore = false;
+    private CompositeSubscription subscription = new CompositeSubscription();
 
     public static MainContentFragment instantiate() {
         MainContentFragment fragment = new MainContentFragment();
@@ -60,10 +59,6 @@ public class MainContentFragment extends BaseContentFragment
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
-
-        mStoresManager.getStores().subscribe(getDatabaseSubscriber());
-
-        mRefreshManager.refreshStores(getNetSubscriber());
     }
 
     private Subscriber<Collection<StoreModel>> getDatabaseSubscriber() {
@@ -78,28 +73,6 @@ public class MainContentFragment extends BaseContentFragment
 
             @Override public void onNext(Collection<StoreModel> stores) {
                 onSuccessfullyReceived(stores);
-            }
-        };
-    }
-
-    private Subscriber<Collection<StoreLightDto>> getNetSubscriber() {
-        return new Subscriber<Collection<StoreLightDto>>() {
-            @Override public void onCompleted() {
-                L.i(MainContentFragment.class, "Refresh request gets completed");
-            }
-
-            @Override public void onError(Throwable e) {
-                L.w(MainContentFragment.class, "Refresh request gets error", e);
-                Toast.makeText(getContext(), R.string.connection_error, Toast.LENGTH_LONG).show();
-            }
-
-            @Override public void onNext(Collection<StoreLightDto> stores) {
-
-                Collection<StoreModel> collection = new ArrayDeque<>();
-                for (StoreLightDto store : stores) {
-                    collection.add(StoreModel.instantiate(store));
-                }
-                onSuccessfullyReceived(collection);
             }
         };
     }
@@ -153,7 +126,14 @@ public class MainContentFragment extends BaseContentFragment
     }
 
     @Nullable @Override public View onCreateView(
-            LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState
+    ) {
+        subscription.add(mStoresManager.getStoresObservable().subscribe(getDatabaseSubscriber()));
+        subscription.add(mStoresManager.subscribe(getDatabaseSubscriber()));
+
+        mRefreshManager.refreshStores();
         return inflater.inflate(R.layout.main_content_fragment, container, false);
     }
 
@@ -166,8 +146,8 @@ public class MainContentFragment extends BaseContentFragment
         } else {
             mapFragment = SupportMapFragment.newInstance();
             getChildFragmentManager().beginTransaction()
-                    .replace(R.id.content_nested, mapFragment)
-                    .commit();
+                                     .replace(R.id.content_nested, mapFragment)
+                                     .commit();
         }
         mapFragment.getMapAsync(this);
     }
@@ -177,6 +157,7 @@ public class MainContentFragment extends BaseContentFragment
         for (Marker marker : mMarkers) {
             marker.remove();
         }
+        subscription.clear();
         super.onDestroyView();
     }
 

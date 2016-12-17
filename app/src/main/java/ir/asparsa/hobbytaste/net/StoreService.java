@@ -2,8 +2,7 @@ package ir.asparsa.hobbytaste.net;
 
 import ir.asparsa.common.net.dto.PageDto;
 import ir.asparsa.common.net.dto.StoreCommentDto;
-import ir.asparsa.common.net.dto.StoreDetailsDto;
-import ir.asparsa.common.net.dto.StoreLightDto;
+import ir.asparsa.common.net.dto.StoreDto;
 import retrofit2.http.*;
 import rx.Observable;
 
@@ -15,10 +14,7 @@ import java.util.Collection;
  */
 public interface StoreService {
     @GET("stores")
-    Observable<Collection<StoreLightDto>> loadStoreLightModels();
-
-    @GET("stores/{storeId}/details")
-    Observable<StoreDetailsDto> loadStoreDetailsModels(@Path("storeId") Long id);
+    Observable<Collection<StoreDto>> loadStoreLightModels();
 
     @POST("stores/{storeId}/comments")
     Observable<PageDto<StoreCommentDto>> loadComments(
