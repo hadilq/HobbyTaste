@@ -102,6 +102,9 @@ public class MainContentFragment extends BaseContentFragment
             double accumulatedLon = 0d;
             BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.placeholder);
 
+            for (Marker marker : mMarkers) {
+                marker.remove();
+            }
             mMarkers.clear();
             for (StoreModel store : mStores) {
                 accumulatedLat += store.getLat();
