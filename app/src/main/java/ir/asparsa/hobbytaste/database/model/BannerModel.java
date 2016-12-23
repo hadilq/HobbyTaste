@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
+import ir.asparsa.common.database.model.BannerColumns;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
@@ -14,27 +15,24 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 @DatabaseTable(tableName = "banners")
 public class BannerModel extends BaseModel implements Parcelable {
 
-    public interface Columns {
-        String ID = "id";
-        String MAIN_URL = "main_url";
-        String THUMBNAIL_URL = "thumbnail_url";
-        String STORE_ID = "store_id";
-    }
-
-    @DatabaseField(columnName = StoreModel.Columns.ID, generatedId = true)
+    @DatabaseField(columnName = BannerColumns.ID, generatedId = true)
     private Long id;
 
-    @DatabaseField(columnName = Columns.MAIN_URL)
+    @DatabaseField(columnName = BannerColumns.MAIN_URL)
     private String mainUrl;
-    @DatabaseField(columnName = Columns.THUMBNAIL_URL)
+    @DatabaseField(columnName = BannerColumns.THUMBNAIL_URL)
     private String thumbnailUrl;
-    @DatabaseField(columnName = Columns.STORE_ID)
+    @DatabaseField(columnName = BannerColumns.STORE)
     private Long storeId;
 
     public BannerModel() {
     }
 
-    public BannerModel(String mainUrl, String thumbnailUrl, Long storeId) {
+    public BannerModel(
+            String mainUrl,
+            String thumbnailUrl,
+            Long storeId
+    ) {
         this.mainUrl = mainUrl;
         this.thumbnailUrl = thumbnailUrl;
         this.storeId = storeId;
@@ -56,7 +54,10 @@ public class BannerModel extends BaseModel implements Parcelable {
         return 0;
     }
 
-    @Override public void writeToParcel(Parcel dest, int flags) {
+    @Override public void writeToParcel(
+            Parcel dest,
+            int flags
+    ) {
         dest.writeValue(this.id);
         dest.writeString(this.mainUrl);
         dest.writeString(this.thumbnailUrl);

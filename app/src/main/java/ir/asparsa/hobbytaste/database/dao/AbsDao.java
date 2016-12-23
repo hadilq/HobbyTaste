@@ -61,6 +61,19 @@ public abstract class AbsDao<T extends BaseModel, ID> {
         });
     }
 
+    public Observable<T> createIfNotExists(final T data) {
+        return Observable.create(new Observable.OnSubscribe<T>() {
+            @Override public void call(Subscriber<? super T> subscriber) {
+                try {
+                    subscriber.onNext(getDao().createIfNotExists(data));
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
+
     public Observable<Collection<Dao.CreateOrUpdateStatus>> createAll(final Collection<T> data) {
         return Observable.create(new Observable.OnSubscribe<Collection<Dao.CreateOrUpdateStatus>>() {
             @Override public void call(Subscriber<? super Collection<Dao.CreateOrUpdateStatus>> subscriber) {
@@ -121,7 +134,10 @@ public abstract class AbsDao<T extends BaseModel, ID> {
         });
     }
 
-    public Observable<List<T>> query(final long limit, final long offset) {
+    public Observable<List<T>> query(
+            final long limit,
+            final long offset
+    ) {
         return Observable.create(new Observable.OnSubscribe<List<T>>() {
             @Override public void call(Subscriber<? super List<T>> subscriber) {
                 try {
@@ -135,7 +151,11 @@ public abstract class AbsDao<T extends BaseModel, ID> {
     }
 
     public Observable<List<T>> query(
-            final long limit, final long offset, final String orderByColumn, final boolean ascending) {
+            final long limit,
+            final long offset,
+            final String orderByColumn,
+            final boolean ascending
+    ) {
 
         return Observable.create(new Observable.OnSubscribe<List<T>>() {
             @Override public void call(Subscriber<? super List<T>> subscriber) {
@@ -155,7 +175,10 @@ public abstract class AbsDao<T extends BaseModel, ID> {
         });
     }
 
-    public Observable<List<T>> query(final String where, final String column) {
+    public Observable<List<T>> query(
+            final String where,
+            final String column
+    ) {
         return Observable.create(new Observable.OnSubscribe<List<T>>() {
             @Override public void call(Subscriber<? super List<T>> subscriber) {
                 try {

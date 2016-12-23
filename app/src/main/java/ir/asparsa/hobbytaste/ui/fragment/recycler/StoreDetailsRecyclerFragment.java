@@ -8,9 +8,11 @@ import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.android.ui.list.provider.AbsListProvider;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
+import ir.asparsa.hobbytaste.ui.list.data.CommentData;
 import ir.asparsa.hobbytaste.ui.list.data.GalleryData;
 import ir.asparsa.hobbytaste.ui.list.data.RatingData;
 import ir.asparsa.hobbytaste.ui.list.data.StoreMapData;
+import ir.asparsa.hobbytaste.ui.list.holder.CommentViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.GalleryViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.RatingViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.StoreMapViewHolder;
@@ -44,6 +46,7 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment {
         array.put(StoreMapData.VIEW_TYPE, StoreMapViewHolder.class.asSubclass(BaseViewHolder.class));
         array.put(GalleryData.VIEW_TYPE, GalleryViewHolder.class.asSubclass(BaseViewHolder.class));
         array.put(RatingData.VIEW_TYPE, RatingViewHolder.class.asSubclass(BaseViewHolder.class));
+        array.put(CommentData.VIEW_TYPE, CommentViewHolder.class.asSubclass(BaseViewHolder.class));
         return array;
     }
 

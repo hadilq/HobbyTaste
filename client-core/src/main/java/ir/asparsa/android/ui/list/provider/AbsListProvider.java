@@ -22,5 +22,5 @@ public abstract class AbsListProvider {
         this.mOnInsertData = onInsertData;
     }
 
-    public abstract void provideData(long limit, long offset);
+    public abstract void provideData(long offset, int limit);
 }

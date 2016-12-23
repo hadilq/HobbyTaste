@@ -10,7 +10,6 @@ import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.net.StoreService;
 import rx.Observable;
 import rx.Observer;
-import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -58,23 +57,22 @@ public class StoresManager {
 
     public Observable<Collection<StoreDto>> getServiceObservable() {
         return mStoreService
-                .loadStoreLightModels()
+                .loadStoreModels()
                 .retry(5)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
+                .subscribeOn(Schedulers.newThread());
     }
 
     public RefreshManager.Refreshable getRefreshable() {
         return new RefreshManager.Refreshable() {
 
-            @Override public void refresh() {
+            @Override public void refresh(RefreshManager.Constraint constraint) {
                 getServiceObservable().subscribe(getObserver());
             }
         };
     }
 
-    public Subscriber<Collection<StoreDto>> getObserver() {
-        return new Subscriber<Collection<StoreDto>>() {
+    public Observer<Collection<StoreDto>> getObserver() {
+        return new Observer<Collection<StoreDto>>() {
             @Override public void onCompleted() {
                 L.i(StoresManager.class, "Refresh request gets completed");
             }

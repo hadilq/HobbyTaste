@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
+import ir.asparsa.common.database.model.StoreColumns;
 import ir.asparsa.common.net.dto.BannerDto;
 import ir.asparsa.common.net.dto.StoreDto;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -19,33 +20,29 @@ import java.util.List;
  */
 @DatabaseTable(tableName = "stores")
 public class StoreModel extends BaseModel implements Parcelable {
-    public interface Columns {
-        String ID = "id";
-        String LAT = "lat";
-        String LON = "lon";
-        String TITLE = "title";
-        String DESCRIPTION = "description";
-        String RATE = "rate";
-    }
 
-    @DatabaseField(id = true, columnName = Columns.ID, canBeNull = false)
+    @DatabaseField(id = true, columnName = StoreColumns.ID, canBeNull = false)
     private Long id;
 
-    @DatabaseField(columnName = Columns.LAT, canBeNull = false)
+    @DatabaseField(columnName = StoreColumns.LAT, canBeNull = false)
     private Double lat;
-    @DatabaseField(columnName = Columns.LON, canBeNull = false)
+    @DatabaseField(columnName = StoreColumns.LON, canBeNull = false)
     private Double lon;
 
-    @DatabaseField(columnName = Columns.TITLE)
+    @DatabaseField(columnName = StoreColumns.TITLE)
     private String title;
-    @DatabaseField(columnName = Columns.DESCRIPTION)
+    @DatabaseField(columnName = StoreColumns.DESCRIPTION)
     private String description;
-    @DatabaseField(columnName = Columns.RATE)
+    @DatabaseField(columnName = StoreColumns.RATE)
     private float rate;
 
     private List<BannerModel> banners;
 
     public StoreModel() {
+    }
+
+    public StoreModel(Long id) {
+        this.id = id;
     }
 
     public static StoreModel instantiate(StoreDto storeLightDto) {

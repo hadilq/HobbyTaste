@@ -18,13 +18,19 @@ import ir.asparsa.android.R2;
 import ir.asparsa.android.ui.fragment.BaseFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
+import ir.asparsa.android.ui.list.data.DataObserver;
 import ir.asparsa.android.ui.list.data.TryAgainData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.android.ui.list.holder.TryAgainViewHolder;
 import ir.asparsa.android.ui.list.provider.AbsListProvider;
 import ir.asparsa.android.ui.view.TryAgainView;
+import rx.Observable;
 import rx.Observer;
+import rx.Subscriber;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -35,7 +41,8 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
 
     private static final String BUNDLE_KEY_SCROLL_POSITION = "BUNDLE_KEY_SCROLL_POSITION";
     private static final String BUNDLE_KEY_NEXT_OFFSET = "BUNDLE_KEY_NEXT_OFFSET";
-    private static final long LIMIT_DEFAULT = 20;
+    private static final String BUNDLE_KEY_LIMIT = "BUNDLE_KEY_LIMIT";
+    private static final int LIMIT_DEFAULT = 20;
 
     protected RecyclerListAdapter mAdapter;
     private AbsListProvider mProvider;
@@ -43,7 +50,7 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
     private TryAgainView.OnTryAgainListener mOnTryAgainListener;
 
     private final Handler mHandler = new Handler();
-    private long mLimit = LIMIT_DEFAULT;
+    private int mLimit = LIMIT_DEFAULT;
     private long mNextOffset = 0;
     private boolean mLoading = true;
     private int mScrollPosition;
@@ -94,18 +101,16 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
             @Nullable Bundle savedInstanceState
     ) {
         super.onViewCreated(view, savedInstanceState);
-        mNextOffset = 0;
+        mNextOffset = getArguments().getLong(BUNDLE_KEY_NEXT_OFFSET, 0);
         mScrollPosition = getArguments().getInt(BUNDLE_KEY_SCROLL_POSITION, 0);
-        long limit = getArguments().getLong(BUNDLE_KEY_NEXT_OFFSET, -1L);
-        if (limit > 0) {
-            mLimit = limit;
-        }
+        mLimit = getArguments().getInt(BUNDLE_KEY_LIMIT, LIMIT_DEFAULT);
         provideDataAndStart();
     }
 
     @Override
     public void onDestroyView() {
         getArguments().putInt(BUNDLE_KEY_SCROLL_POSITION, mLayoutManager.findFirstVisibleItemPosition());
+        getArguments().putInt(BUNDLE_KEY_LIMIT, mLimit);
         getArguments().putLong(BUNDLE_KEY_NEXT_OFFSET, mNextOffset);
         super.onDestroyView();
     }
@@ -118,7 +123,7 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
     }
 
     private void provideData() {
-        mProvider.provideData(mLimit, mNextOffset);
+        mProvider.provideData(mNextOffset, mLimit);
         mNextOffset += mLimit;
     }
 
@@ -164,48 +169,64 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
 
     public class OnInsertData {
         public void OnDataInserted(
-                boolean endOfList,
-                @NonNull List<? extends BaseRecyclerData> data
+                @NonNull DataObserver dataObserver
         ) {
-            if (mAdapter.isEmpty() && data.isEmpty()) {
-                mRecyclerView.setVisibility(View.GONE);
+            if (mLimit > LIMIT_DEFAULT) {
+                mLimit = LIMIT_DEFAULT;
+            }
+            mRecyclerView.setVisibility(View.VISIBLE);
+
+            final List<BaseRecyclerData> list = mAdapter.getList();
+            final List<BaseRecyclerData> clonedlist = new ArrayList<>(list);
+            final Deque<BaseRecyclerData> deque = new ArrayDeque<>();
+            if (!list.isEmpty() && list.get(list.size() - 1).getViewType() == TryAgainData.VIEW_TYPE) {
+                list.remove(list.size() - 1);
+            }
+
+            dataObserver.setDeque(deque);
+            Observable.create(new Observable.OnSubscribe<BaseRecyclerData>() {
+                @Override public void call(Subscriber<? super BaseRecyclerData> subscriber) {
+                    for (BaseRecyclerData baseRecyclerData : list) {
+                        subscriber.onNext(baseRecyclerData);
+                    }
+                    subscriber.onCompleted();
+                }
+            }).subscribe(dataObserver);
+            dataObserver.setDeque(null);
+            list.clear();
+            list.addAll(deque);
+
+            boolean endOfList = true;
+            for (BaseRecyclerData data : clonedlist) {
+                if (!data.equals(list.get(clonedlist.indexOf(data)))) {
+                    endOfList = false;
+                }
+            }
+
+            mLoading = !endOfList;
+            if (mLoading) {
+                list.add(new TryAgainData(true, mOnTryAgainListener));
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        checkIfReadyToProvide();
+                    }
+                });
+            } else if (mAdapter.isEmpty()) {
                 mTryAgainView.showExtraView();
-            } else {
-                if (mLimit > LIMIT_DEFAULT) {
-                    mLimit = LIMIT_DEFAULT;
-                }
-                mRecyclerView.setVisibility(View.VISIBLE);
-
-                List<BaseRecyclerData> list = mAdapter.getList();
-                if (!list.isEmpty() && list.get(list.size() - 1).getViewType() == TryAgainData.VIEW_TYPE) {
-                    list.remove(list.size() - 1);
-                }
-                list.addAll(data);
-                mAdapter.notifyDataSetChanged();
-
-                mLoading = !endOfList;
-                if (mLoading) {
-                    list.add(new TryAgainData(true, mOnTryAgainListener));
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            checkIfReadyToProvide();
-                        }
-                    });
-                }
-                if (mScrollPosition > 0) {
-                    // No need of scroll position any more
-                    mScrollPosition = -1;
-                    mHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mLayoutManager.scrollToPosition(mScrollPosition);
-                        }
-                    });
-                }
-                if (!mAdapter.isEmpty()) {
-                    mTryAgainView.finish();
-                }
+            }
+            if (mScrollPosition > 0) {
+                // No need of scroll position any more
+                mScrollPosition = -1;
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLayoutManager.scrollToPosition(mScrollPosition);
+                    }
+                });
+            }
+            if (!mAdapter.isEmpty()) {
+                mTryAgainView.finish();
             }
         }
 

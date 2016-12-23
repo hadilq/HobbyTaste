@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
+import ir.asparsa.common.database.model.CommentColumns;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -13,24 +14,21 @@ import javax.persistence.*;
 @Table(name = "comments")
 public class CommentModel {
 
-    public interface Columns {
-        String ID = "id";
-        String DESCRIPTION = "description";
-        String RATE = "rate";
-        String STORE = "store";
-    }
-
     @Id
     @GeneratedValue
     private Long id;
 
-    @Column(name = Columns.DESCRIPTION)
+    @Column(name = CommentColumns.DESCRIPTION)
     private String description;
-    @Column(name = Columns.RATE)
+    @Column(name = CommentColumns.RATE)
     private float rate;
+    @Column(name = CommentColumns.CREATED)
+    private long created;
+    @Column(name = CommentColumns.HASH_CODE)
+    private int hashCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = Columns.STORE)
+    @JoinColumn(name = CommentColumns.STORE)
     private StoreModel store;
 
     public CommentModel() {
@@ -38,11 +36,11 @@ public class CommentModel {
 
     public CommentModel(
             String description,
-            float rate,
+            int hashCode,
             StoreModel store
     ) {
         this.description = description;
-        this.rate = rate;
+        this.hashCode = hashCode;
         this.store = store;
     }
 
@@ -60,6 +58,10 @@ public class CommentModel {
 
     public StoreModel getStore() {
         return store;
+    }
+
+    public long getCreated() {
+        return created;
     }
 
     @Override

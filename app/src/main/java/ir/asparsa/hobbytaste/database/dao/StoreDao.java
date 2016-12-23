@@ -1,10 +1,9 @@
 package ir.asparsa.hobbytaste.database.dao;
 
+import ir.asparsa.common.database.model.BannerColumns;
 import ir.asparsa.hobbytaste.database.DatabaseHelper;
-import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import rx.Observable;
-import rx.Observer;
 import rx.Subscriber;
 
 import javax.inject.Inject;
@@ -35,10 +34,10 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
                     for (StoreModel model : models) {
                         model.setBanners(bannerDao.getDao().query(
                                 bannerDao.getDao()
-                                        .queryBuilder()
-                                        .where()
-                                        .eq(BannerModel.Columns.STORE_ID, model.getId())
-                                        .prepare()));
+                                         .queryBuilder()
+                                         .where()
+                                         .eq(BannerColumns.STORE, model.getId())
+                                         .prepare()));
 
                     }
                     subscriber.onNext(models);

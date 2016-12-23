@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.server.controller;
 
+import ir.asparsa.common.database.model.CommentColumns;
 import ir.asparsa.common.net.dto.PageDto;
 import ir.asparsa.common.net.dto.ResponseDto;
 import ir.asparsa.common.net.dto.StoreCommentDto;
@@ -66,13 +67,16 @@ import java.util.*;
             throw new StoreNotFoundException();
         }
 
-        Pageable pageable = new PageRequest(page, size, Sort.Direction.DESC);
+        Pageable pageable = new PageRequest(page, size, new Sort(
+                new Sort.Order(Sort.Direction.DESC, CommentColumns.CREATED)
+        ));
         Page<CommentModel> comments = storeCommentRepository.findByStore(storeModel.get(), pageable);
 
         List<StoreCommentDto> list = new ArrayList<>();
 
         for (CommentModel comment : comments) {
-            list.add(new StoreCommentDto(comment.getRate(), comment.getDescription()));
+            list.add(new StoreCommentDto(comment.getId(), comment.getRate(), comment.getDescription(),
+                                         comment.getCreated(), comment.getStore().getId()));
         }
 
         return new PageDto<>(comments.getTotalElements(), list);
@@ -85,7 +89,9 @@ import java.util.*;
         for (Long id : ids) {
             Optional<CommentModel> comment = storeCommentRepository.findById(id);
             if (comment.isPresent()) {
-                list.add(new StoreCommentDto(comment.get().getRate(), comment.get().getDescription()));
+                list.add(new StoreCommentDto(comment.get().getId(), comment.get().getRate(),
+                                             comment.get().getDescription(), comment.get().getCreated(),
+                                             comment.get().getStore().getId()));
             }
         }
         return list;
@@ -101,7 +107,13 @@ import java.util.*;
         if (!storeModel.isPresent()) {
             throw new StoreNotFoundException();
         }
-        storeCommentRepository.save(new CommentModel(comment.getDescription(), comment.getRate(), storeModel.get()));
+        Optional<CommentModel> existComment = storeCommentRepository
+                .findByHashCodeAndStore(comment.getHashCode(), storeModel.get());
+
+        if (!existComment.isPresent()) {
+            storeCommentRepository
+                    .save(new CommentModel(comment.getDescription(), comment.getHashCode(), storeModel.get()));
+        }
         return new ResponseDto();
     }
 }

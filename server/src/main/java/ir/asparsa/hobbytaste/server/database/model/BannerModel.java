@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
+import ir.asparsa.common.database.model.BannerColumns;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -13,30 +14,27 @@ import javax.persistence.*;
 @Table(name = "banners")
 public class BannerModel {
 
-    public interface Columns {
-        String ID = "id";
-        String MAIN_URL = "main_url";
-        String THUMBNAIL_URL = "thumbnail_url";
-        String STORE = "store";
-    }
-
     @Id
     @GeneratedValue
     private Long id;
 
-    @Column(name = Columns.MAIN_URL)
+    @Column(name = BannerColumns.MAIN_URL)
     private String mainUrl;
-    @Column(name = Columns.THUMBNAIL_URL)
+    @Column(name = BannerColumns.THUMBNAIL_URL)
     private String thumbnailUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = Columns.STORE)
+    @JoinColumn(name = BannerColumns.STORE)
     private StoreModel store;
 
     public BannerModel() {
     }
 
-    public BannerModel(String mainUrl, String thumbnailUrl, StoreModel store) {
+    public BannerModel(
+            String mainUrl,
+            String thumbnailUrl,
+            StoreModel store
+    ) {
         this.mainUrl = mainUrl;
         this.thumbnailUrl = thumbnailUrl;
         this.store = store;

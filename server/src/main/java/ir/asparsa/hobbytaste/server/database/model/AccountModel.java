@@ -6,6 +6,7 @@ package ir.asparsa.hobbytaste.server.database.model;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import ir.asparsa.common.database.model.AccountColumns;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -22,13 +23,13 @@ public class AccountModel implements Serializable {
     private Long id;
 
     @JsonIgnore
-    @Column(name = "password")
+    @Column(name = AccountColumns.PASSWORD)
     private String password;
 
-    @Column(name = "username")
+    @Column(name = AccountColumns.USERNAME)
     private String username;
 
-    @Column(name = "role")
+    @Column(name = AccountColumns.ROLE)
     private String role;
 
     AccountModel() { // jpa only

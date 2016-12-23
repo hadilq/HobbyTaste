@@ -1,6 +1,7 @@
 package ir.asparsa.hobbytaste.net;
 
 import ir.asparsa.common.net.dto.PageDto;
+import ir.asparsa.common.net.dto.ResponseDto;
 import ir.asparsa.common.net.dto.StoreCommentDto;
 import ir.asparsa.common.net.dto.StoreDto;
 import retrofit2.http.*;
@@ -14,7 +15,7 @@ import java.util.Collection;
  */
 public interface StoreService {
     @GET("stores")
-    Observable<Collection<StoreDto>> loadStoreLightModels();
+    Observable<Collection<StoreDto>> loadStoreModels();
 
     @POST("stores/{storeId}/comments")
     Observable<PageDto<StoreCommentDto>> loadComments(
@@ -24,7 +25,7 @@ public interface StoreService {
     );
 
     @PUT("stores/{storeId}/comments")
-    Observable<PageDto<StoreCommentDto>> saveComments(
+    Observable<ResponseDto> saveComment(
             @Path("storeId") Long id,
             @Body StoreCommentDto comment
     );

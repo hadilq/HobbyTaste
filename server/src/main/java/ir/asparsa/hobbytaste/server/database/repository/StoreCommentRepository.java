@@ -22,4 +22,6 @@ public interface StoreCommentRepository extends JpaRepository<CommentModel, Long
 
     Optional<CommentModel> findById(Long id);
 
+    Optional<CommentModel> findByHashCodeAndStore(int hashCode, StoreModel store);
+
 }
