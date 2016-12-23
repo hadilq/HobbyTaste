@@ -27,4 +27,13 @@ public class UsernameData extends BaseRecyclerData {
     @Override public int getViewType() {
         return VIEW_TYPE;
     }
+
+    @Override public boolean equals(Object otherObj) {
+        if ((otherObj == null) || !(otherObj instanceof UsernameData)) {
+            return false;
+        }
+        final UsernameData other = (UsernameData) otherObj;
+        return (getUsername() == null && other.getUsername() == null) ||
+               (getUsername() != null && getUsername().equals(other.getUsername()));
+    }
 }

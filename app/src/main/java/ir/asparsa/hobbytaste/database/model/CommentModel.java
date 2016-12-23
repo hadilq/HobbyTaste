@@ -6,8 +6,6 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.common.database.model.CommentColumns;
-import ir.asparsa.common.database.model.StoreColumns;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
@@ -79,9 +77,8 @@ public class CommentModel extends BaseModel implements Parcelable {
             return false;
         }
         final CommentModel other = (CommentModel) otherObj;
-        return new EqualsBuilder()
-                .append(getId(), other.getId())
-                .isEquals();
+        return (getId() == null && other.getId() == null) ||
+               (getId() != null && getId().equals(other.getId()));
     }
 
     @Override

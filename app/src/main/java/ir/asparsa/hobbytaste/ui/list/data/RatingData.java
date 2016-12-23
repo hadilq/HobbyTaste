@@ -23,4 +23,12 @@ public class RatingData extends BaseRecyclerData {
     public float getRate() {
         return mRate;
     }
+
+    @Override public boolean equals(Object otherObj) {
+        if ((otherObj == null) || !(otherObj instanceof RatingData)) {
+            return false;
+        }
+        final RatingData other = (RatingData) otherObj;
+        return getRate() == other.getRate();
+    }
 }

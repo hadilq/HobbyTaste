@@ -25,4 +25,13 @@ public class StoreMapData extends BaseRecyclerData {
     @Override public int getViewType() {
         return VIEW_TYPE;
     }
+
+    @Override public boolean equals(Object otherObj) {
+        if ((otherObj == null) || !(otherObj instanceof StoreMapData)) {
+            return false;
+        }
+        final StoreMapData other = (StoreMapData) otherObj;
+        return (getStore() == null && other.getStore() == null) ||
+               (getStore() != null && getStore().equals(other.getStore()));
+    }
 }

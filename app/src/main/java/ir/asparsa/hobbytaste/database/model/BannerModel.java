@@ -6,7 +6,6 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.common.database.model.BannerColumns;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 
 /**
  * @author hadi
@@ -85,11 +84,12 @@ public class BannerModel extends BaseModel implements Parcelable {
             return false;
         }
         final BannerModel other = (BannerModel) otherObj;
-        return new EqualsBuilder()
-                .append(getMainUrl(), other.getMainUrl())
-                .append(getThumbnailUrl(), other.getThumbnailUrl())
-                .append(getId(), other.getId())
-                .isEquals();
+        return ((getMainUrl() == null && other.getMainUrl() == null) ||
+                (getMainUrl() != null && getMainUrl().equals(other.getMainUrl()))) &&
+               ((getThumbnailUrl() == null && other.getThumbnailUrl() == null) ||
+                (getThumbnailUrl() != null && getThumbnailUrl().equals(other.getThumbnailUrl()))) &&
+               ((getId() == null && other.getId() == null) ||
+                (getId() != null && getId().equals(other.getId())));
     }
 
     @Override public String toString() {

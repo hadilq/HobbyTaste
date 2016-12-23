@@ -27,4 +27,13 @@ public class GalleryData extends BaseRecyclerData {
     public int getViewType() {
         return VIEW_TYPE;
     }
+
+    @Override public boolean equals(Object otherObj) {
+        if ((otherObj == null) || !(otherObj instanceof GalleryData)) {
+            return false;
+        }
+        final GalleryData other = (GalleryData) otherObj;
+        return (getBanners() == null && other.getBanners() == null) ||
+               (getBanners() != null && getBanners().equals(other.getBanners()));
+    }
 }

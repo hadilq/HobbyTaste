@@ -8,7 +8,6 @@ import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.common.database.model.StoreColumns;
 import ir.asparsa.common.net.dto.BannerDto;
 import ir.asparsa.common.net.dto.StoreDto;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
@@ -102,11 +101,11 @@ public class StoreModel extends BaseModel implements Parcelable {
             return false;
         }
         final StoreModel other = (StoreModel) otherObj;
-        return new EqualsBuilder()
-                .append(getLat(), other.getLat())
-                .append(getLon(), other.getLon())
-                .append(getId(), other.getId())
-                .isEquals();
+        return (((getLat() == null && other.getLat() == null) ||
+                 (getLat() != null || getLat().equals(other.getLat()))) &&
+                ((getLon() == null && other.getLon() == null) ||
+                 (getLon() != null || getLon().equals(other.getLon()))) &&
+                ((getId() == null && other.getId() == null) || (getId() != null || getId().equals(other.getId()))));
     }
 
     @Override
