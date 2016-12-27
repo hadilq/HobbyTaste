@@ -37,7 +37,7 @@ import java.util.List;
  * @author hadi
  * @since 6/23/2016 AD
  */
-public abstract class BaseRecyclerFragment extends BaseFragment {
+public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends BaseFragment {
 
     private static final String BUNDLE_KEY_SCROLL_POSITION = "BUNDLE_KEY_SCROLL_POSITION";
     private static final String BUNDLE_KEY_NEXT_OFFSET = "BUNDLE_KEY_NEXT_OFFSET";
@@ -45,7 +45,7 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
     private static final int LIMIT_DEFAULT = 20;
 
     protected RecyclerListAdapter mAdapter;
-    private AbsListProvider mProvider;
+    protected P mProvider;
     private LinearLayoutManager mLayoutManager;
     private TryAgainView.OnTryAgainListener mOnTryAgainListener;
 
@@ -53,6 +53,7 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
     private int mLimit = LIMIT_DEFAULT;
     private long mNextOffset = 0;
     private boolean mLoading = true;
+    private boolean mTriedInThisInterval = false;
     private int mScrollPosition;
 
     @BindView(R2.id.list)
@@ -124,7 +125,7 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
 
     private void provideData() {
         mProvider.provideData(mNextOffset, mLimit);
-        mNextOffset += mLimit;
+        mTriedInThisInterval = true;
     }
 
     @Nullable
@@ -136,7 +137,7 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
         }};
     }
 
-    protected abstract AbsListProvider provideDataList(
+    protected abstract P provideDataList(
             RecyclerListAdapter adapter,
             OnInsertData insertData
     );
@@ -177,11 +178,11 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
             mRecyclerView.setVisibility(View.VISIBLE);
 
             final List<BaseRecyclerData> list = mAdapter.getList();
-            final List<BaseRecyclerData> clonedlist = new ArrayList<>(list);
-            final Deque<BaseRecyclerData> deque = new ArrayDeque<>();
             if (!list.isEmpty() && list.get(list.size() - 1).getViewType() == TryAgainData.VIEW_TYPE) {
                 list.remove(list.size() - 1);
             }
+            final List<BaseRecyclerData> clonedList = new ArrayList<>(list);
+            final Deque<BaseRecyclerData> deque = new ArrayDeque<>();
 
             dataObserver.setDeque(deque);
             Observable.create(new Observable.OnSubscribe<BaseRecyclerData>() {
@@ -197,13 +198,26 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
             list.addAll(deque);
 
             boolean endOfList = true;
-            for (BaseRecyclerData data : clonedlist) {
-                if (!data.equals(list.get(clonedlist.indexOf(data)))) {
-                    endOfList = false;
+            if (clonedList.size() == list.size()) {
+                for (BaseRecyclerData data : clonedList) {
+                    int position = clonedList.indexOf(data);
+                    if (!data.equals(list.get(position))) {
+                        endOfList = false;
+                        break;
+                    }
                 }
+            } else {
+                endOfList = false;
             }
 
-            mLoading = !endOfList;
+            mLoading = !endOfList || !mTriedInThisInterval;
+
+            if (list.size() >= mNextOffset + mLimit) {
+                mNextOffset += mLimit;
+                mTriedInThisInterval = false;
+                mLoading = true;
+            }
+
             if (mLoading) {
                 list.add(new TryAgainData(true, mOnTryAgainListener));
                 mHandler.post(new Runnable() {
@@ -212,9 +226,18 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
                         checkIfReadyToProvide();
                     }
                 });
-            } else if (mAdapter.isEmpty()) {
+            } else {
+                mAdapter.notifyItemRemoved(list.size());
+            }
+
+            if (mAdapter.isEmpty() && !mLoading) {
                 mTryAgainView.showExtraView();
             }
+
+            if (!mAdapter.isEmpty()) {
+                mTryAgainView.finish();
+            }
+
             if (mScrollPosition > 0) {
                 // No need of scroll position any more
                 mScrollPosition = -1;
@@ -225,9 +248,7 @@ public abstract class BaseRecyclerFragment extends BaseFragment {
                     }
                 });
             }
-            if (!mAdapter.isEmpty()) {
-                mTryAgainView.finish();
-            }
+
         }
 
         public void onError(String message) {

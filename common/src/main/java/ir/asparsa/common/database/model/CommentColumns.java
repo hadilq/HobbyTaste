@@ -8,7 +8,6 @@ public interface CommentColumns {
     String DESCRIPTION = "description";
     String RATE = "rate";
     String CREATED = "created";
-    String CLIENT_CREATED = "client_created";
     String HASH_CODE = "hash_code";
     String STORE = "store";
 }

@@ -58,8 +58,8 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
             long offset,
             int limit
     ) {
-        mCommentManager
-                .loadComments(new CommentManager.Constraint(mStore, offset, limit), this);
+        L.i(getClass(), "Provide data: " + offset + " " + limit);
+        mCommentManager.loadComments(new CommentManager.Constraint(mStore, offset, limit), this);
     }
 
     @Override public void onCompleted() {
@@ -68,16 +68,24 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
 
     @Override public void onError(Throwable e) {
         L.e(getClass(), "An error happened!", e);
+        mOnInsertData.onError(e.getLocalizedMessage());
     }
 
     @Override public void onNext(final Collection<CommentModel> collection) {
+        L.i(getClass(), "Collection of comments" + collection);
+        for (CommentModel commentModel : collection) {
+            if (commentModel.getStoreId() != mStore.getId()) {
+                return;
+            }
+        }
+
         final List<CommentModel> listModel = new ArrayList<>(collection);
         Collections.sort(listModel, new Comparator<CommentModel>() {
             @Override public int compare(
                     CommentModel comment1,
                     CommentModel comment2
             ) {
-                return (int) (comment1.getCreated() - comment2.getCreated());
+                return (int) (comment2.getCreated() - comment1.getCreated());
             }
         });
 
@@ -85,6 +93,7 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
             @Override public void onCompleted() {
                 for (; index < listModel.size(); index++) {
                     deque.add(new CommentData(listModel.get(index)));
+                    mAdapter.notifyItemInserted(deque.size() - 1);
                 }
             }
 
@@ -95,25 +104,21 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
                 }
 
                 CommentModel addedBeforeComment = ((CommentData) baseRecyclerData).getCommentModel();
-                boolean missRecyclerData = false;
+                boolean missRecyclerData = true;
 
                 for (; index < listModel.size(); index++) {
                     CommentModel comment = listModel.get(index);
                     if (addedBeforeComment.equals(comment)) {
+                        missRecyclerData = false;
                         deque.add(baseRecyclerData);
                         index++;
                         break;
                     } else if (comment.getCreated() > addedBeforeComment.getCreated()) {
                         deque.add(new CommentData(comment));
-                        missRecyclerData = true;
+                        mAdapter.notifyItemInserted(deque.size() - 1);
                     } else if (comment.getCreated() < addedBeforeComment.getCreated()) {
-                        if (missRecyclerData) {
-                            index++;
-                            break;
-                        }
+                        missRecyclerData = false;
                         deque.add(baseRecyclerData);
-                        deque.add(new CommentData(comment));
-                        index++;
                         break;
                     }
                 }
@@ -126,5 +131,9 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
 
         mOnInsertData.OnDataInserted(dataHolder);
 
+    }
+
+    public void addComment(CommentModel comment) {
+        provideData(0L, 5);
     }
 }

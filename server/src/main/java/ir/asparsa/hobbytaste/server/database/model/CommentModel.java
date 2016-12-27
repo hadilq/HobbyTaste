@@ -25,7 +25,7 @@ public class CommentModel {
     @Column(name = CommentColumns.CREATED)
     private long created;
     @Column(name = CommentColumns.HASH_CODE)
-    private int hashCode;
+    private long hashCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = CommentColumns.STORE)
@@ -36,12 +36,13 @@ public class CommentModel {
 
     public CommentModel(
             String description,
-            int hashCode,
+            long hashCode,
             StoreModel store
     ) {
         this.description = description;
         this.hashCode = hashCode;
         this.store = store;
+        this.created = System.currentTimeMillis();
     }
 
     public Long getId() {
@@ -62,6 +63,10 @@ public class CommentModel {
 
     public long getCreated() {
         return created;
+    }
+
+    public long getHashCode() {
+        return hashCode;
     }
 
     @Override

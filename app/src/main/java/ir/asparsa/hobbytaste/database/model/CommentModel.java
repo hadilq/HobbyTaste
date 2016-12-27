@@ -27,24 +27,40 @@ public class CommentModel extends BaseModel implements Parcelable {
     private long created;
     @DatabaseField(columnName = CommentColumns.STORE)
     private Long storeId;
-    @DatabaseField(columnName = CommentColumns.CLIENT_CREATED)
-    private Long clientCreated;
+    @DatabaseField(columnName = CommentColumns.HASH_CODE)
+    private long hashCode;
 
     public CommentModel() {
     }
 
     public CommentModel(
-            Long id,
             String description,
             float rate,
             long created,
             Long storeId
+            long hashCode
     ) {
-        this.id = id;
         this.description = description;
         this.rate = rate;
         this.created = created;
         this.storeId = storeId;
+        this.hashCode = hashCode;
+    }
+
+    public CommentModel(
+            String description,
+            long storeId
+    ) {
+        this.description = description;
+        this.storeId = storeId;
+        created = System.currentTimeMillis();
+        this.hashCode = created ^ (((long) getDescription().hashCode()) << 31);
+    }
+
+    public static CommentModel newInstance(StoreCommentDto storeCommentDto) {
+        return new CommentModel(storeCommentDto.getDescription(), storeCommentDto.getRate(),
+                                storeCommentDto.getCreated(), storeCommentDto.getStoreId(),
+                                storeCommentDto.getHashCode());
     }
 
     public Long getId() {
@@ -63,8 +79,8 @@ public class CommentModel extends BaseModel implements Parcelable {
         return created;
     }
 
-    public Long getClientCreated() {
-        return clientCreated;
+    public long getHashCode() {
+        return hashCode;
     }
 
     public Long getStoreId() {

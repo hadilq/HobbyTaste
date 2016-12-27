@@ -9,11 +9,11 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.common.net.dto.AuthenticateDto;
@@ -31,7 +31,7 @@ import javax.inject.Inject;
  */
 public class SetUsernameDialogFragment extends BaseDialogFragment {
 
-    public static final String BUNDLE_KEY_USERNAME = "BUNDLE_KEY_USERNAME";
+    public static final String BUNDLE_KEY_USERNAME = "BUNDLE_KEY_STORE";
 
     @Inject
     UserService mUserService;
@@ -67,11 +67,8 @@ public class SetUsernameDialogFragment extends BaseDialogFragment {
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState
     ) {
-        View v = inflater.inflate(R.layout.set_username_dialog, container, false);
-        WindowManager.LayoutParams params = getDialog().getWindow().getAttributes();
-        params.height = WindowManager.LayoutParams.MATCH_PARENT;
-        getDialog().getWindow().setAttributes(params);
-
+        super.onCreateView(inflater, container, savedInstanceState);
+        View v = inflater.inflate(R.layout.dialog_set_username, container, false);
         ButterKnife.bind(this, v);
 
         mController.setCommitText(getString(R.string.commit))
@@ -104,6 +101,7 @@ public class SetUsernameDialogFragment extends BaseDialogFragment {
                         }
 
                         @Override public void onError(Throwable e) {
+                            L.e(SetUsernameDialogFragment.class, "Cannot send comment", e);
                             mUsernameLayout.setError(e.getLocalizedMessage());
                         }
 

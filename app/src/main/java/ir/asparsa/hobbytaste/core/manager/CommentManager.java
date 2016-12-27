@@ -11,12 +11,9 @@ import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.net.StoreService;
 import rx.Observable;
 import rx.Observer;
-import rx.Subscription;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
-import rx.subjects.SerializedSubject;
-import rx.subjects.Subject;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -35,18 +32,11 @@ public class CommentManager {
     @Inject
     CommentDao mCommentDao;
 
-    private final Subject<Collection<CommentModel>, Collection<CommentModel>> mLoadSubject = new SerializedSubject<>(
-            PublishSubject.<Collection<CommentModel>>create());
-
     @Inject
     public CommentManager() {
     }
 
-    public Subscription subscribeLoad(Observer<Collection<CommentModel>> observer) {
-        return mLoadSubject.subscribe(observer);
-    }
-
-    public Observable<List<CommentModel>> getLoadCommentsObservable(Constraint constraint) {
+    private Observable<List<CommentModel>> getLoadCommentsObservable(Constraint constraint) {
         return mCommentDao
                 .queryComments(constraint.getOffset(), (long) constraint.getLimit(),
                                constraint.getStore().getId())
@@ -54,7 +44,7 @@ public class CommentManager {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<PageDto<StoreCommentDto>> getLoadServiceObservable(Constraint constraint) {
+    private Observable<PageDto<StoreCommentDto>> getLoadServiceObservable(Constraint constraint) {
         return mStoreService
                 .loadComments(
                         constraint.getStore().getId(), (int) (constraint.getOffset() / constraint.getLimit()),
@@ -64,92 +54,152 @@ public class CommentManager {
                 .observeOn(Schedulers.newThread());
     }
 
-    public Observer<PageDto<StoreCommentDto>> getLoadObserver(final Constraint constraint) {
-        return new Observer<PageDto<StoreCommentDto>>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-            }
-
-            @Override public void onNext(PageDto<StoreCommentDto> comments) {
-                List<CommentModel> list = new ArrayList<>();
-                for (StoreCommentDto storeCommentDto : comments.getList()) {
-                    list.add(new CommentModel(storeCommentDto.getId(), storeCommentDto.getDescription(),
-                                              storeCommentDto.getRate(), storeCommentDto.getCreated(),
-                                              storeCommentDto.getStoreId()));
-                }
-                mCommentDao.createAll(list).subscribe(finishLoadAction(constraint, list));
-            }
-        };
-    }
-
-    public Observer<? super Collection<Dao.CreateOrUpdateStatus>> finishLoadAction(
-            final Constraint constraint,
-            final List<CommentModel> list
-    ) {
-        return new Observer<Collection<Dao.CreateOrUpdateStatus>>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-                L.i(StoresManager.class, "Comments cannot finish action", e);
-            }
-
-            @Override public void onNext(Collection<Dao.CreateOrUpdateStatus> statuses) {
-                L.i(StoresManager.class, "Comments completely saved");
-                loadFromDb(constraint);
-
-                mCommentDao.queryComments(constraint.getStore().getId()).subscribe(
-                        compareComments(constraint, list));
-            }
-        };
-    }
-
-    private Observer<? super List<CommentModel>> compareComments(
-            final Constraint constraint,
-            final List<CommentModel> receivedList
-    ) {
-        return new Observer<List<CommentModel>>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-            }
-
-            @Override public void onNext(List<CommentModel> loadedList) {
-                if (loadedList.size() > 0 && receivedList.size() > 0 &&
-                    loadedList.get(0).getCreated() < receivedList.get(receivedList.size() - 1).getCreated()) {
-                    requestServer(new Constraint(constraint.getStore(), constraint.getOffset() + constraint.getLimit(),
-                                                 constraint.getLimit()));
-                }
-            }
-        };
-    }
-
-    public Observable<CommentModel> getSaveCommentObservable(CommentModel comment) {
+    private Observable<CommentModel> getSaveCommentObservable(CommentModel comment) {
         return mCommentDao.createIfNotExists(comment)
                           .subscribeOn(Schedulers.newThread())
                           .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Observable<ResponseDto> getSaveServiceObservable(CommentModel comment) {
+    private Observable<ResponseDto> getSaveServiceObservable(CommentModel comment) {
         return mStoreService
                 .saveComment(
                         comment.getStoreId(),
-                        new StoreCommentDto(comment.getDescription(), comment.hashCode()))
+                        new StoreCommentDto(comment.getDescription(), comment.getHashCode()))
                 .retry(5)
                 .subscribeOn(Schedulers.newThread());
+    }
+
+    private Observable<Long> getCountCommentsObservable(StoreModel store) {
+        return mCommentDao.countOf(store.getId());
+    }
+
+    private Observable<Collection<CommentModel>> getLoadErrorObservable(final Throwable e) {
+        return Observable.create(new Observable.OnSubscribe<Collection<CommentModel>>() {
+            @Override public void call(Subscriber<? super Collection<CommentModel>> subscriber) {
+                subscriber.onError(e);
+            }
+        }).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private Observable<Void> getSaveErrorObservable(final Throwable e) {
+        return Observable.create(new Observable.OnSubscribe<Void>() {
+            @Override public void call(Subscriber<? super Void> subscriber) {
+                subscriber.onError(e);
+            }
+        }).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private void requestServer(
+            Constraint constraint,
+            Observer<Collection<CommentModel>> observer
+    ) {
+        getLoadServiceObservable(constraint).subscribe(onLoadObserver(constraint, observer));
+    }
+
+    private void loadFromDb(
+            Constraint constraint,
+            Observer<Collection<CommentModel>> observer
+    ) {
+        getLoadCommentsObservable(constraint).subscribe(observer);
     }
 
     public void saveComment(
             CommentModel comment,
             final Observer<Void> observer
     ) {
-        getSaveCommentObservable(comment).subscribe(saveToDb(observer));
+        getSaveCommentObservable(comment).subscribe(onSaveToDatabaseObserver(observer));
     }
 
-    private Observer<CommentModel> saveToDb(
+    public void loadComments(
+            final CommentManager.Constraint constraint,
+            final Observer<Collection<CommentModel>> observer
+    ) {
+        if (constraint.getOffset() == 0L) {
+            requestServer(constraint, observer);
+            return;
+        }
+
+        getCountCommentsObservable(constraint.getStore())
+                .subscribe(onCountCommentsObserver(constraint, observer));
+    }
+
+    private Observer<PageDto<StoreCommentDto>> onLoadObserver(
+            final Constraint constraint,
+            final Observer<Collection<CommentModel>> observer
+    ) {
+        return new Observer<PageDto<StoreCommentDto>>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                getLoadErrorObservable(e).subscribe(observer);
+            }
+
+            @Override public void onNext(PageDto<StoreCommentDto> comments) {
+                L.i(CommentManager.class, "Loaded comments from server: " + comments.getList().size() +
+                                          " " + comments.getTotalElements());
+                List<CommentModel> list = new ArrayList<>();
+                for (StoreCommentDto storeCommentDto : comments.getList()) {
+                    list.add(CommentModel.newInstance(storeCommentDto));
+                }
+                mCommentDao.createAll(list)
+                           .subscribe(onFinishLoadObserver(constraint, comments.getTotalElements(), observer));
+            }
+        };
+    }
+
+
+    private Observer<? super Collection<Dao.CreateOrUpdateStatus>> onFinishLoadObserver(
+            final Constraint constraint,
+            final long totalElements,
+            final Observer<Collection<CommentModel>> observer
+    ) {
+        return new Observer<Collection<Dao.CreateOrUpdateStatus>>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                L.i(CommentManager.class, "Comments cannot finish action", e);
+                getLoadErrorObservable(e).subscribe(observer);
+            }
+
+            @Override public void onNext(Collection<Dao.CreateOrUpdateStatus> statuses) {
+                L.i(CommentManager.class, "Comments completely saved");
+                loadFromDb(constraint, observer);
+
+                mCommentDao.countOf(constraint.getStore().getId())
+                           .subscribe(onCheckTotalCountObserver(constraint, totalElements, observer));
+
+            }
+        };
+    }
+
+    private Observer<Long> onCheckTotalCountObserver(
+            final Constraint constraint,
+            final long totalElements,
+            final Observer<Collection<CommentModel>> observer
+    ) {
+        return new Observer<Long>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                getLoadErrorObservable(e).subscribe(observer);
+            }
+
+            @Override public void onNext(Long count) {
+                L.i(CommentManager.class, "Check for total count: " + count + " " + totalElements);
+                if (count < totalElements) {
+                    requestServer(new Constraint(constraint.getStore(), constraint.getOffset() + constraint.getLimit(),
+                                                 constraint.getLimit()), observer);
+                } else if (totalElements < count) {
+                    // TODO handle this exception
+                }
+            }
+        };
+    }
+
+    private Observer<CommentModel> onSaveToDatabaseObserver(
             final Observer<Void> observer
     ) {
         return new Observer<CommentModel>() {
@@ -157,16 +207,19 @@ public class CommentManager {
             }
 
             @Override public void onError(Throwable e) {
-                observer.onError(e);
+                getSaveErrorObservable(e).subscribe(observer);
             }
 
             @Override public void onNext(CommentModel comment) {
-                getSaveServiceObservable(comment).subscribe(saveToServer(comment, observer));
+                L.i(CommentManager.class, "Save new comments to database.");
+                getSaveServiceObservable(comment)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(onSaveToServerObserver(comment, observer));
             }
         };
     }
 
-    private Observer<ResponseDto> saveToServer(
+    private Observer<ResponseDto> onSaveToServerObserver(
             final CommentModel comment,
             final Observer<Void> observer
     ) {
@@ -176,16 +229,19 @@ public class CommentManager {
             }
 
             @Override public void onError(final Throwable e) {
-                mCommentDao.delete(comment).subscribe(deleteOnUnSucceedRequest(e, observer));
+                mCommentDao.delete(comment)
+                           .subscribeOn(Schedulers.newThread())
+                           .subscribe(onDeleteOnUnSucceedRequestObserver(e, observer));
             }
 
             @Override public void onNext(ResponseDto responseDto) {
+                L.i(CommentManager.class, "Saved on server.");
                 observer.onNext(null);
             }
         };
     }
 
-    private Observer<Integer> deleteOnUnSucceedRequest(
+    private Observer<Integer> onDeleteOnUnSucceedRequestObserver(
             final Throwable e,
             final Observer<Void> observer
     ) {
@@ -193,59 +249,44 @@ public class CommentManager {
             @Override public void onCompleted() {
             }
 
-            @Override public void onError(Throwable e) {
-                observer.onError(e);
+            @Override public void onError(Throwable ee) {
+                ee.initCause(e);
+                getSaveErrorObservable(ee).subscribe(observer);
             }
 
             @Override public void onNext(Integer integer) {
-                observer.onError(e);
+                L.i(CommentManager.class, "Successfully deleted from local database, the unsaved comment on server.");
+                getSaveErrorObservable(e).subscribe(observer);
             }
         };
     }
 
-    public void requestServer(Constraint constraint) {
-        getLoadServiceObservable(constraint).subscribe(getLoadObserver(constraint));
-    }
-
-    public Observable<Long> countComments(StoreModel store) {
-        return mCommentDao.countOf(store.getId());
-    }
-
-    public void loadFromDb(Constraint constraint) {
-        getLoadCommentsObservable(constraint).subscribe(mLoadSubject);
-    }
-
-
-    public Subscription loadComments(
-            final CommentManager.Constraint constraint,
-            Observer<Collection<CommentModel>> observer
+    private Observer<Long> onCountCommentsObserver(
+            final Constraint constraint,
+            final Observer<Collection<CommentModel>> observer
     ) {
-        Subscription subscription = subscribeLoad(observer);
-        if (constraint.getOffset() == 0L) {
-            requestServer(constraint);
-            return subscription;
-        }
+        return new Observer<Long>() {
+            @Override public void onCompleted() {
+            }
 
-        countComments(constraint.getStore()).subscribe(
-                new Observer<Long>() {
-                    @Override public void onCompleted() {
-                    }
+            @Override public void onError(Throwable e) {
+                L.e(CommentManager.class, "Cannot count comments for: " + constraint.getStore(), e);
+                getLoadErrorObservable(e).subscribe(observer);
+            }
 
-                    @Override public void onError(Throwable e) {
-                        L.e(CommentManager.class, "Cannot count comments for: " + constraint.getStore(), e);
-                    }
-
-                    @Override public void onNext(Long count) {
-                        if (count < constraint.getOffset() + constraint.getLimit()) {
-                            requestServer(constraint);
-                            return;
-                        }
-
-                        loadFromDb(constraint);
-                    }
+            @Override public void onNext(Long count) {
+                L.i(
+                        CommentManager.class,
+                        "Count comments: " + count + " " + constraint.getOffset() + constraint.getLimit()
+                );
+                if (count < constraint.getOffset() + constraint.getLimit()) {
+                    requestServer(constraint, observer);
+                    return;
                 }
-        );
-        return subscription;
+
+                loadFromDb(constraint, observer);
+            }
+        };
     }
 
     public static class Constraint implements RefreshManager.Constraint {

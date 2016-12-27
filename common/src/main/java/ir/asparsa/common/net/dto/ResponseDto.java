@@ -6,6 +6,17 @@ package ir.asparsa.common.net.dto;
  */
 public class ResponseDto {
 
-    public ResponseDto() {
+    public interface STATUS {
+        int SUCCEED = 0;
+    }
+
+    private int status;
+
+    public ResponseDto(int status) {
+        this.status = status;
+    }
+
+    public int getStatus() {
+        return status;
     }
 }

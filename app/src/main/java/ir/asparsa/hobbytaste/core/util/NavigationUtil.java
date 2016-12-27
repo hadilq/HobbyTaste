@@ -19,8 +19,8 @@ public class NavigationUtil {
             @NonNull FragmentManager fragmentManager, @NonNull BaseContentFragment fragment) {
         fragmentManager
                 .beginTransaction()
-                .replace(R.id.content, fragment, fragment.getFragmentTag())
-                .addToBackStack(fragment.getFragmentTag())
+                .replace(R.id.content, fragment, fragment.getTagName())
+                .addToBackStack(fragment.getTagName())
                 .commit();
     }
 

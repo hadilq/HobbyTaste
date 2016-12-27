@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.ui.list.provider;
 
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
@@ -31,6 +32,7 @@ public class SettingsProvider extends AbsListProvider {
             long offset,
             int limit
     ) {
+        L.i(getClass(), "New data needed: " + offset + " " + limit);
         mOnInsertData.OnDataInserted(new DataObserver() {
             @Override public void onCompleted() {
                 deque.add(new UsernameData(mAuthorizationManager.getUsername()));

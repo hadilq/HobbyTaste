@@ -32,8 +32,6 @@ public abstract class BaseContentFragment extends BaseFragment {
         return getArguments().getString(BUNDLE_KEY_HEADER_TITLE, "");
     }
 
-    public abstract String getFragmentTag();
-
     public BackState onBackPressed() {
         return BackState.BACK_FRAGMENT;
     }

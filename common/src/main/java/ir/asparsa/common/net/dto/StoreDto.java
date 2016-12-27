@@ -14,7 +14,7 @@ public class StoreDto {
     private Double lon;
 
     private String title;
-    private float rate;
+    private Float rate;
     private String description;
     private List<BannerDto> banners;
 
@@ -23,7 +23,7 @@ public class StoreDto {
             Double lat,
             Double lon,
             String title,
-            float rate,
+            Float rate,
             String description,
             List<BannerDto> banners
     ) {
@@ -52,7 +52,7 @@ public class StoreDto {
         return title;
     }
 
-    public float getRate() {
+    public Float getRate() {
         return rate;
     }
 

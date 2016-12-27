@@ -6,37 +6,35 @@ package ir.asparsa.common.net.dto;
  */
 public class StoreCommentDto {
 
-    private Long id;
     private Float rate;
     private String description;
     private Long created;
     private Long storeId;
-    private Integer hashCode;
+    private Long hashCode;
+
+    public StoreCommentDto() {
+    }
 
     public StoreCommentDto(
-            long id,
             float rate,
             String description,
             long created,
-            long storeId
+            long storeId,
+            long hashCode
     ) {
-        this.id = id;
         this.rate = rate;
         this.description = description;
         this.created = created;
         this.storeId = storeId;
+        this.hashCode = hashCode;
     }
 
     public StoreCommentDto(
             String description,
-            Integer hashCode
+            Long hashCode
     ) {
         this.description = description;
         this.hashCode = hashCode;
-    }
-
-    public long getId() {
-        return id;
     }
 
     public String getDescription() {
@@ -55,7 +53,7 @@ public class StoreCommentDto {
         return storeId;
     }
 
-    public Integer getHashCode() {
+    public Long getHashCode() {
         return hashCode;
     }
 }

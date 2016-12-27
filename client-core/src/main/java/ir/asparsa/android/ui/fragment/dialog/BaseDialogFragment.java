@@ -1,11 +1,17 @@
 package ir.asparsa.android.ui.fragment.dialog;
 
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.BaseFragment;
 
@@ -17,6 +23,17 @@ import java.util.List;
 public abstract class BaseDialogFragment extends DialogFragment {
 
     private static final String BUNDLE_KEY_DIALOG_RESULT_EVENT = "BUNDLE_KEY_DIALOG_RESULT_EVENT";
+
+    @Nullable @Override public View onCreateView(
+            LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState
+    ) {
+        WindowManager.LayoutParams params = getDialog().getWindow().getAttributes();
+        params.height = WindowManager.LayoutParams.MATCH_PARENT;
+        getDialog().getWindow().setAttributes(params);
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
 
     public void setOnDialogResultEvent(BaseOnDialogResultEvent event) {
         getArguments().putParcelable(BUNDLE_KEY_DIALOG_RESULT_EVENT, event);

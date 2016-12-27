@@ -48,6 +48,8 @@ import java.util.*;
 
     @RequestMapping(method = RequestMethod.GET)
     Collection<StoreDto> readStores() {
+        logger.info("read stores request");
+
         Collection<StoreDto> collection = new LinkedList<>();
         for (StoreModel storeModel : storeRepository.findAll()) {
             collection.add(storeModel.convertToDto());
@@ -61,6 +63,7 @@ import java.util.*;
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size
     ) {
+        logger.info("read store comments request: storeId: " + id + ", page: " + page + ", size: " + size);
 
         Optional<StoreModel> storeModel = storeRepository.findById(id);
         if (!storeModel.isPresent()) {
@@ -75,26 +78,11 @@ import java.util.*;
         List<StoreCommentDto> list = new ArrayList<>();
 
         for (CommentModel comment : comments) {
-            list.add(new StoreCommentDto(comment.getId(), comment.getRate(), comment.getDescription(),
-                                         comment.getCreated(), comment.getStore().getId()));
+            list.add(CommentModel.convertToDto(comment));
+            logger.info("Loaded comment: " + comment);
         }
 
         return new PageDto<>(comments.getTotalElements(), list);
-    }
-
-    @RequestMapping(value = "/comments", method = RequestMethod.POST)
-    List<StoreCommentDto> readStoreComments(@RequestParam("ids") List<Long> ids) {
-        List<StoreCommentDto> list = new ArrayList<>();
-
-        for (Long id : ids) {
-            Optional<CommentModel> comment = storeCommentRepository.findById(id);
-            if (comment.isPresent()) {
-                list.add(new StoreCommentDto(comment.get().getId(), comment.get().getRate(),
-                                             comment.get().getDescription(), comment.get().getCreated(),
-                                             comment.get().getStore().getId()));
-            }
-        }
-        return list;
     }
 
     @RequestMapping(value = "/{storeId}/comments", method = RequestMethod.PUT)
@@ -102,6 +90,7 @@ import java.util.*;
             @PathVariable("storeId") Long id,
             @RequestBody StoreCommentDto comment
     ) {
+        logger.info("save stores request: storeId: " + id + "comment: " + comment);
 
         Optional<StoreModel> storeModel = storeRepository.findById(id);
         if (!storeModel.isPresent()) {
@@ -111,9 +100,10 @@ import java.util.*;
                 .findByHashCodeAndStore(comment.getHashCode(), storeModel.get());
 
         if (!existComment.isPresent()) {
-            storeCommentRepository
-                    .save(new CommentModel(comment.getDescription(), comment.getHashCode(), storeModel.get()));
+            CommentModel entity = CommentModel.newInstance(comment, storeModel.get());
+            logger.info("Saved comment: " + entity);
+            storeCommentRepository.save(entity);
         }
-        return new ResponseDto();
+        return new ResponseDto(ResponseDto.STATUS.SUCCEED);
     }
 }

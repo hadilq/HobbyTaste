@@ -6,7 +6,7 @@ import android.view.View;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
-import ir.asparsa.android.ui.list.provider.AbsListProvider;
+import ir.asparsa.hobbytaste.database.model.CommentModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.list.data.CommentData;
 import ir.asparsa.hobbytaste.ui.list.data.GalleryData;
@@ -24,7 +24,7 @@ import rx.Observer;
  * @author hadi
  * @since 12/7/2016 AD
  */
-public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment {
+public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDetailsProvider> {
 
     public static final String BUNDLE_KEY_STORE = "BUNDLE_KEY_STORE";
 
@@ -51,7 +51,7 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment {
     }
 
     @Override
-    protected AbsListProvider provideDataList(
+    protected StoreDetailsProvider provideDataList(
             RecyclerListAdapter adapter,
             OnInsertData insertData
     ) {
@@ -74,5 +74,9 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment {
             @Override public void onNext(T t) {
             }
         };
+    }
+
+    public void addComment(CommentModel comment) {
+        mProvider.addComment(comment);
     }
 }

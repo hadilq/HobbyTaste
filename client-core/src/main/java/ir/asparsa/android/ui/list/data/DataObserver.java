@@ -1,5 +1,6 @@
 package ir.asparsa.android.ui.list.data;
 
+import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import rx.Observer;
 
 import java.util.Deque;
@@ -14,8 +15,8 @@ public abstract class DataObserver implements Observer<BaseRecyclerData>{
     @Override public void onError(Throwable e) {
     }
 
-    public void setDeque(Deque<BaseRecyclerData> deque) {
+    public DataObserver setDeque(Deque<BaseRecyclerData> deque) {
         this.deque = deque;
+        return this;
     }
-
 }

@@ -10,7 +10,6 @@ import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
-import ir.asparsa.android.ui.list.provider.AbsListProvider;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.SetUsernameDialogFragment;
@@ -24,7 +23,7 @@ import javax.inject.Inject;
 /**
  * Created by hadi on 12/14/2016 AD.
  */
-public class SettingsRecyclerFragment extends BaseRecyclerFragment {
+public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvider> {
 
     @Inject
     AuthorizationManager mAuthorizationManager;
@@ -45,7 +44,7 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment {
         return null;
     }
 
-    @Override protected AbsListProvider provideDataList(
+    @Override protected SettingsProvider provideDataList(
             RecyclerListAdapter adapter,
             OnInsertData insertData
     ) {

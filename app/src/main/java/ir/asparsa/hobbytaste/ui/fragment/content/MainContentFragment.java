@@ -35,8 +35,6 @@ import java.util.List;
 public class MainContentFragment extends BaseContentFragment
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
-    private static final String FRAGMENT_TAG = "main";
-
     @Inject
     AuthorizationManager mAuthorizationManager;
     @Inject
@@ -166,10 +164,6 @@ public class MainContentFragment extends BaseContentFragment
 
     @Override protected String setHeaderTitle() {
         return getString(R.string.title_main);
-    }
-
-    @Override public String getFragmentTag() {
-        return FRAGMENT_TAG;
     }
 
     @Override public BackState onBackPressed() {
