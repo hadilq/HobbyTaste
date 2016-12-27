@@ -7,8 +7,6 @@ package ir.asparsa.hobbytaste.server.database.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import ir.asparsa.common.database.model.AccountColumns;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -20,7 +18,7 @@ public class AccountModel implements Serializable {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private long id;
 
     @JsonIgnore
     @Column(name = AccountColumns.PASSWORD)
@@ -39,10 +37,6 @@ public class AccountModel implements Serializable {
         this.username = token;
     }
 
-    public AccountModel(Long id) {
-        this.id = id;
-    }
-
     public AccountModel(
             String username,
             String role
@@ -51,7 +45,7 @@ public class AccountModel implements Serializable {
         this.role = role;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
@@ -77,15 +71,14 @@ public class AccountModel implements Serializable {
             return false;
         }
         final AccountModel other = (AccountModel) otherObj;
-        return new EqualsBuilder()
-                .append(getUsername(), other.getUsername())
-                .append(getId(), other.getId())
-                .isEquals();
+        return ((getUsername() == null && other.getUsername() == null) ||
+                (getUsername() != null && getUsername().equals(other.getUsername()))) &&
+               (getId() == getId());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(getUsername()).append(getId()).toHashCode();
+        return (getUsername() == null ? 0 : getUsername().hashCode()) ^ (int) ((getId() ^ getId() >> 31));
     }
 
     @Override public String toString() {

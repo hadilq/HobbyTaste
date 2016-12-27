@@ -8,7 +8,6 @@ import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.common.database.model.StoreColumns;
 import ir.asparsa.common.net.dto.BannerDto;
 import ir.asparsa.common.net.dto.StoreDto;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,27 +20,23 @@ import java.util.List;
 public class StoreModel extends BaseModel implements Parcelable {
 
     @DatabaseField(id = true, columnName = StoreColumns.ID, canBeNull = false)
-    private Long id;
+    private long id;
 
     @DatabaseField(columnName = StoreColumns.LAT, canBeNull = false)
-    private Double lat;
+    private double lat;
     @DatabaseField(columnName = StoreColumns.LON, canBeNull = false)
-    private Double lon;
+    private double lon;
 
     @DatabaseField(columnName = StoreColumns.TITLE)
     private String title;
     @DatabaseField(columnName = StoreColumns.DESCRIPTION)
     private String description;
     @DatabaseField(columnName = StoreColumns.RATE)
-    private float rate;
+    private Float rate;
 
     private List<BannerModel> banners;
 
     public StoreModel() {
-    }
-
-    public StoreModel(Long id) {
-        this.id = id;
     }
 
     public static StoreModel instantiate(StoreDto storeLightDto) {
@@ -63,15 +58,15 @@ public class StoreModel extends BaseModel implements Parcelable {
         return storeModel;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public Double getLon() {
+    public double getLon() {
         return lon;
     }
 
-    public Double getLat() {
+    public double getLat() {
         return lat;
     }
 
@@ -83,7 +78,7 @@ public class StoreModel extends BaseModel implements Parcelable {
         return description;
     }
 
-    public float getRate() {
+    public Float getRate() {
         return rate;
     }
 
@@ -101,16 +96,16 @@ public class StoreModel extends BaseModel implements Parcelable {
             return false;
         }
         final StoreModel other = (StoreModel) otherObj;
-        return (((getLat() == null && other.getLat() == null) ||
-                 (getLat() != null || getLat().equals(other.getLat()))) &&
-                ((getLon() == null && other.getLon() == null) ||
-                 (getLon() != null || getLon().equals(other.getLon()))) &&
-                ((getId() == null && other.getId() == null) || (getId() != null || getId().equals(other.getId()))));
+        return (getLat() == other.getLat() &&
+                getLon() == other.getLon() &&
+                getId() == other.getId());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(getLat()).append(getLon()).append(getId()).toHashCode();
+        long lat = Double.doubleToLongBits(getLat());
+        long lon = Double.doubleToLongBits(getLon());
+        return (int) (((lat ^ lat >> 31) ^ (lon ^ lon >> 31)) ^ (getId() ^ getId() >> 31));
     }
 
     @Override public String toString() {

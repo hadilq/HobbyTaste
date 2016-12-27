@@ -15,14 +15,14 @@ import ir.asparsa.common.database.model.BannerColumns;
 public class BannerModel extends BaseModel implements Parcelable {
 
     @DatabaseField(columnName = BannerColumns.ID, generatedId = true)
-    private Long id;
+    private long id;
 
     @DatabaseField(columnName = BannerColumns.MAIN_URL)
     private String mainUrl;
     @DatabaseField(columnName = BannerColumns.THUMBNAIL_URL)
     private String thumbnailUrl;
     @DatabaseField(columnName = BannerColumns.STORE)
-    private Long storeId;
+    private long storeId;
 
     public BannerModel() {
     }
@@ -30,14 +30,14 @@ public class BannerModel extends BaseModel implements Parcelable {
     public BannerModel(
             String mainUrl,
             String thumbnailUrl,
-            Long storeId
+            long storeId
     ) {
         this.mainUrl = mainUrl;
         this.thumbnailUrl = thumbnailUrl;
         this.storeId = storeId;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
@@ -88,8 +88,12 @@ public class BannerModel extends BaseModel implements Parcelable {
                 (getMainUrl() != null && getMainUrl().equals(other.getMainUrl()))) &&
                ((getThumbnailUrl() == null && other.getThumbnailUrl() == null) ||
                 (getThumbnailUrl() != null && getThumbnailUrl().equals(other.getThumbnailUrl()))) &&
-               ((getId() == null && other.getId() == null) ||
-                (getId() != null && getId().equals(other.getId())));
+               ((getId() == other.getId()));
+    }
+
+    @Override public int hashCode() {
+        return ((getMainUrl() == null ? 0 : getMainUrl().hashCode()) ^
+                (getThumbnailUrl() == null ? 0 : getThumbnailUrl().hashCode())) ^ (int) ((getId() ^ getId() >> 31));
     }
 
     @Override public String toString() {

@@ -1,8 +1,6 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
 import ir.asparsa.common.database.model.BannerColumns;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 
@@ -16,7 +14,7 @@ public class BannerModel {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private long id;
 
     @Column(name = BannerColumns.MAIN_URL)
     private String mainUrl;
@@ -40,7 +38,7 @@ public class BannerModel {
         this.store = store;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
@@ -62,16 +60,17 @@ public class BannerModel {
             return false;
         }
         final BannerModel other = (BannerModel) otherObj;
-        return new EqualsBuilder()
-                .append(getMainUrl(), other.getMainUrl())
-                .append(getThumbnailUrl(), other.getThumbnailUrl())
-                .append(getId(), other.getId())
-                .isEquals();
+        return ((getMainUrl() == null && other.getMainUrl() == null) ||
+                (getMainUrl() != null && getMainUrl().equals(other.getMainUrl()))) &&
+               ((getThumbnailUrl() == null && other.getThumbnailUrl() == null) ||
+                (getThumbnailUrl() != null && getThumbnailUrl().equals(other.getThumbnailUrl()))) &&
+               ((getId() == other.getId()));
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(getMainUrl()).append(getThumbnailUrl()).append(getId()).toHashCode();
+        return ((getMainUrl() == null ? 0 : getMainUrl().hashCode()) ^
+                (getThumbnailUrl() == null ? 0 : getThumbnailUrl().hashCode())) ^ (int) ((getId() ^ getId() >> 31));
     }
 
     @Override public String toString() {
@@ -79,7 +78,7 @@ public class BannerModel {
                "id=" + id +
                ", mainUrl='" + mainUrl + '\'' +
                ", thumbnailUrl='" + thumbnailUrl + '\'' +
-               ", store=" + store +
+               ", storeId=" + store.getId() +
                '}';
     }
 }

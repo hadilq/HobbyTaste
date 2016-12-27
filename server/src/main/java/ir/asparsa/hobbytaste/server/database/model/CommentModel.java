@@ -1,8 +1,7 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
 import ir.asparsa.common.database.model.CommentColumns;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import ir.asparsa.common.net.dto.StoreCommentDto;
 
 import javax.persistence.*;
 
@@ -16,7 +15,7 @@ public class CommentModel {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private long id;
 
     @Column(name = CommentColumns.DESCRIPTION)
     private String description;
@@ -45,7 +44,19 @@ public class CommentModel {
         this.created = System.currentTimeMillis();
     }
 
-    public Long getId() {
+    public static StoreCommentDto convertToDto(CommentModel comment) {
+        return new StoreCommentDto(comment.getRate(), comment.getDescription(), comment.getCreated(),
+                                   comment.getStore().getId(), comment.getHashCode());
+    }
+
+    public static CommentModel newInstance(
+            StoreCommentDto comment,
+            StoreModel store
+    ) {
+        return new CommentModel(comment.getDescription(), comment.getHashCode(), store);
+    }
+
+    public long getId() {
         return id;
     }
 
@@ -75,22 +86,22 @@ public class CommentModel {
             return false;
         }
         final CommentModel other = (CommentModel) otherObj;
-        return new EqualsBuilder()
-                .append(getId(), other.getId())
-                .isEquals();
+        return store.getId() == store.getId() && getHashCode() == other.getHashCode();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(getId()).toHashCode();
+        return (int) (hashCode >> 15);
     }
 
     @Override public String toString() {
         return "CommentModel{" +
                "id=" + id +
                ", description='" + description + '\'' +
-               ", rate='" + rate + '\'' +
-               ", store=" + store +
+               ", rate=" + rate +
+               ", created=" + created +
+               ", hashCode=" + hashCode +
+               ", storeId=" + store.getId() +
                '}';
     }
 }

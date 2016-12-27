@@ -3,8 +3,6 @@ package ir.asparsa.hobbytaste.server.database.model;
 import ir.asparsa.common.database.model.StoreColumns;
 import ir.asparsa.common.net.dto.BannerDto;
 import ir.asparsa.common.net.dto.StoreDto;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,12 +20,12 @@ public class StoreModel implements Serializable {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private long id;
 
     @Column(name = StoreColumns.LAT)
-    private Double lat;
+    private double lat;
     @Column(name = StoreColumns.LON)
-    private Double lon;
+    private double lon;
 
     @Column(name = StoreColumns.TITLE)
     private String title;
@@ -44,8 +42,8 @@ public class StoreModel implements Serializable {
     }
 
     public StoreModel(
-            Double lat,
-            Double lon,
+            double lat,
+            double lon,
             String title,
             String description,
             Float rate
@@ -67,15 +65,15 @@ public class StoreModel implements Serializable {
         return new StoreDto(id, lat, lon, title, rate, description, banners);
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public Double getLon() {
+    public double getLon() {
         return lon;
     }
 
-    public Double getLat() {
+    public double getLat() {
         return lat;
     }
 
@@ -105,16 +103,16 @@ public class StoreModel implements Serializable {
             return false;
         }
         final StoreModel other = (StoreModel) otherObj;
-        return new EqualsBuilder()
-                .append(getLat(), other.getLat())
-                .append(getLon(), other.getLon())
-                .append(getId(), other.getId())
-                .isEquals();
+        return (getLat() == other.getLat() &&
+                getLon() == other.getLon() &&
+                getId() == other.getId());
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(getLat()).append(getLon()).append(getId()).toHashCode();
+        long lat = Double.doubleToLongBits(getLat());
+        long lon = Double.doubleToLongBits(getLon());
+        return (int) (((lat ^ lat >> 31) ^ (lon ^ lon >> 31)) ^ (getId() ^ getId() >> 31));
     }
 
     @Override public String toString() {

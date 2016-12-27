@@ -6,7 +6,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.common.database.model.CommentColumns;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import ir.asparsa.common.net.dto.StoreCommentDto;
 
 /**
  * @author hadi
@@ -16,17 +16,17 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class CommentModel extends BaseModel implements Parcelable {
 
 
-    @DatabaseField(columnName = CommentColumns.ID, id = true, canBeNull = false)
-    private Long id;
+    @DatabaseField(columnName = CommentColumns.ID, generatedId = true)
+    private long id;
 
-    @DatabaseField(columnName = CommentColumns.DESCRIPTION)
+    @DatabaseField(columnName = CommentColumns.DESCRIPTION, canBeNull = false)
     private String description;
     @DatabaseField(columnName = CommentColumns.RATE)
-    private float rate;
+    private Float rate;
     @DatabaseField(columnName = CommentColumns.CREATED)
-    private long created;
-    @DatabaseField(columnName = CommentColumns.STORE)
-    private Long storeId;
+    private Long created;
+    @DatabaseField(columnName = CommentColumns.STORE, canBeNull = false)
+    private long storeId;
     @DatabaseField(columnName = CommentColumns.HASH_CODE)
     private long hashCode;
 
@@ -37,7 +37,7 @@ public class CommentModel extends BaseModel implements Parcelable {
             String description,
             float rate,
             long created,
-            Long storeId
+            long storeId,
             long hashCode
     ) {
         this.description = description;
@@ -63,15 +63,19 @@ public class CommentModel extends BaseModel implements Parcelable {
                                 storeCommentDto.getHashCode());
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public float getRate() {
+    public Float getRate() {
         return rate;
     }
 
@@ -83,7 +87,7 @@ public class CommentModel extends BaseModel implements Parcelable {
         return hashCode;
     }
 
-    public Long getStoreId() {
+    public long getStoreId() {
         return storeId;
     }
 
@@ -93,13 +97,12 @@ public class CommentModel extends BaseModel implements Parcelable {
             return false;
         }
         final CommentModel other = (CommentModel) otherObj;
-        return (getId() == null && other.getId() == null) ||
-               (getId() != null && getId().equals(other.getId()));
+        return getStoreId() == other.getStoreId() && getHashCode() == other.getHashCode();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(getClientCreated()).append(getDescription()).append(getId()).toHashCode();
+        return (int) (getHashCode() >> 15);
     }
 
     @Override public String toString() {
@@ -107,7 +110,9 @@ public class CommentModel extends BaseModel implements Parcelable {
                "id=" + id +
                ", description='" + description + '\'' +
                ", rate=" + rate +
+               ", created=" + created +
                ", storeId=" + storeId +
+               ", hashCode=" + hashCode +
                '}';
     }
 
