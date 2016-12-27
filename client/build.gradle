@@ -19,7 +19,7 @@ android {
             output.outputFile = new File(
                     output.outputFile.parent,
                     output.outputFile.name.replace(".apk", "-${variant.versionName}.apk")
-                            .replace("app", "HobbyTaste"))
+                            .replace("client", "HobbyTaste"))
         }
     }
 
