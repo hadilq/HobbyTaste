@@ -1,14 +1,10 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "24.0.3"
-
     signingConfigs {
         config {
             keyAlias keystoreProperties['keyAlias']
@@ -18,12 +14,17 @@ android {
         }
     }
 
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFile = new File(
+                    output.outputFile.parent,
+                    output.outputFile.name.replace(".apk", "-${variant.versionName}.apk")
+                            .replace("app", "HobbyTaste"))
+        }
+    }
+
     defaultConfig {
         applicationId "ir.asparsa.hobbytaste"
-        minSdkVersion 17
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
 
         buildConfigField 'String', 'BASE_URL', '"http://192.168.1.7:8090/api/v1/"'
     }
@@ -54,29 +55,31 @@ dependencies {
         exclude group: 'io.reactivex'
     }
     compile(project(':common'))
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'com.android.support:design:25.0.1'
-    compile 'com.android.support:support-v4:25.0.1'
+    compile "com.android.support:appcompat-v7:$global_appcompatVersion"
+    compile "com.android.support:design:$global_designVersion"
+    compile "com.android.support:support-v4:$global_supportVersion"
     // OrmLite
-    compile 'com.j256.ormlite:ormlite-core:4.48'
-    compile 'com.j256.ormlite:ormlite-android:4.48'
+    compile "com.j256.ormlite:ormlite-core:$global_ormliteVersion"
+    compile "com.j256.ormlite:ormlite-android:$global_ormliteVersion"
     // Dagger
-    apt 'com.google.dagger:dagger-compiler:2.8'
-    compile 'com.google.dagger:dagger:2.8'
+    provided "com.google.dagger:dagger-compiler:$global_daggerVersion"
+    compile "com.google.dagger:dagger:$global_daggerVersion"
     provided 'javax.annotation:jsr250-api:1.0'
     // Butter Knife
-    compile 'com.jakewharton:butterknife:8.4.0'
-    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile "com.jakewharton:butterknife:$global_butterknifeVersion"
+    provided "com.jakewharton:butterknife-compiler:$global_butterknifeVersion"
     // RxAndroid
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'io.reactivex:rxjava:1.1.6'
+    compile "io.reactivex:rxandroid:$global_rxandroidVersion"
+    compile "io.reactivex:rxjava:$global_rxjavaVersion"
     // Google map
     compile 'com.google.android.gms:play-services:9.8.0'
     // Retrofit
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
-    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile "com.squareup.retrofit2:retrofit:$global_retrofitVersion"
+    compile "com.squareup.retrofit2:converter-gson:$global_retrofitVersion"
+    compile "com.squareup.retrofit2:adapter-rxjava:$global_retrofitVersion"
+    // Picasso
+    compile "com.squareup.picasso:picasso:$global_picassoVersion"
 
-    testCompile 'junit:junit:4.12'
+    // Test
+    testCompile "junit:junit:$global_junitVersion"
 }

@@ -10,7 +10,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.2'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'
     }
@@ -29,4 +28,50 @@ task clean(type: Delete) {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '3.2'
+}
+
+subprojects {
+
+    // The most recent interface number that the library implements.
+    def appCurrent = 0
+    // The implementation number of the current interface.
+    def appRevision = 0
+    // The difference between the newest and oldest interfaces that the library implements.
+    def appAge = 1
+
+    ext.global_compileSdkVersion = 25
+    ext.global_buildToolsVersion = "25.0.1"
+
+    ext.global_minSdkVersion = 17
+    ext.global_targetSdkVersion = 25
+    ext.global_versionCode = appCurrent * 100 + appRevision * 10 + appAge
+    ext.global_versionName = "$appCurrent.$appRevision.$appAge"
+
+    ext.global_appcompatVersion = "25.0.1"
+    ext.global_designVersion = "25.0.1"
+    ext.global_supportVersion = "25.0.1"
+    ext.global_daggerVersion = "2.8"
+    ext.global_butterknifeVersion = "8.4.0"
+    ext.global_rxandroidVersion = "1.2.1"
+    ext.global_rxjavaVersion = "1.1.6"
+    ext.global_ormliteVersion = "4.48"
+    ext.global_retrofitVersion = "2.1.0"
+    ext.global_picassoVersion = "2.5.2"
+    ext.global_junitVersion = "4.12"
+
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            android {
+                compileSdkVersion global_compileSdkVersion
+                buildToolsVersion global_buildToolsVersion
+
+                defaultConfig {
+                    minSdkVersion global_minSdkVersion
+                    targetSdkVersion global_targetSdkVersion
+                    versionCode global_versionCode
+                    versionName global_versionName
+                }
+            }
+        }
+    }
 }

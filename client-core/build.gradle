@@ -1,19 +1,9 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
-
     publishNonDefault true
 
-    defaultConfig {
-        minSdkVersion 17
-        targetSdkVersion 25
-        versionCode 1
-        versionName "1.0"
-    }
     buildTypes {
         release {
             minifyEnabled false
@@ -24,18 +14,21 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.0.1'
-    compile 'com.android.support:design:25.0.1'
-    compile 'com.android.support:support-v4:25.0.1'
+    compile "com.android.support:appcompat-v7:$global_appcompatVersion"
+    compile "com.android.support:design:$global_designVersion"
+    compile "com.android.support:support-v4:$global_supportVersion"
     // Dagger
-    apt 'com.google.dagger:dagger-compiler:2.8'
-    compile 'com.google.dagger:dagger:2.8'
+    provided "com.google.dagger:dagger-compiler:$global_daggerVersion"
+    compile "com.google.dagger:dagger:$global_daggerVersion"
     provided 'javax.annotation:jsr250-api:1.0'
     // Butter Knife
-    compile 'com.jakewharton:butterknife:8.4.0'
-    apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile "com.jakewharton:butterknife:$global_butterknifeVersion"
+    provided "com.jakewharton:butterknife-compiler:$global_butterknifeVersion"
     // RxAndroid
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'io.reactivex:rxjava:1.1.6'
+    compile "io.reactivex:rxandroid:$global_rxandroidVersion"
+    compile "io.reactivex:rxjava:$global_rxjavaVersion"
+
+    // Test
+    testCompile "junit:junit:$global_junitVersion"
+
 }
