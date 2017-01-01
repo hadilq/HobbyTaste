@@ -31,8 +31,10 @@ public class StoreModel implements Serializable {
     private String title;
     @Column(name = StoreColumns.DESCRIPTION)
     private String description;
+    @Column(name = StoreColumns.VIEWED)
+    private Long viewed;
     @Column(name = StoreColumns.RATE)
-    private Float rate;
+    private Long rate;
 
     @OneToMany(mappedBy = "store", fetch = FetchType.EAGER)
     @Column(name = StoreColumns.BANNERS)
@@ -46,23 +48,25 @@ public class StoreModel implements Serializable {
             double lon,
             String title,
             String description,
-            Float rate
+            Long rate,
+            Long viewed
     ) {
         this.lat = lat;
         this.lon = lon;
         this.title = title;
         this.description = description;
+        this.viewed = viewed;
         this.rate = rate;
     }
 
-    public StoreDto convertToDto() {
+    public StoreDto convertToDto(boolean like) {
         List<BannerDto> banners = new ArrayList<>();
         if (this.banners != null && this.banners.size() != 0) {
             for (BannerModel banner : this.banners) {
                 banners.add(new BannerDto(banner.getMainUrl(), banner.getThumbnailUrl()));
             }
         }
-        return new StoreDto(id, lat, lon, title, rate, description, banners);
+        return new StoreDto(id, lat, lon, title, viewed, rate, like, description, banners);
     }
 
     public long getId() {
@@ -85,8 +89,24 @@ public class StoreModel implements Serializable {
         return description;
     }
 
-    public Float getRate() {
+    public Long getViewed() {
+        return viewed;
+    }
+
+    public Long increaseViewed() {
+        return ++viewed;
+    }
+
+    public Long getRate() {
         return rate;
+    }
+
+    public Long increaseRate() {
+        return ++rate;
+    }
+
+    public Long decreaseRate() {
+        return --rate;
     }
 
     public Collection<BannerModel> getBanners() {

@@ -5,22 +5,25 @@ import ir.asparsa.common.net.dto.PageDto;
 import ir.asparsa.common.net.dto.ResponseDto;
 import ir.asparsa.common.net.dto.StoreCommentDto;
 import ir.asparsa.common.net.dto.StoreDto;
-import ir.asparsa.hobbytaste.server.database.model.CommentModel;
-import ir.asparsa.hobbytaste.server.database.model.StoreModel;
-import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
-import ir.asparsa.hobbytaste.server.database.repository.StoreCommentRepository;
-import ir.asparsa.hobbytaste.server.database.repository.StoreRepository;
+import ir.asparsa.common.net.path.StoreServicePath;
+import ir.asparsa.hobbytaste.server.database.model.*;
+import ir.asparsa.hobbytaste.server.database.repository.*;
+import ir.asparsa.hobbytaste.server.exception.CommentNotFoundException;
+import ir.asparsa.hobbytaste.server.exception.InternalServerErrorException;
 import ir.asparsa.hobbytaste.server.exception.StoreNotFoundException;
+import ir.asparsa.hobbytaste.server.security.JwtTokenUtil;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -28,36 +31,82 @@ import java.util.*;
  * @since 11/30/2016 AD
  */
 @RestController
-@RequestMapping(WebSecurityConfig.ENTRY_POINT_API + "/stores") class StoresRestController {
+@RequestMapping(WebSecurityConfig.ENTRY_POINT_API + "/" + StoreServicePath.SERVICE) class StoresRestController {
 
     private final static Logger logger = LoggerFactory.getLogger(StoresRestController.class);
 
-    private final AccountRepository accountRepository;
-    private final StoreRepository storeRepository;
-    private final StoreCommentRepository storeCommentRepository;
+    @Value("${jwt.header}")
+    private String tokenHeader;
 
-    @Autowired StoresRestController(
-            AccountRepository accountRepository,
-            StoreRepository storeRepository,
-            StoreCommentRepository storeCommentRepository
-    ) {
-        this.accountRepository = accountRepository;
-        this.storeRepository = storeRepository;
-        this.storeCommentRepository = storeCommentRepository;
+    @Autowired
+    AccountRepository accountRepository;
+    @Autowired
+    StoreRepository storeRepository;
+    @Autowired
+    StoreLikeRepository storeRateRepository;
+    @Autowired
+    StoreCommentRepository storeCommentRepository;
+    @Autowired
+    CommentLikeRepository commentLikeRepository;
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
+
+
+    @Autowired StoresRestController() {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    Collection<StoreDto> readStores() {
+    Collection<StoreDto> readStores(HttpServletRequest request) {
         logger.info("read stores request");
+
+        AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
+        if (account == null) {
+            // This request must be authorized before, so this never should happened
+            logger.error("Account is null, header " + request.getHeader(tokenHeader));
+            throw new InternalServerErrorException();
+        }
+        List<StoreLikeModel> storeLikes = storeRateRepository.findByAccount(account);
 
         Collection<StoreDto> collection = new LinkedList<>();
         for (StoreModel storeModel : storeRepository.findAll()) {
-            collection.add(storeModel.convertToDto());
+            boolean like = false;
+            for (StoreLikeModel storeLike : storeLikes) {
+                if (storeLike.getStore().equals(storeModel)) {
+                    like = true;
+                    break;
+                }
+            }
+            collection.add(storeModel.convertToDto(like));
         }
         return collection;
     }
 
-    @RequestMapping(value = "/{storeId}/comments", method = RequestMethod.POST)
+    @RequestMapping(value = StoreServicePath.VIEWED, method = RequestMethod.PUT)
+    StoreDto storeViewed(
+            @PathVariable("storeId") Long id,
+            HttpServletRequest request
+    ) {
+        logger.info("read stores request");
+
+        Optional<StoreModel> storeModel = storeRepository.findById(id);
+        if (!storeModel.isPresent()) {
+            throw new StoreNotFoundException();
+        }
+        AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
+        if (account == null) {
+            // This request must be authorized before, so this never should happened
+            logger.error("Account is null, header " + request.getHeader(tokenHeader));
+            throw new InternalServerErrorException();
+        }
+        Optional<StoreLikeModel> storeLike = storeRateRepository.findByAccountAndStore(account, storeModel.get());
+
+        storeModel.get().increaseViewed();
+        storeRepository.save(storeModel.get());
+
+        return storeModel.get().convertToDto(storeLike.isPresent());
+    }
+
+    @RequestMapping(value = StoreServicePath.COMMENTS, method = RequestMethod.POST)
     PageDto<StoreCommentDto> readStoreCommentsList(
             @PathVariable("storeId") Long id,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -85,12 +134,12 @@ import java.util.*;
         return new PageDto<>(comments.getTotalElements(), list);
     }
 
-    @RequestMapping(value = "/{storeId}/comments", method = RequestMethod.PUT)
+    @RequestMapping(value = StoreServicePath.COMMENTS, method = RequestMethod.PUT)
     ResponseDto saveStoreComments(
             @PathVariable("storeId") Long id,
             @RequestBody StoreCommentDto comment
     ) {
-        logger.info("save stores request: storeId: " + id + "comment: " + comment);
+        logger.info("save stores comment request: storeId: " + id + ", comment: " + comment);
 
         Optional<StoreModel> storeModel = storeRepository.findById(id);
         if (!storeModel.isPresent()) {
@@ -104,6 +153,162 @@ import java.util.*;
             logger.info("Saved comment: " + entity);
             storeCommentRepository.save(entity);
         }
+        return new ResponseDto(ResponseDto.STATUS.SUCCEED);
+    }
+
+    @RequestMapping(value = StoreServicePath.LIKE, method = RequestMethod.PUT)
+    ResponseDto saveStoreLike(
+            @PathVariable("storeId") Long id,
+            HttpServletRequest request
+    ) {
+        logger.info("save store like request: storeId: " + id + ", liked");
+
+        Optional<StoreModel> storeModel = storeRepository.findById(id);
+        if (!storeModel.isPresent()) {
+            throw new StoreNotFoundException();
+        }
+        AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
+        if (account == null) {
+            // This request must be authorized before, so this never should happened
+            logger.error("Account is null, header " + request.getHeader(tokenHeader));
+            throw new InternalServerErrorException();
+        }
+        List<StoreLikeModel> storeLikes = storeRateRepository.findByAccount(account);
+        StoreLikeModel storeLiked = null;
+        for (StoreLikeModel storeLike : storeLikes) {
+            if (storeLike.getStore().equals(storeModel.get())) {
+                storeLiked = storeLike;
+                break;
+            }
+        }
+
+        if (storeLiked == null) {
+            storeRateRepository.save(new StoreLikeModel(storeModel.get(), account));
+        }
+
+        storeModel.get().increaseRate();
+        storeRepository.save(storeModel.get());
+
+        return new ResponseDto(ResponseDto.STATUS.SUCCEED);
+    }
+
+    @RequestMapping(value = StoreServicePath.UNLIKE, method = RequestMethod.PUT)
+    ResponseDto saveStoreUnlike(
+            @PathVariable("storeId") Long id,
+            HttpServletRequest request
+    ) {
+        logger.info("save store like request: storeId: " + id + ", unliked");
+
+        Optional<StoreModel> storeModel = storeRepository.findById(id);
+        if (!storeModel.isPresent()) {
+            throw new StoreNotFoundException();
+        }
+        AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
+        if (account == null) {
+            // This request must be authorized before, so this never should happened
+            logger.error("Account is null, header " + request.getHeader(tokenHeader));
+            throw new InternalServerErrorException();
+        }
+        List<StoreLikeModel> storeLikes = storeRateRepository.findByAccount(account);
+        StoreLikeModel storeLiked = null;
+        for (StoreLikeModel storeLike : storeLikes) {
+            if (storeLike.getStore().equals(storeModel.get())) {
+                storeLiked = storeLike;
+                break;
+            }
+        }
+
+        if (storeLiked != null) {
+            storeRateRepository.delete(storeLiked);
+        }
+
+        storeModel.get().decreaseRate();
+        storeRepository.save(storeModel.get());
+
+        return new ResponseDto(ResponseDto.STATUS.SUCCEED);
+    }
+
+    @RequestMapping(value = StoreServicePath.LIKE_COMMENT, method = RequestMethod.PUT)
+    ResponseDto saveCommentLike(
+            @PathVariable("storeId") Long id,
+            @PathVariable("commentHashCode") Long hashCode,
+            HttpServletRequest request
+    ) {
+        logger.info("save comment like request: storeId: " + id + ", comment hash code: " + hashCode + ", liked");
+
+        Optional<StoreModel> storeModel = storeRepository.findById(id);
+        if (!storeModel.isPresent()) {
+            throw new StoreNotFoundException();
+        }
+        Optional<CommentModel> commentModel = storeCommentRepository.findByHashCodeAndStore(hashCode, storeModel.get());
+        if (!commentModel.isPresent()) {
+            throw new CommentNotFoundException();
+        }
+        AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
+        if (account == null) {
+            // This request must be authorized before, so this never should happened
+            logger.error("Account is null, header " + request.getHeader(tokenHeader));
+            throw new InternalServerErrorException();
+        }
+
+        List<CommentLikeModel> commentLikes = commentLikeRepository.findByAccount(account);
+        CommentLikeModel commentLiked = null;
+        for (CommentLikeModel commentLike : commentLikes) {
+            if (commentLike.getComment().equals(commentModel.get())) {
+                commentLiked = commentLike;
+                break;
+            }
+        }
+
+        if (commentLiked == null) {
+            commentLikeRepository.save(new CommentLikeModel(commentModel.get(), account));
+        }
+
+        commentModel.get().increaseRate();
+        storeCommentRepository.save(commentModel.get());
+
+        return new ResponseDto(ResponseDto.STATUS.SUCCEED);
+    }
+
+    @RequestMapping(value = StoreServicePath.UNLIKE_COMMENT, method = RequestMethod.PUT)
+    ResponseDto saveCommentUnlike(
+            @PathVariable("storeId") Long id,
+            @PathVariable("commentHashCode") Long hashCode,
+            HttpServletRequest request
+    ) {
+        logger.info("save comment like request: storeId: " + id + ", comment hash code: " + hashCode + ", unliked");
+
+        Optional<StoreModel> storeModel = storeRepository.findById(id);
+        if (!storeModel.isPresent()) {
+            throw new StoreNotFoundException();
+        }
+        Optional<CommentModel> commentModel = storeCommentRepository.findByHashCodeAndStore(hashCode, storeModel.get());
+        if (!commentModel.isPresent()) {
+            throw new CommentNotFoundException();
+        }
+        AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
+        if (account == null) {
+            // This request must be authorized before, so this never should happened
+            logger.error("Account is null, header " + request.getHeader(tokenHeader));
+            throw new InternalServerErrorException();
+        }
+
+        List<CommentLikeModel> commentLikes = commentLikeRepository.findByAccount(account);
+        CommentLikeModel commentLiked = null;
+        for (CommentLikeModel commentLike : commentLikes) {
+            if (commentLike.getComment().equals(commentModel.get())) {
+                commentLiked = commentLike;
+                break;
+            }
+        }
+
+        if (commentLiked != null) {
+            commentLikeRepository.delete(commentLiked);
+        }
+
+        commentModel.get().decreaseRate();
+        storeCommentRepository.save(commentModel.get());
+
         return new ResponseDto(ResponseDto.STATUS.SUCCEED);
     }
 }

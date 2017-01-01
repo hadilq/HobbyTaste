@@ -1,6 +1,7 @@
 package ir.asparsa.hobbytaste.server.controller;
 
 import ir.asparsa.common.net.dto.AuthenticateDto;
+import ir.asparsa.common.net.path.UserServicePath;
 import ir.asparsa.hobbytaste.server.database.model.AccountModel;
 import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
 import ir.asparsa.hobbytaste.server.exception.EmptyUsernameException;
@@ -25,7 +26,7 @@ import java.util.Random;
  * @since 12/1/2016 AD
  */
 @RestController
-@RequestMapping(WebSecurityConfig.ENTRY_POINT_API + "/user") class UserRestController {
+@RequestMapping(WebSecurityConfig.ENTRY_POINT_API + "/" + UserServicePath.SERVICE) class UserRestController {
 
     private final static Logger logger = LoggerFactory.getLogger(UserRestController.class);
 
@@ -40,7 +41,7 @@ import java.util.Random;
     public UserRestController() {
     }
 
-    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    @RequestMapping(value = UserServicePath.AUTHENTICATE, method = RequestMethod.POST)
     AuthenticateDto authorization() {
         String username = generateUsername();
         logger.info("username: " + username);
@@ -50,7 +51,7 @@ import java.util.Random;
         return new AuthenticateDto(jwtTokenUtil.generateToken(account), username);
     }
 
-    @RequestMapping(value = "/username", method = RequestMethod.POST)
+    @RequestMapping(value = UserServicePath.USERNAME, method = RequestMethod.POST)
     AuthenticateDto changeUsername(
             @RequestParam("new") String username,
             HttpServletRequest request
@@ -63,7 +64,7 @@ import java.util.Random;
         AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
         if (account == null) {
             // This request must be authorized before, so this never should happened
-            logger.error("Account is null " + account);
+            logger.error("Account is null, header " + request.getHeader(tokenHeader));
             throw new InternalServerErrorException();
         }
 

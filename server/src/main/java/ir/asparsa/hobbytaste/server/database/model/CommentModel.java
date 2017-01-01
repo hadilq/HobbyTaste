@@ -20,7 +20,7 @@ public class CommentModel {
     @Column(name = CommentColumns.DESCRIPTION)
     private String description;
     @Column(name = CommentColumns.RATE)
-    private float rate;
+    private Long rate;
     @Column(name = CommentColumns.CREATED)
     private long created;
     @Column(name = CommentColumns.HASH_CODE)
@@ -64,8 +64,16 @@ public class CommentModel {
         return description;
     }
 
-    public float getRate() {
+    public Long getRate() {
         return rate;
+    }
+
+    public Long increaseRate() {
+        return ++rate;
+    }
+
+    public Long decreaseRate() {
+        return --rate;
     }
 
     public StoreModel getStore() {

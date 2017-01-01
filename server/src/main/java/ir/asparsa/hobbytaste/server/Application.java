@@ -30,7 +30,8 @@ public class Application {
     CommandLineRunner init(
             AccountRepository accountRepository,
             StoreRepository storeRepository,
-            StoreBannerRepository storeBannerRepository) {
+            StoreBannerRepository storeBannerRepository
+    ) {
         if (storeRepository.findAll().size() == 0) {
 
             return (evt) -> {
@@ -45,7 +46,7 @@ public class Application {
 
 
                 StoreModel store = storeRepository.save(new StoreModel(
-                        lat, lon, "Marryam", "Maryam description", 5.0f
+                        lat, lon, "Marryam", "Maryam description", 2L, 3L
                 ));
                 BannerModel banner = new BannerModel(
                         "https://www.gravatar.com/avatar/7c27855c6a5e53fb3ec289e0f152b230?s=328&d=identicon&r=PG",
@@ -68,7 +69,7 @@ public class Application {
                 lat -= delta;
 
                 store = storeRepository.save(new StoreModel(
-                        lat, lon, "Hadi", "Hadi description", 4.5f
+                        lat, lon, "Hadi", "Hadi description", 1L, 99L
                 ));
                 banner = new BannerModel(
                         "https://www.gravatar.com/avatar/430a6af757fa56045c6bdf2d1a6931db?s=48&d=identicon&r=PG",
@@ -91,7 +92,7 @@ public class Application {
                 lat -= delta;
 
                 store = storeRepository.save(new StoreModel(
-                        lat, lon, "Habiba", "Habiba description", 4.0f
+                        lat, lon, "Habiba", "Habiba description", 7L, 77L
 
                 ));
                 banner = new BannerModel(
@@ -115,7 +116,7 @@ public class Application {
                 lat -= delta;
 
                 store = storeRepository.save(new StoreModel(
-                        lat, lon, "Mohammad", "Mohammad description", 3.5f
+                        lat, lon, "Mohammad", "Mohammad description", 2L, 10L
                 ));
                 banner = new BannerModel(
                         "https://www.gravatar.com/avatar/500f5fef2e950bb076c66bc570c6f4f9?s=32&d=identicon&r=PG&f=1",

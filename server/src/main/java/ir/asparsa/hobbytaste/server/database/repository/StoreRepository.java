@@ -12,5 +12,4 @@ import java.util.Optional;
 
 public interface StoreRepository extends JpaRepository<StoreModel, Long> {
     Optional<StoreModel> findById(Long id);
-
 }

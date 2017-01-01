@@ -14,7 +14,9 @@ public class StoreDto {
     private Double lon;
 
     private String title;
-    private Float rate;
+    private Long viewed;
+    private Long rate;
+    private Boolean like;
     private String description;
     private List<BannerDto> banners;
 
@@ -23,7 +25,9 @@ public class StoreDto {
             Double lat,
             Double lon,
             String title,
-            Float rate,
+            Long viewed,
+            Long rate,
+            Boolean like,
             String description,
             List<BannerDto> banners
     ) {
@@ -31,7 +35,9 @@ public class StoreDto {
         this.lat = lat;
         this.lon = lon;
         this.title = title;
+        this.viewed = viewed;
         this.rate = rate;
+        this.like = like;
         this.description = description;
         this.banners = banners;
     }
@@ -52,8 +58,16 @@ public class StoreDto {
         return title;
     }
 
-    public Float getRate() {
+    public Long getViewed() {
+        return viewed;
+    }
+
+    public Long getRate() {
         return rate;
+    }
+
+    public Boolean getLike() {
+        return like;
     }
 
     public List<BannerDto> getBanners() {

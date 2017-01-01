@@ -9,6 +9,7 @@ public interface StoreColumns {
     String LON = "lon";
     String TITLE = "title";
     String DESCRIPTION = "description";
+    String VIEWED = "viewed";
     String RATE = "rate";
     String BANNERS = "banners";
 }
