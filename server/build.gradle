@@ -23,6 +23,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('org.apache.commons:commons-lang3:3.5')
     compile 'io.jsonwebtoken:jjwt:0.7.0'
+    compile "io.reactivex:rxjava:$global_rxjavaVersion"
     runtime('mysql:mysql-connector-java')
 
     testCompile('org.springframework.boot:spring-boot-starter-test')

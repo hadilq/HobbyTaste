@@ -22,9 +22,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+import rx.Observable;
+import rx.schedulers.Schedulers;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author hadi
@@ -101,7 +106,9 @@ import java.util.*;
         Optional<StoreLikeModel> storeLike = storeRateRepository.findByAccountAndStore(account, storeModel.get());
 
         storeModel.get().increaseViewed();
-        storeRepository.save(storeModel.get());
+        Observable.create((Observable.OnSubscribe<Void>) subscriber -> storeRepository.save(storeModel.get()))
+                  .subscribeOn(Schedulers.newThread())
+                  .subscribe();
 
         return storeModel.get().convertToDto(storeLike.isPresent());
     }
@@ -187,7 +194,9 @@ import java.util.*;
         }
 
         storeModel.get().increaseRate();
-        storeRepository.save(storeModel.get());
+        Observable.create((Observable.OnSubscribe<Void>) subscriber -> storeRepository.save(storeModel.get()))
+                  .subscribeOn(Schedulers.newThread())
+                  .subscribe();
 
         return new ResponseDto(ResponseDto.STATUS.SUCCEED);
     }
@@ -223,7 +232,9 @@ import java.util.*;
         }
 
         storeModel.get().decreaseRate();
-        storeRepository.save(storeModel.get());
+        Observable.create((Observable.OnSubscribe<Void>) subscriber -> storeRepository.save(storeModel.get()))
+                  .subscribeOn(Schedulers.newThread())
+                  .subscribe();
 
         return new ResponseDto(ResponseDto.STATUS.SUCCEED);
     }
@@ -265,7 +276,9 @@ import java.util.*;
         }
 
         commentModel.get().increaseRate();
-        storeCommentRepository.save(commentModel.get());
+        Observable.create((Observable.OnSubscribe<Void>) subscriber -> storeCommentRepository.save(commentModel.get()))
+                  .subscribeOn(Schedulers.newThread())
+                  .subscribe();
 
         return new ResponseDto(ResponseDto.STATUS.SUCCEED);
     }
@@ -307,7 +320,9 @@ import java.util.*;
         }
 
         commentModel.get().decreaseRate();
-        storeCommentRepository.save(commentModel.get());
+        Observable.create((Observable.OnSubscribe<Void>) subscriber -> storeCommentRepository.save(commentModel.get()))
+                  .subscribeOn(Schedulers.newThread())
+                  .subscribe();
 
         return new ResponseDto(ResponseDto.STATUS.SUCCEED);
     }
