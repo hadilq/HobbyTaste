@@ -12,8 +12,12 @@ import ir.asparsa.hobbytaste.net.StoreService;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
+import rx.subjects.SerializedSubject;
+import rx.subjects.Subject;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -110,17 +114,23 @@ public class CommentManager {
         getSaveCommentObservable(comment).subscribe(onSaveToDatabaseObserver(observer));
     }
 
-    public void loadComments(
+    public Subscription loadComments(
             final CommentManager.Constraint constraint,
             final Observer<Collection<CommentModel>> observer
     ) {
+        Subject<Collection<CommentModel>, Collection<CommentModel>> subject = new SerializedSubject<>(
+                PublishSubject.<Collection<CommentModel>>create());
+        Subscription subscription = subject.subscribe(observer);
+
         if (constraint.getOffset() == 0L) {
             requestServer(constraint, observer);
-            return;
+            return subscription;
         }
 
         getCountCommentsObservable(constraint.getStore())
-                .subscribe(onCountCommentsObserver(constraint, observer));
+                .subscribe(onCountCommentsObserver(constraint, subject));
+
+        return subscription;
     }
 
     private Observer<PageDto<StoreCommentDto>> onLoadObserver(

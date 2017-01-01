@@ -16,6 +16,7 @@ import ir.asparsa.hobbytaste.ui.list.data.GalleryData;
 import ir.asparsa.hobbytaste.ui.list.data.RatingData;
 import ir.asparsa.hobbytaste.ui.list.data.StoreMapData;
 import rx.Observer;
+import rx.Subscription;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -30,6 +31,7 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
     CommentManager mCommentManager;
 
     private final StoreModel mStore;
+    private Subscription mSubscription;
 
     public StoreDetailsProvider(
             @NonNull RecyclerListAdapter adapter,
@@ -59,7 +61,7 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
             int limit
     ) {
         L.i(getClass(), "Provide data: " + offset + " " + limit);
-        mCommentManager.loadComments(new CommentManager.Constraint(mStore, offset, limit), this);
+        mSubscription = mCommentManager.loadComments(new CommentManager.Constraint(mStore, offset, limit), this);
     }
 
     @Override public void onCompleted() {
@@ -135,5 +137,9 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
 
     public void addComment(CommentModel comment) {
         provideData(0L, 5);
+    }
+
+    public Subscription getSubscription() {
+        return mSubscription;
     }
 }

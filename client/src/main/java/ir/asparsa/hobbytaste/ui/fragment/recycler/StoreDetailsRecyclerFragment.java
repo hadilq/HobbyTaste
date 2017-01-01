@@ -76,6 +76,11 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
         };
     }
 
+    @Override public void onDestroyView() {
+        mProvider.getSubscription().unsubscribe();
+        super.onDestroyView();
+    }
+
     public void addComment(CommentModel comment) {
         mProvider.addComment(comment);
     }
