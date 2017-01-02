@@ -77,7 +77,7 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
     }
 
     @Override public void onDestroyView() {
-        mProvider.getSubscription().unsubscribe();
+        mProvider.clear();
         super.onDestroyView();
     }
 

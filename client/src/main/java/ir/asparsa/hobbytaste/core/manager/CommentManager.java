@@ -37,7 +37,7 @@ public class CommentManager {
     CommentDao mCommentDao;
 
     @Inject
-    public CommentManager() {
+    CommentManager() {
     }
 
     private Observable<List<CommentModel>> getLoadCommentsObservable(Constraint constraint) {
@@ -100,7 +100,7 @@ public class CommentManager {
         getLoadServiceObservable(constraint).subscribe(onLoadObserver(constraint, observer));
     }
 
-    private void loadFromDb(
+    private void loadFromDatabase(
             Constraint constraint,
             Observer<Collection<CommentModel>> observer
     ) {
@@ -123,7 +123,7 @@ public class CommentManager {
         Subscription subscription = subject.subscribe(observer);
 
         if (constraint.getOffset() == 0L) {
-            requestServer(constraint, observer);
+            requestServer(constraint, subject);
             return subscription;
         }
 
@@ -175,7 +175,7 @@ public class CommentManager {
 
             @Override public void onNext(Collection<Dao.CreateOrUpdateStatus> statuses) {
                 L.i(CommentManager.class, "Comments completely saved");
-                loadFromDb(constraint, observer);
+                loadFromDatabase(constraint, observer);
 
                 mCommentDao.countOf(constraint.getStore().getId())
                            .subscribe(onCheckTotalCountObserver(constraint, totalElements, observer));
@@ -294,12 +294,12 @@ public class CommentManager {
                     return;
                 }
 
-                loadFromDb(constraint, observer);
+                loadFromDatabase(constraint, observer);
             }
         };
     }
 
-    public static class Constraint implements RefreshManager.Constraint {
+    public static class Constraint {
         private StoreModel store;
         private long offset;
         private int limit;
