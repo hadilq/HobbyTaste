@@ -20,6 +20,8 @@ import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
 import junit.framework.Assert;
 import rx.Observer;
 
+import java.util.List;
+
 /**
  * @author hadi
  * @since 12/7/2016 AD
@@ -55,12 +57,7 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
             RecyclerListAdapter adapter,
             OnInsertData insertData
     ) {
-        StoreModel store = getArguments().getParcelable(BUNDLE_KEY_STORE);
-        if (store == null) {
-            store = new StoreModel();
-            Assert.fail("Store cannot be null!");
-        }
-        return new StoreDetailsProvider(adapter, insertData, store);
+        return new StoreDetailsProvider(adapter, insertData, getStoreModel());
     }
 
     @Override protected <T extends Event> Observer<T> getObserver() {
@@ -72,6 +69,9 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
             }
 
             @Override public void onNext(T t) {
+                if (t instanceof RatingViewHolder.OnHeartClick) {
+                    onHeartClick();
+                }
             }
         };
     }
@@ -79,6 +79,24 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
     @Override public void onDestroyView() {
         mProvider.clear();
         super.onDestroyView();
+    }
+
+    private StoreModel getStoreModel() {
+        StoreModel store = getArguments().getParcelable(BUNDLE_KEY_STORE);
+        if (store == null) {
+            store = new StoreModel();
+            Assert.fail("Store cannot be null!");
+        }
+        return store;
+    }
+
+    private void onHeartClick() {
+        StoreModel store = getStoreModel();
+        store.heartBeat();
+        List<Integer> list = mAdapter.findViewHolder(RatingViewHolder.class);
+        for (Integer integer : list) {
+            mAdapter.notifyItemChanged(integer);
+        }
     }
 
     public void addComment(CommentModel comment) {

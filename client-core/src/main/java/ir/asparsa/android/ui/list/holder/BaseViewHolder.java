@@ -3,6 +3,7 @@ package ir.asparsa.android.ui.list.holder;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import rx.Observer;
 
@@ -12,11 +13,11 @@ import rx.Observer;
  */
 public abstract class BaseViewHolder<DATA extends BaseRecyclerData> extends RecyclerView.ViewHolder {
 
-    protected final Observer mObserver;
+    protected final Observer<BaseRecyclerFragment.Event> mObserver;
 
     public BaseViewHolder(
             View itemView,
-            Observer observer,
+            Observer<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView);

@@ -6,8 +6,12 @@
 
     <color name="toolbar_title">#ebe7f1</color>
     <color name="text">#110720</color>
+    <color name="text_hint">#777778</color>
 
     <color name="divider">#dcdcdc</color>
+
+    <color name="heart_on">#df4c4c</color>
+    <color name="heart_off">#948181</color>
 
 
 </resources>

@@ -18,6 +18,7 @@
     <dimen name="vertical_margin_half">16dp</dimen>
     <dimen name="vertical_margin">32dp</dimen>
     <dimen name="vertical_margin_double">64dp</dimen>
+    <dimen name="heart_size">35dp</dimen>
 
 
 </resources>

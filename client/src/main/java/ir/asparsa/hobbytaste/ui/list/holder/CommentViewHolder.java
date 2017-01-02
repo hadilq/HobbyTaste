@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.list.data.CommentData;
@@ -20,7 +21,7 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
 
     public CommentViewHolder(
             View itemView,
-            Observer observer,
+            Observer<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);

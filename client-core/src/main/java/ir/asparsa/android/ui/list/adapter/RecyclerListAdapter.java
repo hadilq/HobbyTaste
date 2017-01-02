@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import ir.asparsa.android.core.logger.L;
+import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.android.ui.list.holder.EmptyViewHolder;
@@ -32,14 +33,14 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
     private final RecyclerView mRecyclerView;
     private List<BaseRecyclerData> mList = new ArrayList<>();
     private final SparseArrayCompat<Class<? extends BaseViewHolder>> mHoldersMap;
-    private final Observer mObserver;
+    private final Observer<BaseRecyclerFragment.Event> mObserver;
 
     public RecyclerListAdapter(
             @NonNull RecyclerView recyclerView,
             @NonNull LinearLayoutManager layoutManager,
             @Nullable Bundle savedInstanceState,
             @NonNull SparseArrayCompat<Class<? extends BaseViewHolder>> holdersMap,
-            @Nullable Observer observer
+            @Nullable Observer<BaseRecyclerFragment.Event> observer
     ) {
         this.mRecyclerView = recyclerView;
         this.mLayoutManager = layoutManager;
@@ -210,7 +211,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
         List<BaseRecyclerData> list = new ArrayList<>();
         for (BaseRecyclerData data : mList) {
             if (clazz.isInstance(data)) {
-                list.add((BaseRecyclerData) data);
+                list.add(data);
             }
         }
         return list;

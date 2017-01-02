@@ -21,7 +21,7 @@ public class UserNameViewHolder extends BaseViewHolder<UsernameData> {
 
     public UserNameViewHolder(
             View itemView,
-            Observer observer,
+            Observer<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);

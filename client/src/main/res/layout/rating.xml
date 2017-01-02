@@ -1,17 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-    <RatingBar
-            android:id="@+id/rating"
+    <ImageView
+            android:id="@+id/heart"
+            android:layout_width="@dimen/heart_size"
+            android:layout_height="@dimen/heart_size"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/heart"/>
+
+    <TextView
+            android:id="@+id/rate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/horizontal_margin_double"
-            android:layout_marginEnd="@dimen/horizontal_margin_double"
-            style="?android:attr/ratingBarStyleSmall"
-            android:numStars="5"
-            android:stepSize="0.1"
-            android:isIndicator="true"/>
+            android:layout_toRightOf="@id/heart"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/font_size_small"
+            android:textColor="@color/text_hint"/>
 
-</FrameLayout>
+    <TextView
+            android:id="@+id/viewed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/font_size_small"
+            android:textColor="@color/text_hint"/>
+
+</RelativeLayout>

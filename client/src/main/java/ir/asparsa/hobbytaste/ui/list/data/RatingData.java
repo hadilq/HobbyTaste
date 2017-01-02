@@ -10,18 +10,34 @@ public class RatingData extends BaseRecyclerData {
 
     public static final int VIEW_TYPE = R.layout.rating;
 
-    private final float mRate;
+    private final long mRate;
+    private final long mViewed;
+    private final boolean mLike;
 
-    public RatingData(float rate) {
-        mRate = rate;
+    public RatingData(
+            long rate,
+            long viewed,
+            boolean like
+    ) {
+        this.mRate = rate;
+        this.mViewed = viewed;
+        this.mLike = like;
     }
 
     @Override public int getViewType() {
         return VIEW_TYPE;
     }
 
-    public float getRate() {
+    public long getRate() {
         return mRate;
+    }
+
+    public long getViewed() {
+        return mViewed;
+    }
+
+    public boolean isLike() {
+        return mLike;
     }
 
     @Override public boolean equals(Object otherObj) {

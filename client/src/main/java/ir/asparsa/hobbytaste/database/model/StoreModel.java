@@ -31,8 +31,12 @@ public class StoreModel extends BaseModel implements Parcelable {
     private String title;
     @DatabaseField(columnName = StoreColumns.DESCRIPTION)
     private String description;
-    @DatabaseField(columnName = StoreColumns.RATE)
-    private Float rate;
+    @DatabaseField(columnName = StoreColumns.RATE, canBeNull = false)
+    private long rate;
+    @DatabaseField(columnName = StoreColumns.VIEWED, canBeNull = false)
+    private long viewed;
+    @DatabaseField(columnName = StoreColumns.LIKE, canBeNull = false)
+    private boolean liked;
 
     private List<BannerModel> banners;
 
@@ -46,6 +50,8 @@ public class StoreModel extends BaseModel implements Parcelable {
         storeModel.lon = storeLightDto.getLon();
         storeModel.title = storeLightDto.getTitle();
         storeModel.rate = storeLightDto.getRate();
+        storeModel.viewed = storeLightDto.getViewed();
+        storeModel.liked = storeLightDto.getLike();
         storeModel.description = storeLightDto.getDescription();
         List<BannerModel> banners = new ArrayList<>();
         if (storeLightDto.getBanners() != null && storeLightDto.getBanners().size() != 0) {
@@ -78,8 +84,16 @@ public class StoreModel extends BaseModel implements Parcelable {
         return description;
     }
 
-    public Float getRate() {
+    public long getRate() {
         return rate;
+    }
+
+    public long getViewed() {
+        return viewed;
+    }
+
+    public boolean isLiked() {
+        return liked;
     }
 
     public List<BannerModel> getBanners() {
@@ -88,6 +102,10 @@ public class StoreModel extends BaseModel implements Parcelable {
 
     public void setBanners(List<BannerModel> banners) {
         this.banners = banners;
+    }
+
+    public void heartBeat() {
+        liked = !liked;
     }
 
     @Override
@@ -127,21 +145,25 @@ public class StoreModel extends BaseModel implements Parcelable {
             Parcel dest,
             int flags
     ) {
-        dest.writeValue(this.id);
-        dest.writeValue(this.lat);
-        dest.writeValue(this.lon);
+        dest.writeLong(this.id);
+        dest.writeDouble(this.lat);
+        dest.writeDouble(this.lon);
         dest.writeString(this.title);
         dest.writeString(this.description);
-        dest.writeFloat(this.rate);
+        dest.writeValue(this.rate);
+        dest.writeValue(this.viewed);
+        dest.writeByte(this.liked ? (byte) 1 : (byte) 0);
     }
 
     protected StoreModel(Parcel in) {
-        this.id = (Long) in.readValue(Long.class.getClassLoader());
-        this.lat = (Double) in.readValue(Double.class.getClassLoader());
-        this.lon = (Double) in.readValue(Double.class.getClassLoader());
+        this.id = in.readLong();
+        this.lat = in.readDouble();
+        this.lon = in.readDouble();
         this.title = in.readString();
         this.description = in.readString();
-        this.rate = in.readFloat();
+        this.rate = (Long) in.readValue(Long.class.getClassLoader());
+        this.viewed = (Long) in.readValue(Long.class.getClassLoader());
+        this.liked = in.readByte() != 0;
     }
 
     public static final Creator<StoreModel> CREATOR = new Creator<StoreModel>() {

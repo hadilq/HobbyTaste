@@ -12,4 +12,5 @@ public interface StoreColumns {
     String VIEWED = "viewed";
     String RATE = "rate";
     String BANNERS = "banners";
+    String LIKE = "like";
 }

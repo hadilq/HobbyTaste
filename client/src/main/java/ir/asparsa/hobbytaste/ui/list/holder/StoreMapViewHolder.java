@@ -10,6 +10,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.*;
 import ir.asparsa.android.core.logger.L;
+import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
@@ -35,7 +36,7 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
 
     public StoreMapViewHolder(
             View itemView,
-            Observer observer,
+            Observer<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);
