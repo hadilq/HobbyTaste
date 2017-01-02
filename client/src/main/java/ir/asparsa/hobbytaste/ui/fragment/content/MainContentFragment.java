@@ -15,12 +15,11 @@ import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
-import ir.asparsa.hobbytaste.core.manager.RefreshManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
-import rx.Subscriber;
+import rx.Observer;
 import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
@@ -37,8 +36,6 @@ public class MainContentFragment extends BaseContentFragment
 
     @Inject
     AuthorizationManager mAuthorizationManager;
-    @Inject
-    RefreshManager mRefreshManager;
     @Inject
     StoresManager mStoresManager;
 
@@ -59,8 +56,8 @@ public class MainContentFragment extends BaseContentFragment
         ApplicationLauncher.mainComponent().inject(this);
     }
 
-    private Subscriber<Collection<StoreModel>> getDatabaseSubscriber() {
-        return new Subscriber<Collection<StoreModel>>() {
+    private Observer<Collection<StoreModel>> getDatabaseObserver() {
+        return new Observer<Collection<StoreModel>>() {
             @Override public void onCompleted() {
                 L.i(MainContentFragment.class, "Refresh request gets completed");
             }
@@ -131,10 +128,7 @@ public class MainContentFragment extends BaseContentFragment
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState
     ) {
-        subscription.add(mStoresManager.getStoresObservable().subscribe(getDatabaseSubscriber()));
-        subscription.add(mStoresManager.subscribe(getDatabaseSubscriber()));
-
-        mRefreshManager.refreshStores();
+        subscription.add(mStoresManager.loadStores(getDatabaseObserver()));
         return inflater.inflate(R.layout.main_content_fragment, container, false);
     }
 
