@@ -5,6 +5,7 @@ import android.support.v4.util.SparseArrayCompat;
 import android.view.View;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
+import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
@@ -70,7 +71,9 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
 
             @Override public void onNext(T t) {
                 if (t instanceof RatingViewHolder.OnHeartClick) {
-                    onHeartClick();
+                    onStoreHeartClick();
+                } else if (t instanceof CommentViewHolder.OnHeartClick) {
+                    onCommentHeartClick(((CommentViewHolder.OnHeartClick) t).getComment());
                 }
             }
         };
@@ -90,7 +93,7 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
         return store;
     }
 
-    private void onHeartClick() {
+    private void onStoreHeartClick() {
         StoreModel store = getStoreModel();
         store.heartBeat();
         List<Integer> list = mAdapter.findViewHolder(RatingViewHolder.class);
@@ -99,7 +102,26 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
         }
     }
 
+    private void onCommentHeartClick(CommentModel comment) {
+        comment.heartBeat();
+        int index = findViewHolder(comment);
+        if (index != -1) {
+            mAdapter.notifyItemChanged(index);
+        }
+    }
+
     public void addComment(CommentModel comment) {
         mProvider.addComment(comment);
     }
+
+    private int findViewHolder(CommentModel comment) {
+        List<BaseRecyclerData> list = mAdapter.findData(CommentData.class);
+        for (BaseRecyclerData data : list) {
+            if (comment.equals(data)) {
+                return list.indexOf(data);
+            }
+        }
+        return -1;
+    }
+
 }

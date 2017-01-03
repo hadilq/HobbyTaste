@@ -6,27 +6,30 @@ package ir.asparsa.common.net.dto;
  */
 public class StoreCommentDto {
 
-    private Float rate;
     private String description;
     private Long created;
     private Long storeId;
     private Long hashCode;
+    private Long rate;
+    private Boolean like;
 
     public StoreCommentDto() {
     }
 
     public StoreCommentDto(
-            float rate,
             String description,
-            long created,
-            long storeId,
-            long hashCode
+            Long created,
+            Long storeId,
+            Long hashCode,
+            Long rate,
+            Boolean like
     ) {
-        this.rate = rate;
         this.description = description;
         this.created = created;
         this.storeId = storeId;
         this.hashCode = hashCode;
+        this.rate = rate;
+        this.like = like;
     }
 
     public StoreCommentDto(
@@ -41,7 +44,7 @@ public class StoreCommentDto {
         return description;
     }
 
-    public float getRate() {
+    public long getRate() {
         return rate;
     }
 
@@ -53,7 +56,11 @@ public class StoreCommentDto {
         return storeId;
     }
 
-    public Long getHashCode() {
+    public long getHashCode() {
         return hashCode;
+    }
+
+    public Boolean getLike() {
+        return like;
     }
 }

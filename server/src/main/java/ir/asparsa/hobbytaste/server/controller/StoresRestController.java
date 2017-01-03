@@ -1,6 +1,6 @@
 package ir.asparsa.hobbytaste.server.controller;
 
-import ir.asparsa.common.database.model.CommentColumns;
+import ir.asparsa.common.database.model.Comment;
 import ir.asparsa.common.net.dto.PageDto;
 import ir.asparsa.common.net.dto.ResponseDto;
 import ir.asparsa.common.net.dto.StoreCommentDto;
@@ -26,10 +26,7 @@ import rx.Observable;
 import rx.schedulers.Schedulers;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author hadi
@@ -48,7 +45,7 @@ import java.util.Optional;
     @Autowired
     StoreRepository storeRepository;
     @Autowired
-    StoreLikeRepository storeRateRepository;
+    StoreLikeRepository storeLikeRepository;
     @Autowired
     StoreCommentRepository storeCommentRepository;
     @Autowired
@@ -70,7 +67,7 @@ import java.util.Optional;
             logger.error("Account is null, header " + request.getHeader(tokenHeader));
             throw new InternalServerErrorException();
         }
-        List<StoreLikeModel> storeLikes = storeRateRepository.findByAccount(account);
+        List<StoreLikeModel> storeLikes = storeLikeRepository.findByAccount(account);
 
         Collection<StoreDto> collection = new LinkedList<>();
         for (StoreModel storeModel : storeRepository.findAll()) {
@@ -103,7 +100,7 @@ import java.util.Optional;
             logger.error("Account is null, header " + request.getHeader(tokenHeader));
             throw new InternalServerErrorException();
         }
-        Optional<StoreLikeModel> storeLike = storeRateRepository.findByAccountAndStore(account, storeModel.get());
+        Optional<StoreLikeModel> storeLike = storeLikeRepository.findByAccountAndStore(account, storeModel.get());
 
         storeModel.get().increaseViewed();
         Observable.create((Observable.OnSubscribe<Void>) subscriber -> storeRepository.save(storeModel.get()))
@@ -117,9 +114,17 @@ import java.util.Optional;
     PageDto<StoreCommentDto> readStoreCommentsList(
             @PathVariable("storeId") Long id,
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "20") int size
+            @RequestParam(value = "size", defaultValue = "20") int size,
+            HttpServletRequest request
     ) {
         logger.info("read store comments request: storeId: " + id + ", page: " + page + ", size: " + size);
+
+        AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
+        if (account == null) {
+            // This request must be authorized before, so this never should happened
+            logger.error("Account is null, header " + request.getHeader(tokenHeader));
+            throw new InternalServerErrorException();
+        }
 
         Optional<StoreModel> storeModel = storeRepository.findById(id);
         if (!storeModel.isPresent()) {
@@ -127,14 +132,21 @@ import java.util.Optional;
         }
 
         Pageable pageable = new PageRequest(page, size, new Sort(
-                new Sort.Order(Sort.Direction.DESC, CommentColumns.CREATED)
+                new Sort.Order(Sort.Direction.DESC, Comment.Columns.CREATED)
         ));
         Page<CommentModel> comments = storeCommentRepository.findByStore(storeModel.get(), pageable);
 
+        List<CommentLikeModel> commentLikes = commentLikeRepository.findByAccountAndStore(account, storeModel.get());
         List<StoreCommentDto> list = new ArrayList<>();
-
         for (CommentModel comment : comments) {
-            list.add(CommentModel.convertToDto(comment));
+            boolean like = false;
+            for (CommentLikeModel commentLike : commentLikes) {
+                if (commentLike.getComment().equals(comment)) {
+                    like = true;
+                    break;
+                }
+            }
+            list.add(CommentModel.convertToDto(comment, like));
             logger.info("Loaded comment: " + comment);
         }
 
@@ -155,11 +167,15 @@ import java.util.Optional;
         Optional<CommentModel> existComment = storeCommentRepository
                 .findByHashCodeAndStore(comment.getHashCode(), storeModel.get());
 
+        CommentModel entity;
         if (!existComment.isPresent()) {
-            CommentModel entity = CommentModel.newInstance(comment, storeModel.get());
+            entity = CommentModel.newInstance(comment, storeModel.get());
             logger.info("Saved comment: " + entity);
-            storeCommentRepository.save(entity);
+            entity = storeCommentRepository.save(entity);
+        } else {
+            entity = existComment.get();
         }
+        // TODO send entity
         return new ResponseDto(ResponseDto.STATUS.SUCCEED);
     }
 
@@ -180,7 +196,7 @@ import java.util.Optional;
             logger.error("Account is null, header " + request.getHeader(tokenHeader));
             throw new InternalServerErrorException();
         }
-        List<StoreLikeModel> storeLikes = storeRateRepository.findByAccount(account);
+        List<StoreLikeModel> storeLikes = storeLikeRepository.findByAccount(account);
         StoreLikeModel storeLiked = null;
         for (StoreLikeModel storeLike : storeLikes) {
             if (storeLike.getStore().equals(storeModel.get())) {
@@ -190,7 +206,7 @@ import java.util.Optional;
         }
 
         if (storeLiked == null) {
-            storeRateRepository.save(new StoreLikeModel(storeModel.get(), account));
+            storeLikeRepository.save(new StoreLikeModel(storeModel.get(), account));
         }
 
         storeModel.get().increaseRate();
@@ -218,7 +234,7 @@ import java.util.Optional;
             logger.error("Account is null, header " + request.getHeader(tokenHeader));
             throw new InternalServerErrorException();
         }
-        List<StoreLikeModel> storeLikes = storeRateRepository.findByAccount(account);
+        List<StoreLikeModel> storeLikes = storeLikeRepository.findByAccount(account);
         StoreLikeModel storeLiked = null;
         for (StoreLikeModel storeLike : storeLikes) {
             if (storeLike.getStore().equals(storeModel.get())) {
@@ -228,7 +244,7 @@ import java.util.Optional;
         }
 
         if (storeLiked != null) {
-            storeRateRepository.delete(storeLiked);
+            storeLikeRepository.delete(storeLiked);
         }
 
         storeModel.get().decreaseRate();
@@ -262,7 +278,7 @@ import java.util.Optional;
             throw new InternalServerErrorException();
         }
 
-        List<CommentLikeModel> commentLikes = commentLikeRepository.findByAccount(account);
+        List<CommentLikeModel> commentLikes = commentLikeRepository.findByAccountAndStore(account, storeModel.get());
         CommentLikeModel commentLiked = null;
         for (CommentLikeModel commentLike : commentLikes) {
             if (commentLike.getComment().equals(commentModel.get())) {
@@ -306,7 +322,7 @@ import java.util.Optional;
             throw new InternalServerErrorException();
         }
 
-        List<CommentLikeModel> commentLikes = commentLikeRepository.findByAccount(account);
+        List<CommentLikeModel> commentLikes = commentLikeRepository.findByAccountAndStore(account, storeModel.get());
         CommentLikeModel commentLiked = null;
         for (CommentLikeModel commentLike : commentLikes) {
             if (commentLike.getComment().equals(commentModel.get())) {
