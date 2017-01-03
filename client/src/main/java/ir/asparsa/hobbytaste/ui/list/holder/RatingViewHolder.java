@@ -19,7 +19,7 @@ import rx.Observer;
 public class RatingViewHolder extends BaseViewHolder<RatingData> {
 
     @BindView(R.id.heart)
-    ImageView mHearImageView;
+    ImageView mHeartImageView;
     @BindView(R.id.rate)
     TextView mRateTextView;
     @BindView(R.id.viewed)
@@ -35,13 +35,17 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
     }
 
     @Override public void onBindView(RatingData data) {
-        mHearImageView.getDrawable().setColorFilter(
-                itemView.getResources().getColor(data.isLike() ? R.color.heart_on : R.color.heart_off),
-                PorterDuff.Mode.SRC_ATOP);
-        mRateTextView.setText(Long.toString(data.getRate()));
+        mRateTextView.setText(itemView.getContext().getResources()
+                                      .getString(R.string.rating, data.getRate(),
+                                                 itemView.getContext().getResources().getQuantityString(
+                                                         R.plurals.like, (int) data.getRate())));
+
         mViewedTextView.setText(Long.toString(data.getViewed()));
 
-        mHearImageView.setOnClickListener(new View.OnClickListener() {
+        mHeartImageView.getDrawable().setColorFilter(
+                itemView.getResources().getColor(data.isLike() ? R.color.heart_on : R.color.heart_off),
+                PorterDuff.Mode.SRC_ATOP);
+        mHeartImageView.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
                 if (mObserver != null) {
                     mObserver.onNext(new OnHeartClick());

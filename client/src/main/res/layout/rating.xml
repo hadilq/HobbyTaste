@@ -7,7 +7,7 @@
             android:id="@+id/heart"
             android:layout_width="@dimen/heart_size"
             android:layout_height="@dimen/heart_size"
-            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:src="@drawable/heart"/>
 
@@ -15,7 +15,7 @@
             android:id="@+id/rate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/heart"
+            android:layout_toEndOf="@id/heart"
             android:layout_centerVertical="true"
             android:textSize="@dimen/font_size_small"
             android:textColor="@color/text_hint"/>
@@ -24,7 +24,7 @@
             android:id="@+id/viewed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:textSize="@dimen/font_size_small"
             android:textColor="@color/text_hint"/>
