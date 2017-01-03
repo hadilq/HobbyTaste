@@ -1,6 +1,6 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
-import ir.asparsa.common.database.model.StoreColumns;
+import ir.asparsa.common.database.model.Store;
 import ir.asparsa.common.net.dto.BannerDto;
 import ir.asparsa.common.net.dto.StoreDto;
 
@@ -15,29 +15,29 @@ import java.util.List;
  * @since 11/30/2016 AD
  */
 @Entity
-@Table(name = "stores")
+@Table(name = Store.TABLE_NAME)
 public class StoreModel implements Serializable {
 
     @Id
     @GeneratedValue
     private long id;
 
-    @Column(name = StoreColumns.LAT)
+    @Column(name = Store.Columns.LAT)
     private double lat;
-    @Column(name = StoreColumns.LON)
+    @Column(name = Store.Columns.LON)
     private double lon;
 
-    @Column(name = StoreColumns.TITLE)
+    @Column(name = Store.Columns.TITLE)
     private String title;
-    @Column(name = StoreColumns.DESCRIPTION)
+    @Column(name = Store.Columns.DESCRIPTION)
     private String description;
-    @Column(name = StoreColumns.VIEWED)
+    @Column(name = Store.Columns.VIEWED)
     private Long viewed;
-    @Column(name = StoreColumns.RATE)
+    @Column(name = Store.Columns.RATE)
     private Long rate;
 
     @OneToMany(mappedBy = "store", fetch = FetchType.EAGER)
-    @Column(name = StoreColumns.BANNERS)
+    @Column(name = Store.Columns.BANNERS)
     private Collection<BannerModel> banners;
 
     StoreModel() {

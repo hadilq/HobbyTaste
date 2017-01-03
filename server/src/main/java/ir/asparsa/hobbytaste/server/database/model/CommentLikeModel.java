@@ -1,25 +1,27 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
-import ir.asparsa.common.database.model.CommentLikeColumns;
+import ir.asparsa.common.database.model.CommentLike;
 
 import javax.persistence.*;
 
 /**
  * Created by hadi on 12/30/2016 AD.
  */
+@Entity
+@Table(name = CommentLike.TABLE_NAME)
 public class CommentLikeModel {
 
     @Id
     @GeneratedValue
-    @Column(name = CommentLikeColumns.ID)
+    @Column(name = CommentLike.Columns.ID)
     private long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = CommentLikeColumns.COMMENT)
+    @JoinColumn(name = CommentLike.Columns.COMMENT)
     private CommentModel comment;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = CommentLikeColumns.ACCOUNT)
+    @JoinColumn(name = CommentLike.Columns.ACCOUNT)
     private AccountModel account;
 
     public CommentLikeModel() {

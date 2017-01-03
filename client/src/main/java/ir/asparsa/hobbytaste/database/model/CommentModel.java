@@ -5,43 +5,48 @@ import android.os.Parcelable;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
-import ir.asparsa.common.database.model.CommentColumns;
+import ir.asparsa.common.database.model.Comment;
 import ir.asparsa.common.net.dto.StoreCommentDto;
 
 /**
  * @author hadi
  * @since 12/7/2016 AD
  */
-@DatabaseTable(tableName = "comments")
+@DatabaseTable(tableName = Comment.TABLE_NAME)
 public class CommentModel extends BaseModel implements Parcelable {
 
 
-    @DatabaseField(columnName = CommentColumns.ID, generatedId = true)
+    @DatabaseField(columnName = Comment.Columns.ID, generatedId = true)
     private long id;
 
-    @DatabaseField(columnName = CommentColumns.DESCRIPTION, canBeNull = false)
+    @DatabaseField(columnName = Comment.Columns.DESCRIPTION, canBeNull = false)
     private String description;
-    @DatabaseField(columnName = CommentColumns.RATE)
-    private Float rate;
-    @DatabaseField(columnName = CommentColumns.CREATED)
-    private Long created;
-    @DatabaseField(columnName = CommentColumns.STORE, canBeNull = false)
+    @DatabaseField(columnName = Comment.Columns.RATE, canBeNull = false)
+    private long rate;
+    @DatabaseField(columnName = Comment.Columns.LIKE)
+    private boolean like;
+    @DatabaseField(columnName = Comment.Columns.CREATED)
+    private long created;
+    @DatabaseField(columnName = Comment.Columns.STORE, canBeNull = false)
     private long storeId;
-    @DatabaseField(columnName = CommentColumns.HASH_CODE)
+    @DatabaseField(columnName = Comment.Columns.HASH_CODE)
     private long hashCode;
+
 
     public CommentModel() {
     }
 
     public CommentModel(
             String description,
-            float rate,
+            long rate,
+            boolean like,
             long created,
             long storeId,
             long hashCode
     ) {
         this.description = description;
         this.rate = rate;
+        this.like = like;
         this.created = created;
         this.storeId = storeId;
         this.hashCode = hashCode;
@@ -53,12 +58,12 @@ public class CommentModel extends BaseModel implements Parcelable {
     ) {
         this.description = description;
         this.storeId = storeId;
-        created = System.currentTimeMillis();
+        this.created = System.currentTimeMillis();
         this.hashCode = created ^ (((long) getDescription().hashCode()) << 31);
     }
 
     public static CommentModel newInstance(StoreCommentDto storeCommentDto) {
-        return new CommentModel(storeCommentDto.getDescription(), storeCommentDto.getRate(),
+        return new CommentModel(storeCommentDto.getDescription(), storeCommentDto.getRate(), storeCommentDto.getLike(),
                                 storeCommentDto.getCreated(), storeCommentDto.getStoreId(),
                                 storeCommentDto.getHashCode());
     }
@@ -75,8 +80,12 @@ public class CommentModel extends BaseModel implements Parcelable {
         return description;
     }
 
-    public Float getRate() {
+    public long getRate() {
         return rate;
+    }
+
+    public boolean isLike() {
+        return like;
     }
 
     public long getCreated() {
@@ -89,6 +98,10 @@ public class CommentModel extends BaseModel implements Parcelable {
 
     public long getStoreId() {
         return storeId;
+    }
+
+    public void heartBeat() {
+        like = !like;
     }
 
     @Override
@@ -105,11 +118,13 @@ public class CommentModel extends BaseModel implements Parcelable {
         return (int) (getHashCode() >> 15);
     }
 
+
     @Override public String toString() {
         return "CommentModel{" +
                "id=" + id +
                ", description='" + description + '\'' +
                ", rate=" + rate +
+               ", like=" + like +
                ", created=" + created +
                ", storeId=" + storeId +
                ", hashCode=" + hashCode +
@@ -124,17 +139,23 @@ public class CommentModel extends BaseModel implements Parcelable {
             Parcel dest,
             int flags
     ) {
-        dest.writeValue(this.id);
+        dest.writeLong(this.id);
         dest.writeString(this.description);
-        dest.writeFloat(this.rate);
-        dest.writeValue(this.storeId);
+        dest.writeLong(this.rate);
+        dest.writeByte(this.like ? (byte) 1 : (byte) 0);
+        dest.writeLong(this.created);
+        dest.writeLong(this.storeId);
+        dest.writeLong(this.hashCode);
     }
 
     protected CommentModel(Parcel in) {
-        this.id = (Long) in.readValue(Long.class.getClassLoader());
+        this.id = in.readLong();
         this.description = in.readString();
-        this.rate = in.readFloat();
-        this.storeId = (Long) in.readValue(Long.class.getClassLoader());
+        this.rate = in.readLong();
+        this.like = in.readByte() != 0;
+        this.created = in.readLong();
+        this.storeId = in.readLong();
+        this.hashCode = in.readLong();
     }
 
     public static final Creator<CommentModel> CREATOR = new Creator<CommentModel>() {

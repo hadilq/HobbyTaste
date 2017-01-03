@@ -5,23 +5,23 @@ import android.os.Parcelable;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
-import ir.asparsa.common.database.model.BannerColumns;
+import ir.asparsa.common.database.model.Banner;
 
 /**
  * @author hadi
  * @since 12/7/2016 AD
  */
-@DatabaseTable(tableName = "banners")
+@DatabaseTable(tableName = Banner.TABLE_NAME)
 public class BannerModel extends BaseModel implements Parcelable {
 
-    @DatabaseField(columnName = BannerColumns.ID, generatedId = true)
+    @DatabaseField(columnName = Banner.Columns.ID, generatedId = true)
     private long id;
 
-    @DatabaseField(columnName = BannerColumns.MAIN_URL)
+    @DatabaseField(columnName = Banner.Columns.MAIN_URL)
     private String mainUrl;
-    @DatabaseField(columnName = BannerColumns.THUMBNAIL_URL)
+    @DatabaseField(columnName = Banner.Columns.THUMBNAIL_URL)
     private String thumbnailUrl;
-    @DatabaseField(columnName = BannerColumns.STORE)
+    @DatabaseField(columnName = Banner.Columns.STORE)
     private long storeId;
 
     public BannerModel() {

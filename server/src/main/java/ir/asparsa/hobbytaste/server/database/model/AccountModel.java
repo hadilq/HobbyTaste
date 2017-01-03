@@ -6,14 +6,14 @@ package ir.asparsa.hobbytaste.server.database.model;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import ir.asparsa.common.database.model.AccountColumns;
+import ir.asparsa.common.database.model.Account;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 
 @Entity
-@Table(name = "accounts")
+@Table(name = Account.TABLE_NAME)
 public class AccountModel implements Serializable {
 
     @Id
@@ -21,13 +21,13 @@ public class AccountModel implements Serializable {
     private long id;
 
     @JsonIgnore
-    @Column(name = AccountColumns.PASSWORD)
+    @Column(name = Account.Columns.PASSWORD)
     private String password;
 
-    @Column(name = AccountColumns.USERNAME)
+    @Column(name = Account.Columns.USERNAME)
     private String username;
 
-    @Column(name = AccountColumns.ROLE)
+    @Column(name = Account.Columns.ROLE)
     private String role;
 
     AccountModel() { // jpa only

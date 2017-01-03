@@ -1,25 +1,27 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
-import ir.asparsa.common.database.model.StoreLikeColumns;
+import ir.asparsa.common.database.model.StoreLike;
 
 import javax.persistence.*;
 
 /**
  * Created by hadi on 12/30/2016 AD.
  */
+@Entity
+@Table(name = StoreLike.TABLE_NAME)
 public class StoreLikeModel {
 
     @Id
     @GeneratedValue
-    @Column(name = StoreLikeColumns.ID)
+    @Column(name = StoreLike.Columns.ID)
     private long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = StoreLikeColumns.STORE)
+    @JoinColumn(name = StoreLike.Columns.STORE)
     private StoreModel store;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = StoreLikeColumns.ACCOUNT)
+    @JoinColumn(name = StoreLike.Columns.ACCOUNT)
     private AccountModel account;
 
     public StoreLikeModel() {

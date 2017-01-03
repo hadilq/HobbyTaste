@@ -1,6 +1,6 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
-import ir.asparsa.common.database.model.CommentColumns;
+import ir.asparsa.common.database.model.Comment;
 import ir.asparsa.common.net.dto.StoreCommentDto;
 
 import javax.persistence.*;
@@ -10,24 +10,24 @@ import javax.persistence.*;
  * @since 12/7/2016 AD
  */
 @Entity
-@Table(name = "comments")
+@Table(name = Comment.TABLE_NAME)
 public class CommentModel {
 
     @Id
     @GeneratedValue
     private long id;
 
-    @Column(name = CommentColumns.DESCRIPTION)
+    @Column(name = Comment.Columns.DESCRIPTION)
     private String description;
-    @Column(name = CommentColumns.RATE)
+    @Column(name = Comment.Columns.RATE)
     private Long rate;
-    @Column(name = CommentColumns.CREATED)
+    @Column(name = Comment.Columns.CREATED)
     private long created;
-    @Column(name = CommentColumns.HASH_CODE)
+    @Column(name = Comment.Columns.HASH_CODE)
     private long hashCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = CommentColumns.STORE)
+    @JoinColumn(name = Comment.Columns.STORE)
     private StoreModel store;
 
     public CommentModel() {
@@ -41,12 +41,16 @@ public class CommentModel {
         this.description = description;
         this.hashCode = hashCode;
         this.store = store;
+        this.rate = 0L;
         this.created = System.currentTimeMillis();
     }
 
-    public static StoreCommentDto convertToDto(CommentModel comment) {
-        return new StoreCommentDto(comment.getRate(), comment.getDescription(), comment.getCreated(),
-                                   comment.getStore().getId(), comment.getHashCode());
+    public static StoreCommentDto convertToDto(
+            CommentModel comment,
+            boolean like
+    ) {
+        return new StoreCommentDto(comment.getDescription(), comment.getCreated(),
+                                   comment.getStore().getId(), comment.getHashCode(), comment.getRate(), like);
     }
 
     public static CommentModel newInstance(

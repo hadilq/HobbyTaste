@@ -1,6 +1,6 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
-import ir.asparsa.common.database.model.BannerColumns;
+import ir.asparsa.common.database.model.Banner;
 
 import javax.persistence.*;
 
@@ -9,20 +9,20 @@ import javax.persistence.*;
  * @since 12/7/2016 AD
  */
 @Entity
-@Table(name = "banners")
+@Table(name = Banner.TABLE_NAME)
 public class BannerModel {
 
     @Id
     @GeneratedValue
     private long id;
 
-    @Column(name = BannerColumns.MAIN_URL)
+    @Column(name = Banner.Columns.MAIN_URL)
     private String mainUrl;
-    @Column(name = BannerColumns.THUMBNAIL_URL)
+    @Column(name = Banner.Columns.THUMBNAIL_URL)
     private String thumbnailUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = BannerColumns.STORE)
+    @JoinColumn(name = Banner.Columns.STORE)
     private StoreModel store;
 
     public BannerModel() {

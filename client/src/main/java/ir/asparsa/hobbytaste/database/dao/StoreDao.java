@@ -1,6 +1,6 @@
 package ir.asparsa.hobbytaste.database.dao;
 
-import ir.asparsa.common.database.model.BannerColumns;
+import ir.asparsa.common.database.model.Banner;
 import ir.asparsa.hobbytaste.database.DatabaseHelper;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import rx.Observable;
@@ -36,7 +36,7 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
                                 bannerDao.getDao()
                                          .queryBuilder()
                                          .where()
-                                         .eq(BannerColumns.STORE, model.getId())
+                                         .eq(Banner.Columns.STORE, model.getId())
                                          .prepare()));
 
                     }

@@ -5,7 +5,7 @@ import android.os.Parcelable;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
-import ir.asparsa.common.database.model.StoreColumns;
+import ir.asparsa.common.database.model.Store;
 import ir.asparsa.common.net.dto.BannerDto;
 import ir.asparsa.common.net.dto.StoreDto;
 
@@ -16,26 +16,26 @@ import java.util.List;
  * @author hadi
  * @since 11/30/2016 AD
  */
-@DatabaseTable(tableName = "stores")
+@DatabaseTable(tableName = Store.TABLE_NAME)
 public class StoreModel extends BaseModel implements Parcelable {
 
-    @DatabaseField(id = true, columnName = StoreColumns.ID, canBeNull = false)
+    @DatabaseField(id = true, columnName = Store.Columns.ID, canBeNull = false)
     private long id;
 
-    @DatabaseField(columnName = StoreColumns.LAT, canBeNull = false)
+    @DatabaseField(columnName = Store.Columns.LAT, canBeNull = false)
     private double lat;
-    @DatabaseField(columnName = StoreColumns.LON, canBeNull = false)
+    @DatabaseField(columnName = Store.Columns.LON, canBeNull = false)
     private double lon;
 
-    @DatabaseField(columnName = StoreColumns.TITLE)
+    @DatabaseField(columnName = Store.Columns.TITLE)
     private String title;
-    @DatabaseField(columnName = StoreColumns.DESCRIPTION)
+    @DatabaseField(columnName = Store.Columns.DESCRIPTION)
     private String description;
-    @DatabaseField(columnName = StoreColumns.RATE, canBeNull = false)
+    @DatabaseField(columnName = Store.Columns.RATE, canBeNull = false)
     private long rate;
-    @DatabaseField(columnName = StoreColumns.VIEWED, canBeNull = false)
+    @DatabaseField(columnName = Store.Columns.VIEWED, canBeNull = false)
     private long viewed;
-    @DatabaseField(columnName = StoreColumns.LIKE, canBeNull = false)
+    @DatabaseField(columnName = Store.Columns.LIKE, canBeNull = false)
     private boolean liked;
 
     private List<BannerModel> banners;
@@ -134,6 +134,9 @@ public class StoreModel extends BaseModel implements Parcelable {
                ", title='" + title + '\'' +
                ", description='" + description + '\'' +
                ", rate=" + rate +
+               ", viewed=" + viewed +
+               ", liked=" + liked +
+               ", banners=" + banners +
                '}';
     }
 

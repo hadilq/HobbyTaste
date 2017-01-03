@@ -1,7 +1,7 @@
 package ir.asparsa.hobbytaste.database.dao;
 
 import com.j256.ormlite.dao.Dao;
-import ir.asparsa.common.database.model.CommentColumns;
+import ir.asparsa.common.database.model.Comment;
 import ir.asparsa.hobbytaste.database.DatabaseHelper;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
 import rx.Observable;
@@ -42,9 +42,9 @@ public class CommentDao extends AbsDao<CommentModel, Integer> {
                                     getDao().queryBuilder()
                                             .offset(offset)
                                             .limit(limit)
-                                            .orderBy(CommentColumns.CREATED, false)
+                                            .orderBy(Comment.Columns.CREATED, false)
                                             .where()
-                                            .eq(CommentColumns.STORE, storeId)
+                                            .eq(Comment.Columns.STORE, storeId)
                                             .prepare()));
 
                     subscriber.onCompleted();
@@ -64,9 +64,9 @@ public class CommentDao extends AbsDao<CommentModel, Integer> {
                     subscriber.onNext(
                             getDao().query(
                                     getDao().queryBuilder()
-                                            .orderBy(CommentColumns.CREATED, false)
+                                            .orderBy(Comment.Columns.CREATED, false)
                                             .where()
-                                            .eq(CommentColumns.STORE, storeId)
+                                            .eq(Comment.Columns.STORE, storeId)
                                             .prepare()));
 
                     subscriber.onCompleted();
@@ -85,7 +85,7 @@ public class CommentDao extends AbsDao<CommentModel, Integer> {
                             getDao().queryBuilder()
                                     .setCountOf(true)
                                     .where()
-                                    .eq(CommentColumns.STORE, storeId)
+                                    .eq(Comment.Columns.STORE, storeId)
                                     .prepare()));
                     subscriber.onCompleted();
                 } catch (Exception e) {
