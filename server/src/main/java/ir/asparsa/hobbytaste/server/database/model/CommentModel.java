@@ -45,12 +45,10 @@ public class CommentModel {
         this.created = System.currentTimeMillis();
     }
 
-    public static StoreCommentDto convertToDto(
-            CommentModel comment,
+    public StoreCommentDto convertToDto(
             boolean like
     ) {
-        return new StoreCommentDto(comment.getDescription(), comment.getCreated(),
-                                   comment.getStore().getId(), comment.getHashCode(), comment.getRate(), like);
+        return new StoreCommentDto(getDescription(), getCreated(), getStore().getId(), getHashCode(), getRate(), like);
     }
 
     public static CommentModel newInstance(

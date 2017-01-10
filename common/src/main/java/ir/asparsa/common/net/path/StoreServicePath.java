@@ -7,8 +7,6 @@ public interface StoreServicePath {
     String SERVICE = "store";
     String VIEWED = "/{storeId}/viewed";
     String COMMENTS = "/{storeId}/comments";
-    String LIKE = "/{storeId}/liked";
-    String UNLIKE = "/{storeId}/unlike";
-    String LIKE_COMMENT = "/{storeId}/comment/{commentHashCode}/like";
-    String UNLIKE_COMMENT = "/{storeId}/comment/{commentHashCode}/unlike";
+    String LIKE = "/{storeId}/liked/{like}";
+    String LIKE_COMMENT = "/{storeId}/comment/{commentHashCode}/like/{like}";
 }

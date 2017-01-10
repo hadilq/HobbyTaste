@@ -43,21 +43,21 @@ public class StoreModel extends BaseModel implements Parcelable {
     public StoreModel() {
     }
 
-    public static StoreModel instantiate(StoreDto storeLightDto) {
+    public static StoreModel instantiate(StoreDto storeDto) {
         StoreModel storeModel = new StoreModel();
-        storeModel.id = storeLightDto.getId();
-        storeModel.lat = storeLightDto.getLat();
-        storeModel.lon = storeLightDto.getLon();
-        storeModel.title = storeLightDto.getTitle();
-        storeModel.rate = storeLightDto.getRate();
-        storeModel.viewed = storeLightDto.getViewed();
-        storeModel.liked = storeLightDto.getLike();
-        storeModel.description = storeLightDto.getDescription();
+        storeModel.id = storeDto.getId();
+        storeModel.lat = storeDto.getLat();
+        storeModel.lon = storeDto.getLon();
+        storeModel.title = storeDto.getTitle();
+        storeModel.rate = storeDto.getRate();
+        storeModel.viewed = storeDto.getViewed();
+        storeModel.liked = storeDto.getLike();
+        storeModel.description = storeDto.getDescription();
         List<BannerModel> banners = new ArrayList<>();
-        if (storeLightDto.getBanners() != null && storeLightDto.getBanners().size() != 0) {
-            for (BannerDto bannerDto : storeLightDto.getBanners()) {
+        if (storeDto.getBanners() != null && storeDto.getBanners().size() != 0) {
+            for (BannerDto bannerDto : storeDto.getBanners()) {
                 banners.add(
-                        new BannerModel(bannerDto.getMainUrl(), bannerDto.getThumbnailUrl(), storeLightDto.getId()));
+                        new BannerModel(bannerDto.getMainUrl(), bannerDto.getThumbnailUrl(), storeDto.getId()));
             }
         }
         storeModel.banners = banners;
@@ -106,6 +106,7 @@ public class StoreModel extends BaseModel implements Parcelable {
 
     public void heartBeat() {
         liked = !liked;
+        rate = liked ? rate + 1 : rate - 1;
     }
 
     @Override

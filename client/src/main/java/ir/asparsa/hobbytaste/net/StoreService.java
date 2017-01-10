@@ -35,24 +35,15 @@ public interface StoreService {
     );
 
     @PUT(StoreServicePath.SERVICE + StoreServicePath.LIKE)
-    Observable<ResponseDto> like(
-            @Path("storeId") Long id
-    );
-
-    @PUT(StoreServicePath.SERVICE + StoreServicePath.UNLIKE)
-    Observable<ResponseDto> unlike(
-            @Path("storeId") Long id
+    Observable<StoreDto> like(
+            @Path("storeId") Long id,
+            @Path("like") Boolean like
     );
 
     @PUT(StoreServicePath.SERVICE + StoreServicePath.LIKE_COMMENT)
-    Observable<ResponseDto> likeComment(
+    Observable<StoreCommentDto> likeComment(
             @Path("storeId") Long id,
-            @Path("commentHashCode") Long commentHashCode
-    );
-
-    @PUT(StoreServicePath.SERVICE + StoreServicePath.UNLIKE_COMMENT)
-    Observable<ResponseDto> unlikeComment(
-            @Path("storeId") Long id,
-            @Path("commentHashCode") Long commentHashCode
+            @Path("commentHashCode") Long commentHashCode,
+            @Path("like") Boolean like
     );
 }

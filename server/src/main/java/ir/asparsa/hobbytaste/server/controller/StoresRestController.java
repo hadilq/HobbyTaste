@@ -2,7 +2,6 @@ package ir.asparsa.hobbytaste.server.controller;
 
 import ir.asparsa.common.database.model.Comment;
 import ir.asparsa.common.net.dto.PageDto;
-import ir.asparsa.common.net.dto.ResponseDto;
 import ir.asparsa.common.net.dto.StoreCommentDto;
 import ir.asparsa.common.net.dto.StoreDto;
 import ir.asparsa.common.net.path.StoreServicePath;
@@ -23,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import rx.Observable;
+import rx.Observer;
 import rx.schedulers.Schedulers;
 
 import javax.servlet.http.HttpServletRequest;
@@ -146,7 +146,7 @@ import java.util.*;
                     break;
                 }
             }
-            list.add(CommentModel.convertToDto(comment, like));
+            list.add(comment.convertToDto(like));
             logger.info("Loaded comment: " + comment);
         }
 
@@ -154,7 +154,7 @@ import java.util.*;
     }
 
     @RequestMapping(value = StoreServicePath.COMMENTS, method = RequestMethod.PUT)
-    ResponseDto saveStoreComments(
+    StoreCommentDto saveStoreComments(
             @PathVariable("storeId") Long id,
             @RequestBody StoreCommentDto comment
     ) {
@@ -175,27 +175,29 @@ import java.util.*;
         } else {
             entity = existComment.get();
         }
-        // TODO send entity
-        return new ResponseDto(ResponseDto.STATUS.SUCCEED);
+        return entity.convertToDto(false);
     }
 
     @RequestMapping(value = StoreServicePath.LIKE, method = RequestMethod.PUT)
-    ResponseDto saveStoreLike(
+    StoreDto saveStoreLike(
             @PathVariable("storeId") Long id,
+            @PathVariable("like") Boolean like,
             HttpServletRequest request
     ) {
-        logger.info("save store like request: storeId: " + id + ", liked");
+        logger.info("save store like request: storeId: " + id + ", liked: " + like);
 
         Optional<StoreModel> storeModel = storeRepository.findById(id);
         if (!storeModel.isPresent()) {
             throw new StoreNotFoundException();
         }
+
         AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
         if (account == null) {
             // This request must be authorized before, so this never should happened
             logger.error("Account is null, header " + request.getHeader(tokenHeader));
             throw new InternalServerErrorException();
         }
+
         List<StoreLikeModel> storeLikes = storeLikeRepository.findByAccount(account);
         StoreLikeModel storeLiked = null;
         for (StoreLikeModel storeLike : storeLikes) {
@@ -205,72 +207,54 @@ import java.util.*;
             }
         }
 
-        if (storeLiked == null) {
+        if (like && storeLiked == null) {
             storeLikeRepository.save(new StoreLikeModel(storeModel.get(), account));
-        }
-
-        storeModel.get().increaseRate();
-        Observable.create((Observable.OnSubscribe<Void>) subscriber -> storeRepository.save(storeModel.get()))
-                  .subscribeOn(Schedulers.newThread())
-                  .subscribe();
-
-        return new ResponseDto(ResponseDto.STATUS.SUCCEED);
-    }
-
-    @RequestMapping(value = StoreServicePath.UNLIKE, method = RequestMethod.PUT)
-    ResponseDto saveStoreUnlike(
-            @PathVariable("storeId") Long id,
-            HttpServletRequest request
-    ) {
-        logger.info("save store like request: storeId: " + id + ", unliked");
-
-        Optional<StoreModel> storeModel = storeRepository.findById(id);
-        if (!storeModel.isPresent()) {
-            throw new StoreNotFoundException();
-        }
-        AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
-        if (account == null) {
-            // This request must be authorized before, so this never should happened
-            logger.error("Account is null, header " + request.getHeader(tokenHeader));
-            throw new InternalServerErrorException();
-        }
-        List<StoreLikeModel> storeLikes = storeLikeRepository.findByAccount(account);
-        StoreLikeModel storeLiked = null;
-        for (StoreLikeModel storeLike : storeLikes) {
-            if (storeLike.getStore().equals(storeModel.get())) {
-                storeLiked = storeLike;
-                break;
-            }
-        }
-
-        if (storeLiked != null) {
+        } else if (!like && storeLiked != null) {
             storeLikeRepository.delete(storeLiked);
         }
 
-        storeModel.get().decreaseRate();
+        if (like) {
+            storeModel.get().increaseRate();
+        } else {
+            storeModel.get().decreaseRate();
+        }
+
         Observable.create((Observable.OnSubscribe<Void>) subscriber -> storeRepository.save(storeModel.get()))
                   .subscribeOn(Schedulers.newThread())
-                  .subscribe();
+                  .subscribe(new Observer<Void>() {
+                      @Override public void onCompleted() {
+                      }
 
-        return new ResponseDto(ResponseDto.STATUS.SUCCEED);
+                      @Override public void onError(Throwable e) {
+                      }
+
+                      @Override public void onNext(Void aVoid) {
+                      }
+                  });
+
+        return storeModel.get().convertToDto(like);
     }
 
     @RequestMapping(value = StoreServicePath.LIKE_COMMENT, method = RequestMethod.PUT)
-    ResponseDto saveCommentLike(
+    StoreCommentDto saveCommentLike(
             @PathVariable("storeId") Long id,
             @PathVariable("commentHashCode") Long hashCode,
+            @PathVariable("like") Boolean like,
             HttpServletRequest request
     ) {
-        logger.info("save comment like request: storeId: " + id + ", comment hash code: " + hashCode + ", liked");
+        logger.info(
+                "save comment like request: storeId: " + id + ", comment hash code: " + hashCode + ", liked: " + like);
 
         Optional<StoreModel> storeModel = storeRepository.findById(id);
         if (!storeModel.isPresent()) {
             throw new StoreNotFoundException();
         }
+
         Optional<CommentModel> commentModel = storeCommentRepository.findByHashCodeAndStore(hashCode, storeModel.get());
         if (!commentModel.isPresent()) {
             throw new CommentNotFoundException();
         }
+
         AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
         if (account == null) {
             // This request must be authorized before, so this never should happened
@@ -287,59 +271,30 @@ import java.util.*;
             }
         }
 
-        if (commentLiked == null) {
+        if (like && commentLiked == null) {
             commentLikeRepository.save(new CommentLikeModel(commentModel.get(), account));
-        }
-
-        commentModel.get().increaseRate();
-        Observable.create((Observable.OnSubscribe<Void>) subscriber -> storeCommentRepository.save(commentModel.get()))
-                  .subscribeOn(Schedulers.newThread())
-                  .subscribe();
-
-        return new ResponseDto(ResponseDto.STATUS.SUCCEED);
-    }
-
-    @RequestMapping(value = StoreServicePath.UNLIKE_COMMENT, method = RequestMethod.PUT)
-    ResponseDto saveCommentUnlike(
-            @PathVariable("storeId") Long id,
-            @PathVariable("commentHashCode") Long hashCode,
-            HttpServletRequest request
-    ) {
-        logger.info("save comment like request: storeId: " + id + ", comment hash code: " + hashCode + ", unliked");
-
-        Optional<StoreModel> storeModel = storeRepository.findById(id);
-        if (!storeModel.isPresent()) {
-            throw new StoreNotFoundException();
-        }
-        Optional<CommentModel> commentModel = storeCommentRepository.findByHashCodeAndStore(hashCode, storeModel.get());
-        if (!commentModel.isPresent()) {
-            throw new CommentNotFoundException();
-        }
-        AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
-        if (account == null) {
-            // This request must be authorized before, so this never should happened
-            logger.error("Account is null, header " + request.getHeader(tokenHeader));
-            throw new InternalServerErrorException();
-        }
-
-        List<CommentLikeModel> commentLikes = commentLikeRepository.findByAccountAndStore(account, storeModel.get());
-        CommentLikeModel commentLiked = null;
-        for (CommentLikeModel commentLike : commentLikes) {
-            if (commentLike.getComment().equals(commentModel.get())) {
-                commentLiked = commentLike;
-                break;
-            }
-        }
-
-        if (commentLiked != null) {
+        } else if (!like && commentLiked != null) {
             commentLikeRepository.delete(commentLiked);
         }
 
-        commentModel.get().decreaseRate();
+        if (like) {
+            commentModel.get().increaseRate();
+        } else {
+            commentModel.get().decreaseRate();
+        }
         Observable.create((Observable.OnSubscribe<Void>) subscriber -> storeCommentRepository.save(commentModel.get()))
                   .subscribeOn(Schedulers.newThread())
-                  .subscribe();
+                  .subscribe(new Observer<Void>() {
+                      @Override public void onCompleted() {
+                      }
 
-        return new ResponseDto(ResponseDto.STATUS.SUCCEED);
+                      @Override public void onError(Throwable e) {
+                      }
+
+                      @Override public void onNext(Void aVoid) {
+                      }
+                  });
+
+        return commentModel.get().convertToDto(like);
     }
 }

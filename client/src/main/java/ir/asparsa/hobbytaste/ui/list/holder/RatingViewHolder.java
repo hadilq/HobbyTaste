@@ -34,7 +34,7 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
         ButterKnife.bind(this, itemView);
     }
 
-    @Override public void onBindView(RatingData data) {
+    @Override public void onBindView(final RatingData data) {
         mRateTextView.setText(itemView.getContext().getResources()
                                       .getString(R.string.rating, data.getRate(),
                                                  itemView.getContext().getResources().getQuantityString(
@@ -48,13 +48,22 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
         mHeartImageView.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
                 if (mObserver != null) {
-                    mObserver.onNext(new OnHeartClick());
+                    mObserver.onNext(new OnHeartClick(data));
                 }
             }
         });
     }
 
     public static class OnHeartClick implements BaseRecyclerFragment.Event {
+        private RatingData data;
+
+        OnHeartClick(RatingData data) {
+            this.data = data;
+        }
+
+        public RatingData getData() {
+            return data;
+        }
     }
 
 }

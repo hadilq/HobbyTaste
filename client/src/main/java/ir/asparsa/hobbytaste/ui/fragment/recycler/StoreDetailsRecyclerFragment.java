@@ -7,6 +7,8 @@ import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
+import ir.asparsa.hobbytaste.core.manager.CommentManager;
+import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.list.data.CommentData;
@@ -20,7 +22,9 @@ import ir.asparsa.hobbytaste.ui.list.holder.StoreMapViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
 import junit.framework.Assert;
 import rx.Observer;
+import rx.subscriptions.CompositeSubscription;
 
+import javax.inject.Inject;
 import java.util.List;
 
 /**
@@ -31,8 +35,14 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
 
     public static final String BUNDLE_KEY_STORE = "BUNDLE_KEY_STORE";
 
-    public static StoreDetailsRecyclerFragment instantiate(Bundle bundle) {
+    @Inject
+    StoresManager mStoresManager;
+    @Inject
+    CommentManager mCommentManager;
 
+    CompositeSubscription mSubscription = new CompositeSubscription();
+
+    public static StoreDetailsRecyclerFragment instantiate(Bundle bundle) {
         StoreDetailsRecyclerFragment fragment = new StoreDetailsRecyclerFragment();
         fragment.setArguments(bundle);
         return fragment;
@@ -71,7 +81,7 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
 
             @Override public void onNext(T t) {
                 if (t instanceof RatingViewHolder.OnHeartClick) {
-                    onStoreHeartClick();
+                    onStoreHeartClick(((RatingViewHolder.OnHeartClick) t).getData());
                 } else if (t instanceof CommentViewHolder.OnHeartClick) {
                     onCommentHeartClick(((CommentViewHolder.OnHeartClick) t).getComment());
                 }
@@ -81,6 +91,7 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
 
     @Override public void onDestroyView() {
         mProvider.clear();
+        mSubscription.clear();
         super.onDestroyView();
     }
 
@@ -93,13 +104,39 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
         return store;
     }
 
-    private void onStoreHeartClick() {
+    private void onStoreHeartClick(RatingData data) {
         StoreModel store = getStoreModel();
         store.heartBeat();
+        data.setLike(store.isLiked());
+        data.setRate(store.getRate());
+        notifyHearBeat();
+        mSubscription.add(mStoresManager.heartBeat(store, getHeartBeatObserver(data)));
+    }
+
+    private void notifyHearBeat() {
         List<Integer> list = mAdapter.findViewHolder(RatingViewHolder.class);
         for (Integer integer : list) {
             mAdapter.notifyItemChanged(integer);
         }
+    }
+
+    private Observer<StoreModel> getHeartBeatObserver(final RatingData data) {
+        return new Observer<StoreModel>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                StoreModel store = getStoreModel();
+                store.heartBeat();
+                data.setLike(store.isLiked());
+                data.setRate(store.getRate());
+                notifyHearBeat();
+            }
+
+            @Override public void onNext(StoreModel storeModel) {
+                getArguments().putParcelable(BUNDLE_KEY_STORE, storeModel);
+            }
+        };
     }
 
     private void onCommentHeartClick(CommentModel comment) {

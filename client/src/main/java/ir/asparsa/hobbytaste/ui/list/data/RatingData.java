@@ -10,9 +10,9 @@ public class RatingData extends BaseRecyclerData {
 
     public static final int VIEW_TYPE = R.layout.rating;
 
-    private final long mRate;
-    private final long mViewed;
-    private final boolean mLike;
+    private long mRate;
+    private long mViewed;
+    private boolean mLike;
 
     public RatingData(
             long rate,
@@ -38,6 +38,18 @@ public class RatingData extends BaseRecyclerData {
 
     public boolean isLike() {
         return mLike;
+    }
+
+    public void setRate(long mRate) {
+        this.mRate = mRate;
+    }
+
+    public void setViewed(long mViewed) {
+        this.mViewed = mViewed;
+    }
+
+    public void setLike(boolean mLike) {
+        this.mLike = mLike;
     }
 
     @Override public boolean equals(Object otherObj) {

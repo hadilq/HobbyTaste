@@ -1,13 +1,20 @@
 package ir.asparsa.hobbytaste.database.dao;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import com.j256.ormlite.dao.Dao;
 import ir.asparsa.common.database.model.Banner;
+import ir.asparsa.common.database.model.Store;
 import ir.asparsa.hobbytaste.database.DatabaseHelper;
+import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import rx.Observable;
 import rx.Subscriber;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -47,5 +54,105 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
                 }
             }
         });
+    }
+
+    public Observable<StoreModel> create(
+            @NonNull final BannerDao bannerDao,
+            @Nullable final StoreModel oldModel,
+            @NonNull final StoreModel newModel
+    ) {
+        return Observable.create(new Observable.OnSubscribe<StoreModel>() {
+            @Override public void call(Subscriber<? super StoreModel> subscriber) {
+                try {
+                    createStore(bannerDao, oldModel, newModel);
+
+                    subscriber.onNext(newModel);
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
+
+    public Observable<Collection<StoreModel>> createAll(
+            @NonNull final BannerDao bannerDao,
+            @NonNull final Collection<StoreModel> newModels
+    ) {
+        return Observable.create(new Observable.OnSubscribe<Collection<StoreModel>>() {
+            @Override public void call(Subscriber<? super Collection<StoreModel>> subscriber) {
+                try {
+                    for (StoreModel newModel : newModels) {
+                        createStore(bannerDao, null, newModel);
+                    }
+
+                    subscriber.onNext(newModels);
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+
+    }
+
+    private void createStore(
+            @NonNull BannerDao bannerDao,
+            @Nullable StoreModel oldModel,
+            @NonNull StoreModel newModel
+    ) throws java.sql.SQLException {
+        List<StoreModel> list;
+        if (oldModel == null) {
+            list = getDao().query(
+                    getDao().queryBuilder()
+                            .where()
+                            .eq(Store.Columns.ID, newModel.getId())
+                            .prepare());
+        } else {
+            list = new ArrayList<>();
+            list.add(oldModel);
+        }
+
+        Dao.CreateOrUpdateStatus update = getDao().createOrUpdate(newModel);
+        if (list.isEmpty()) {
+            bannerDao.createAll(newModel.getBanners());
+        } else {
+            List<BannerModel> oldBannerList;
+            if (oldModel == null) {
+                oldBannerList = bannerDao.getDao().query(
+                        bannerDao.getDao().queryBuilder()
+                                 .where()
+                                 .eq(Banner.Columns.STORE, newModel.getId())
+                                 .prepare());
+            } else {
+                oldBannerList = oldModel.getBanners();
+            }
+            for (BannerModel oldBanner : oldBannerList) {
+                boolean isFound = false;
+                for (BannerModel newBanner : newModel.getBanners()) {
+                    if (oldBanner.equals(newBanner)) {
+                        isFound = true;
+                        break;
+                    }
+                }
+                if (!isFound) {
+                    bannerDao.delete(oldBanner);
+                }
+            }
+
+            for (BannerModel newBanner : newModel.getBanners()) {
+                boolean isFound = false;
+                for (BannerModel oldBanner : oldBannerList) {
+                    if (oldBanner.equals(newBanner)) {
+                        isFound = true;
+                        break;
+                    }
+                }
+                if (!isFound) {
+                    bannerDao.create(newBanner);
+                }
+            }
+        }
+        return;
     }
 }

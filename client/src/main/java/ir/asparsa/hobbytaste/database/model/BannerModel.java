@@ -87,8 +87,7 @@ public class BannerModel extends BaseModel implements Parcelable {
         return ((getMainUrl() == null && other.getMainUrl() == null) ||
                 (getMainUrl() != null && getMainUrl().equals(other.getMainUrl()))) &&
                ((getThumbnailUrl() == null && other.getThumbnailUrl() == null) ||
-                (getThumbnailUrl() != null && getThumbnailUrl().equals(other.getThumbnailUrl()))) &&
-               ((getId() == other.getId()));
+                (getThumbnailUrl() != null && getThumbnailUrl().equals(other.getThumbnailUrl())));
     }
 
     @Override public int hashCode() {

@@ -1,11 +1,9 @@
 package ir.asparsa.hobbytaste.core.manager;
 
-import com.j256.ormlite.dao.Dao;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.common.net.dto.StoreDto;
 import ir.asparsa.hobbytaste.database.dao.BannerDao;
 import ir.asparsa.hobbytaste.database.dao.StoreDao;
-import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.net.StoreService;
 import rx.Observable;
@@ -48,9 +46,19 @@ public class StoresManager {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private Observable<Collection<StoreDto>> getServiceObservable() {
+    private Observable<Collection<StoreDto>> getLoadServiceObservable() {
         return mStoreService
                 .loadStoreModels()
+                .retry(5)
+                .subscribeOn(Schedulers.newThread());
+    }
+
+    private Observable<StoreDto> getLikeServiceObservable(
+            long id,
+            boolean like
+    ) {
+        return mStoreService
+                .like(id, like)
                 .retry(5)
                 .subscribeOn(Schedulers.newThread());
     }
@@ -63,8 +71,17 @@ public class StoresManager {
         }).observeOn(AndroidSchedulers.mainThread());
     }
 
+
+    private Observable<StoreModel> getSaveErrorObservable(final Throwable e) {
+        return Observable.create(new Observable.OnSubscribe<StoreModel>() {
+            @Override public void call(Subscriber<? super StoreModel> subscriber) {
+                subscriber.onError(e);
+            }
+        }).observeOn(AndroidSchedulers.mainThread());
+    }
+
     private void requestServer(Observer<Collection<StoreModel>> observer) {
-        getServiceObservable().subscribe(onLoadObserver(observer));
+        getLoadServiceObservable().subscribe(onLoadObserver(observer));
     }
 
     private void loadFromDatabase(Observer<Collection<StoreModel>> observer) {
@@ -73,7 +90,6 @@ public class StoresManager {
 
 
     public Subscription loadStores(Observer<Collection<StoreModel>> observer) {
-
         Subject<Collection<StoreModel>, Collection<StoreModel>> subject = new SerializedSubject<>(
                 PublishSubject.<Collection<StoreModel>>create());
         Subscription subscribe = subject.subscribe(observer);
@@ -84,6 +100,55 @@ public class StoresManager {
 
         return subscribe;
     }
+
+    public Subscription heartBeat(
+            StoreModel store,
+            Observer<StoreModel> observer
+    ) {
+        Subject<StoreModel, StoreModel> subject = new SerializedSubject<>(PublishSubject.<StoreModel>create());
+        Subscription subscription = subject.subscribe(observer);
+        getLikeServiceObservable(store.getId(), store.isLiked()).subscribe(onNewStoreReceivedObserver(store, subject));
+        return subscription;
+    }
+
+    private Observer<? super StoreDto> onNewStoreReceivedObserver(
+            final StoreModel oldStore,
+            final Observer<StoreModel> observer
+    ) {
+        return new Observer<StoreDto>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                getSaveErrorObservable(e).subscribe(observer);
+            }
+
+            @Override public void onNext(StoreDto storeDto) {
+                StoreModel newStore = StoreModel.instantiate(storeDto);
+                mStoreDao.create(mBannerDao, oldStore, newStore)
+                         .subscribeOn(AndroidSchedulers.mainThread())
+                         .subscribe(onFinishSavingObserver(observer));
+            }
+        };
+    }
+
+    private Observer<? super StoreModel> onFinishSavingObserver(
+            final Observer<StoreModel> observer
+    ) {
+        return new Observer<StoreModel>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                observer.onError(e);
+            }
+
+            @Override public void onNext(StoreModel newStore) {
+                observer.onNext(newStore);
+            }
+        };
+    }
+
 
     private Observer<Collection<StoreDto>> onLoadObserver(final Observer<Collection<StoreModel>> observer) {
         return new Observer<Collection<StoreDto>>() {
@@ -105,112 +170,28 @@ public class StoresManager {
                 for (StoreDto store : stores) {
                     collection.add(StoreModel.instantiate(store));
                 }
-                mStoreDao.queryAllStores(mBannerDao).subscribe(onRemoveOldBannersObserver(collection, observer));
+                mStoreDao.createAll(mBannerDao, collection)
+                         .subscribeOn(AndroidSchedulers.mainThread())
+                         .subscribe(onFinishObserver(observer));
             }
         };
     }
 
-    private Observer<? super List<StoreModel>> onRemoveOldBannersObserver(
-            final Collection<StoreModel> stores,
+    private Observer<? super Collection<StoreModel>> onFinishObserver(
             final Observer<Collection<StoreModel>> observer
     ) {
-
-        return new Observer<List<StoreModel>>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-                L.i(StoresManager.class, "Stores cannot remove old banners", e);
-                getLoadErrorObservable(e).subscribe(observer);
-            }
-
-            @Override public void onNext(List<StoreModel> oldStores) {
-                Collection<BannerModel> oldBanners = new ArrayDeque<>();
-                for (StoreModel oldStore : oldStores) {
-                    oldBanners.addAll(oldStore.getBanners());
-                }
-                mBannerDao.deleteAll(oldBanners).subscribe(onRemoveOldStoresObserver(oldStores, stores, observer));
-            }
-        };
-    }
-
-    private Observer<? super Integer> onRemoveOldStoresObserver(
-            final List<StoreModel> oldStores,
-            final Collection<StoreModel> stores,
-            final Observer<Collection<StoreModel>> observer
-    ) {
-        return new Observer<Integer>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-                L.i(StoresManager.class, "Stores cannot remove old stores", e);
-                getLoadErrorObservable(e).subscribe(observer);
-            }
-
-            @Override public void onNext(Integer integer) {
-                mStoreDao.deleteAll(oldStores).subscribe(onAddNewStoresObserver(stores, observer));
-            }
-        };
-    }
-
-    private Observer<? super Integer> onAddNewStoresObserver(
-            final Collection<StoreModel> stores,
-            final Observer<Collection<StoreModel>> observer
-    ) {
-        return new Observer<Integer>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-                L.i(StoresManager.class, "Stores cannot add new stores", e);
-                getLoadErrorObservable(e).subscribe(observer);
-            }
-
-            @Override public void onNext(Integer integer) {
-                Collection<BannerModel> banners = new ArrayDeque<>();
-                for (StoreModel store : stores) {
-                    banners.addAll(store.getBanners());
-                }
-                mStoreDao.createAll(stores).subscribe(onAddNewBannersObserver(banners, observer));
-            }
-        };
-    }
-
-    private Observer<? super Collection<Dao.CreateOrUpdateStatus>> onAddNewBannersObserver(
-            final Collection<BannerModel> banners,
-            final Observer<Collection<StoreModel>> observer
-    ) {
-        return new Observer<Collection<Dao.CreateOrUpdateStatus>>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-                L.i(StoresManager.class, "Stores cannot add new banners", e);
-                getLoadErrorObservable(e).subscribe(observer);
-            }
-
-            @Override public void onNext(Collection<Dao.CreateOrUpdateStatus> statuses) {
-                mBannerDao.createAll(banners).subscribe(onFinishObserver(observer));
-            }
-        };
-    }
-
-    private Observer<? super Collection<Dao.CreateOrUpdateStatus>> onFinishObserver(
-            final Observer<Collection<StoreModel>> observer
-    ) {
-        return new Observer<Collection<Dao.CreateOrUpdateStatus>>() {
+        return new Observer<Collection<StoreModel>>() {
             @Override public void onCompleted() {
             }
 
             @Override public void onError(Throwable e) {
                 L.i(StoresManager.class, "Stores cannot finish action", e);
-                getLoadErrorObservable(e).subscribe(observer);
+                observer.onError(e);
             }
 
-            @Override public void onNext(Collection<Dao.CreateOrUpdateStatus> statuses) {
+            @Override public void onNext(Collection<StoreModel> list) {
                 L.i(StoresManager.class, "Stores completely saved");
-                getStoresObservable().subscribe(observer);
+                observer.onNext(list);
             }
         };
     }
