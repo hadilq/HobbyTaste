@@ -216,4 +216,8 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
         }
         return list;
     }
+
+    public List<BaseRecyclerData> getDataList() {
+        return new ArrayList<>(mList);
+    }
 }

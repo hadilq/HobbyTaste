@@ -10,6 +10,7 @@ import butterknife.ButterKnife;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
+import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import ir.asparsa.hobbytaste.ui.list.data.CommentData;
 import rx.Observer;
 
@@ -44,7 +45,7 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
                                                  itemView.getContext().getResources().getQuantityString(
                                                          R.plurals.like, (int) data.getCommentModel().getRate())));
 
-        mDateTimeTextView.setText(Long.toString(data.getCommentModel().getCreated()));
+        mDateTimeTextView.setText(String.format(LanguageUtil.getLocale(), "%d", data.getCommentModel().getCreated()));
 
         mHeartImageView.getDrawable().setColorFilter(
                 itemView.getResources()
@@ -60,7 +61,7 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
     }
 
     public static class OnHeartClick implements BaseRecyclerFragment.Event {
-        private CommentData  comment;
+        private CommentData comment;
 
         OnHeartClick(CommentData comment) {
             this.comment = comment;

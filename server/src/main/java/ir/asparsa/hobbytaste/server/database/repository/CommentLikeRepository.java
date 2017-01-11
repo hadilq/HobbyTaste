@@ -7,6 +7,7 @@ import ir.asparsa.hobbytaste.server.database.model.CommentLikeModel;
 import ir.asparsa.hobbytaste.server.database.model.StoreModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -15,13 +16,13 @@ import java.util.List;
  */
 public interface CommentLikeRepository extends JpaRepository<CommentLikeModel, Long> {
 
-    @Query(value = "SELECT l FROM " + CommentLike.TABLE_NAME + " l " +
+    @Query(value = "SELECT l.* FROM " + CommentLike.TABLE_NAME + " l " +
                    "JOIN " + Comment.TABLE_NAME + " c " +
-                   "ON l." + CommentLike.Columns.COMMENT + " = c " +
+                   "ON l." + CommentLike.Columns.COMMENT + " = c." + Comment.Columns.ID + " " +
                    "WHERE l." + CommentLike.Columns.ACCOUNT + " = :account " +
                    "AND c." + Comment.Columns.STORE + " = :store", nativeQuery = true)
     List<CommentLikeModel> findByAccountAndStore(
-            AccountModel account,
-            StoreModel store
+            @Param("account") AccountModel account,
+            @Param("store") StoreModel store
     );
 }

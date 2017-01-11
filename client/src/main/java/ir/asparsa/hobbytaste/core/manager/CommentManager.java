@@ -182,6 +182,7 @@ public class CommentManager {
                             .subscribe(observer);
                     return;
                 }
+                newComment.setId(oldComment.getId());
                 mCommentDao.create(newComment)
                            .subscribeOn(AndroidSchedulers.mainThread())
                            .subscribe(onFinishHeartBeatObserver(newComment, observer));
@@ -195,6 +196,7 @@ public class CommentManager {
     ) {
         return new Observer<Dao.CreateOrUpdateStatus>() {
             @Override public void onCompleted() {
+                // Don't call observer's on completed method
             }
 
             @Override public void onError(Throwable e) {
@@ -309,7 +311,7 @@ public class CommentManager {
     ) {
         return new Observer<ResponseDto>() {
             @Override public void onCompleted() {
-
+                // Don't call observer's on completed method
             }
 
             @Override public void onError(final Throwable e) {

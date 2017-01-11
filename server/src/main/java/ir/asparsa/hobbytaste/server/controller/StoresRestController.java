@@ -41,8 +41,6 @@ import java.util.*;
     private String tokenHeader;
 
     @Autowired
-    AccountRepository accountRepository;
-    @Autowired
     StoreRepository storeRepository;
     @Autowired
     StoreLikeRepository storeLikeRepository;
@@ -54,7 +52,7 @@ import java.util.*;
     JwtTokenUtil jwtTokenUtil;
 
 
-    @Autowired StoresRestController() {
+    StoresRestController() {
     }
 
     @RequestMapping(method = RequestMethod.GET)

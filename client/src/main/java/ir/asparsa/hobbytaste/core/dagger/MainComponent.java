@@ -7,6 +7,7 @@ import ir.asparsa.hobbytaste.ui.fragment.content.StoreDetailsContentFragment;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.CommentDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.SetUsernameDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.SettingsRecyclerFragment;
+import ir.asparsa.hobbytaste.ui.fragment.recycler.StoreDetailsRecyclerFragment;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
 
@@ -35,4 +36,6 @@ public interface MainComponent {
     void inject(StoreDetailsContentFragment storeDetailsContentFragment);
 
     void inject(CommentDialogFragment commentDialogFragment);
+
+    void inject(StoreDetailsRecyclerFragment storeDetailsRecyclerFragment);
 }

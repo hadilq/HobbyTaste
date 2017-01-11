@@ -39,8 +39,8 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
                                       .getString(R.string.rating, data.getRate(),
                                                  itemView.getContext().getResources().getQuantityString(
                                                          R.plurals.like, (int) data.getRate())));
-
-        mViewedTextView.setText(Long.toString(data.getViewed()));
+        mViewedTextView.setText(itemView.getContext().getResources()
+                                        .getString(R.string.viewed, data.getViewed()));
 
         mHeartImageView.getDrawable().setColorFilter(
                 itemView.getResources().getColor(data.isLike() ? R.color.heart_on : R.color.heart_off),

@@ -1,12 +1,14 @@
 package ir.asparsa.hobbytaste.ui.fragment.recycler;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.util.SparseArrayCompat;
 import android.view.View;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.CommentManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
@@ -46,6 +48,11 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
         StoreDetailsRecyclerFragment fragment = new StoreDetailsRecyclerFragment();
         fragment.setArguments(bundle);
         return fragment;
+    }
+
+    @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ApplicationLauncher.mainComponent().inject(this);
     }
 
     @Override
@@ -146,12 +153,12 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
 
             @Override public void onError(Throwable e) {
                 comment.heartBeat();
-                notifyStoreHeartBeat();
+                notifyCommentHeartBeat(comment);
             }
 
             @Override public void onNext(CommentModel commentModel) {
                 comment.setCommentModel(commentModel);
-                notifyStoreHeartBeat();
+                notifyCommentHeartBeat(comment);
             }
         };
     }
@@ -171,7 +178,7 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
     }
 
     private int findViewHolder(CommentData comment) {
-        List<BaseRecyclerData> list = mAdapter.findData(CommentData.class);
+        List<BaseRecyclerData> list = mAdapter.getDataList();
         for (BaseRecyclerData data : list) {
             if (data.equals(comment)) {
                 return list.indexOf(data);

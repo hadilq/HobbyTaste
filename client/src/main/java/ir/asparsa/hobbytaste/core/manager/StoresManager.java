@@ -81,13 +81,14 @@ public class StoresManager {
     }
 
     private void requestServer(Observer<Collection<StoreModel>> observer) {
-        getLoadServiceObservable().subscribe(onLoadObserver(observer));
+        getLoadServiceObservable()
+                .subscribe(onLoadObserver(observer));
     }
 
     private void loadFromDatabase(Observer<Collection<StoreModel>> observer) {
-        getStoresObservable().subscribe(observer);
+        getStoresObservable()
+                .subscribe(getLoadObserver(observer));
     }
-
 
     public Subscription loadStores(Observer<Collection<StoreModel>> observer) {
         Subject<Collection<StoreModel>, Collection<StoreModel>> subject = new SerializedSubject<>(
@@ -101,6 +102,7 @@ public class StoresManager {
         return subscribe;
     }
 
+
     public Subscription heartBeat(
             StoreModel store,
             Observer<StoreModel> observer
@@ -109,6 +111,22 @@ public class StoresManager {
         Subscription subscription = subject.subscribe(observer);
         getLikeServiceObservable(store.getId(), store.isLiked()).subscribe(onNewStoreReceivedObserver(store, subject));
         return subscription;
+    }
+
+    private Observer<? super List<StoreModel>> getLoadObserver(final Observer<Collection<StoreModel>> observer) {
+        return new Observer<List<StoreModel>>() {
+            @Override public void onCompleted() {
+                // Don't call observer's on completed method
+            }
+
+            @Override public void onError(Throwable e) {
+                observer.onError(e);
+            }
+
+            @Override public void onNext(List<StoreModel> storeModels) {
+                observer.onNext(storeModels);
+            }
+        };
     }
 
     private Observer<? super StoreDto> onNewStoreReceivedObserver(
@@ -137,6 +155,7 @@ public class StoresManager {
     ) {
         return new Observer<StoreModel>() {
             @Override public void onCompleted() {
+                // Don't call observer's on completed method
             }
 
             @Override public void onError(Throwable e) {

@@ -15,10 +15,11 @@
     <string name="comment_is_empty">نظر شما خالی است</string>
     <string name="comment_store_is_empty">مشکلی پیش آمده! لطفا دوباره این دیالوگ را باز نمایید</string>
     <string name="rating">%1$d %2$s</string>
-
+    <string name="viewed">%1$d viewed</string>
 
     <plurals name="like">
         <item quantity="one">like</item>
         <item quantity="other">likes</item>
     </plurals>
+
 </resources>
