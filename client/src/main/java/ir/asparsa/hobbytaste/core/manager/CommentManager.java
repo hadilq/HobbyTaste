@@ -36,16 +36,7 @@ public class CommentManager {
     @Inject
     CommentDao mCommentDao;
 
-    @Inject
-    CommentManager() {
-    }
-
-    private Observable<List<CommentModel>> getLoadCommentsObservable(Constraint constraint) {
-        return mCommentDao
-                .queryComments(constraint.getOffset(), (long) constraint.getLimit(),
-                               constraint.getStore().getId())
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
+    @Inject CommentManager() {
     }
 
     private Observable<PageDto<StoreCommentDto>> getLoadServiceObservable(Constraint constraint) {
@@ -58,12 +49,6 @@ public class CommentManager {
                 .observeOn(Schedulers.newThread());
     }
 
-    private Observable<CommentModel> getSaveCommentObservable(CommentModel comment) {
-        return mCommentDao.createIfNotExists(comment)
-                          .subscribeOn(Schedulers.newThread())
-                          .observeOn(AndroidSchedulers.mainThread());
-    }
-
     private Observable<ResponseDto> getSaveServiceObservable(CommentModel comment) {
         return mStoreService
                 .saveComment(
@@ -71,6 +56,31 @@ public class CommentManager {
                         new StoreCommentDto(comment.getDescription(), comment.getHashCode()))
                 .retry(5)
                 .subscribeOn(Schedulers.newThread());
+    }
+
+    private Observable<StoreCommentDto> getLikeServiceObservable(
+            long storeId,
+            long hashCode,
+            boolean liked
+    ) {
+        return mStoreService
+                .likeComment(storeId, hashCode, liked)
+                .retry(5)
+                .subscribeOn(Schedulers.newThread());
+    }
+
+    private Observable<List<CommentModel>> getLoadCommentsObservable(Constraint constraint) {
+        return mCommentDao
+                .queryComments(constraint.getOffset(), (long) constraint.getLimit(),
+                               constraint.getStore().getId())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private Observable<CommentModel> getSaveCommentObservable(CommentModel comment) {
+        return mCommentDao.createIfNotExists(comment)
+                          .subscribeOn(Schedulers.newThread())
+                          .observeOn(AndroidSchedulers.mainThread());
     }
 
     private Observable<Long> getCountCommentsObservable(StoreModel store) {
@@ -88,6 +98,14 @@ public class CommentManager {
     private Observable<Void> getSaveErrorObservable(final Throwable e) {
         return Observable.create(new Observable.OnSubscribe<Void>() {
             @Override public void call(Subscriber<? super Void> subscriber) {
+                subscriber.onError(e);
+            }
+        }).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    private Observable<CommentModel> getLikeErrorObservable(final Throwable e) {
+        return Observable.create(new Observable.OnSubscribe<CommentModel>() {
+            @Override public void call(Subscriber<? super CommentModel> subscriber) {
                 subscriber.onError(e);
             }
         }).observeOn(AndroidSchedulers.mainThread());
@@ -133,6 +151,63 @@ public class CommentManager {
         return subscription;
     }
 
+    public Subscription heartBeat(
+            CommentModel commentModel,
+            Observer<CommentModel> observer
+    ) {
+        Subject<CommentModel, CommentModel> subject = new SerializedSubject<>(PublishSubject.<CommentModel>create());
+        Subscription subscription = subject.subscribe(observer);
+        getLikeServiceObservable(commentModel.getStoreId(), commentModel.getHashCode(), commentModel.isLiked())
+                .subscribe(onCommentReceivedObserver(commentModel, subject));
+        return subscription;
+    }
+
+    private Observer<StoreCommentDto> onCommentReceivedObserver(
+            final CommentModel oldComment,
+            final Observer<CommentModel> observer
+    ) {
+        return new Observer<StoreCommentDto>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                getLikeErrorObservable(e).subscribe(observer);
+            }
+
+            @Override public void onNext(StoreCommentDto storeCommentDto) {
+                CommentModel newComment = CommentModel.newInstance(storeCommentDto);
+                if (!newComment.equals(oldComment)) {
+                    getLikeErrorObservable(new RuntimeException(
+                            "New comment is different from old comment: " + oldComment + ", " + newComment))
+                            .subscribe(observer);
+                    return;
+                }
+                mCommentDao.create(newComment)
+                           .subscribeOn(AndroidSchedulers.mainThread())
+                           .subscribe(onFinishHeartBeatObserver(newComment, observer));
+            }
+        };
+    }
+
+    private Observer<? super Dao.CreateOrUpdateStatus> onFinishHeartBeatObserver(
+            final CommentModel newComment,
+            final Observer<CommentModel> observer
+    ) {
+        return new Observer<Dao.CreateOrUpdateStatus>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                observer.onError(e);
+            }
+
+            @Override public void onNext(Dao.CreateOrUpdateStatus createOrUpdateStatus) {
+                observer.onNext(newComment);
+            }
+        };
+    }
+
+
     private Observer<PageDto<StoreCommentDto>> onLoadObserver(
             final Constraint constraint,
             final Observer<Collection<CommentModel>> observer
@@ -157,7 +232,6 @@ public class CommentManager {
             }
         };
     }
-
 
     private Observer<? super Collection<Dao.CreateOrUpdateStatus>> onFinishLoadObserver(
             final Constraint constraint,

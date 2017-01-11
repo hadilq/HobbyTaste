@@ -10,7 +10,6 @@ import butterknife.ButterKnife;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
-import ir.asparsa.hobbytaste.database.model.CommentModel;
 import ir.asparsa.hobbytaste.ui.list.data.CommentData;
 import rx.Observer;
 
@@ -49,25 +48,25 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
 
         mHeartImageView.getDrawable().setColorFilter(
                 itemView.getResources()
-                        .getColor(data.getCommentModel().isLike() ? R.color.heart_on : R.color.heart_off),
+                        .getColor(data.getCommentModel().isLiked() ? R.color.heart_on : R.color.heart_off),
                 PorterDuff.Mode.SRC_ATOP);
         mHeartImageView.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
                 if (mObserver != null) {
-                    mObserver.onNext(new OnHeartClick(data.getCommentModel()));
+                    mObserver.onNext(new OnHeartClick(data));
                 }
             }
         });
     }
 
     public static class OnHeartClick implements BaseRecyclerFragment.Event {
-        private CommentModel comment;
+        private CommentData  comment;
 
-        OnHeartClick(CommentModel comment) {
+        OnHeartClick(CommentData comment) {
             this.comment = comment;
         }
 
-        public CommentModel getComment() {
+        public CommentData getComment() {
             return comment;
         }
     }

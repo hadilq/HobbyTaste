@@ -109,18 +109,17 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
         store.heartBeat();
         data.setLike(store.isLiked());
         data.setRate(store.getRate());
-        notifyHearBeat();
-        mSubscription.add(mStoresManager.heartBeat(store, getHeartBeatObserver(data)));
+        notifyStoreHeartBeat();
+        mSubscription.add(mStoresManager.heartBeat(store, getStoreHeartBeatObserver(data)));
     }
 
-    private void notifyHearBeat() {
-        List<Integer> list = mAdapter.findViewHolder(RatingViewHolder.class);
-        for (Integer integer : list) {
-            mAdapter.notifyItemChanged(integer);
-        }
+    private void onCommentHeartClick(CommentData comment) {
+        comment.heartBeat();
+        notifyCommentHeartBeat(comment);
+        mSubscription.add(mCommentManager.heartBeat(comment.getCommentModel(), getCommentHeartBeatObserver(comment)));
     }
 
-    private Observer<StoreModel> getHeartBeatObserver(final RatingData data) {
+    private Observer<StoreModel> getStoreHeartBeatObserver(final RatingData data) {
         return new Observer<StoreModel>() {
             @Override public void onCompleted() {
             }
@@ -130,35 +129,59 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
                 store.heartBeat();
                 data.setLike(store.isLiked());
                 data.setRate(store.getRate());
-                notifyHearBeat();
+                notifyStoreHeartBeat();
             }
 
             @Override public void onNext(StoreModel storeModel) {
                 getArguments().putParcelable(BUNDLE_KEY_STORE, storeModel);
+                notifyStoreHeartBeat();
             }
         };
     }
 
-    private void onCommentHeartClick(CommentModel comment) {
-        comment.heartBeat();
+    private Observer<CommentModel> getCommentHeartBeatObserver(final CommentData comment) {
+        return new Observer<CommentModel>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                comment.heartBeat();
+                notifyStoreHeartBeat();
+            }
+
+            @Override public void onNext(CommentModel commentModel) {
+                comment.setCommentModel(commentModel);
+                notifyStoreHeartBeat();
+            }
+        };
+    }
+
+    private void notifyStoreHeartBeat() {
+        List<Integer> list = mAdapter.findViewHolder(RatingViewHolder.class);
+        for (Integer integer : list) {
+            mAdapter.notifyItemChanged(integer);
+        }
+    }
+
+    private void notifyCommentHeartBeat(CommentData comment) {
         int index = findViewHolder(comment);
         if (index != -1) {
             mAdapter.notifyItemChanged(index);
         }
     }
 
-    public void addComment(CommentModel comment) {
-        mProvider.addComment(comment);
-    }
-
-    private int findViewHolder(CommentModel comment) {
+    private int findViewHolder(CommentData comment) {
         List<BaseRecyclerData> list = mAdapter.findData(CommentData.class);
         for (BaseRecyclerData data : list) {
-            if (comment.equals(data)) {
+            if (data.equals(comment)) {
                 return list.indexOf(data);
             }
         }
         return -1;
+    }
+
+    public void addComment(CommentModel comment) {
+        mProvider.addComment(comment);
     }
 
 }

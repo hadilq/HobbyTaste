@@ -24,7 +24,7 @@ public class CommentModel extends BaseModel implements Parcelable {
     @DatabaseField(columnName = Comment.Columns.RATE, canBeNull = false)
     private long rate;
     @DatabaseField(columnName = Comment.Columns.LIKE)
-    private boolean like;
+    private boolean liked;
     @DatabaseField(columnName = Comment.Columns.CREATED)
     private long created;
     @DatabaseField(columnName = Comment.Columns.STORE, canBeNull = false)
@@ -46,7 +46,7 @@ public class CommentModel extends BaseModel implements Parcelable {
     ) {
         this.description = description;
         this.rate = rate;
-        this.like = like;
+        this.liked = like;
         this.created = created;
         this.storeId = storeId;
         this.hashCode = hashCode;
@@ -84,8 +84,8 @@ public class CommentModel extends BaseModel implements Parcelable {
         return rate;
     }
 
-    public boolean isLike() {
-        return like;
+    public boolean isLiked() {
+        return liked;
     }
 
     public long getCreated() {
@@ -101,7 +101,8 @@ public class CommentModel extends BaseModel implements Parcelable {
     }
 
     public void heartBeat() {
-        like = !like;
+        liked = !liked;
+        rate = liked ? rate + 1 : rate - 1;
     }
 
     @Override
@@ -124,7 +125,7 @@ public class CommentModel extends BaseModel implements Parcelable {
                "id=" + id +
                ", description='" + description + '\'' +
                ", rate=" + rate +
-               ", like=" + like +
+               ", liked=" + liked +
                ", created=" + created +
                ", storeId=" + storeId +
                ", hashCode=" + hashCode +
@@ -142,7 +143,7 @@ public class CommentModel extends BaseModel implements Parcelable {
         dest.writeLong(this.id);
         dest.writeString(this.description);
         dest.writeLong(this.rate);
-        dest.writeByte(this.like ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.liked ? (byte) 1 : (byte) 0);
         dest.writeLong(this.created);
         dest.writeLong(this.storeId);
         dest.writeLong(this.hashCode);
@@ -152,7 +153,7 @@ public class CommentModel extends BaseModel implements Parcelable {
         this.id = in.readLong();
         this.description = in.readString();
         this.rate = in.readLong();
-        this.like = in.readByte() != 0;
+        this.liked = in.readByte() != 0;
         this.created = in.readLong();
         this.storeId = in.readLong();
         this.hashCode = in.readLong();

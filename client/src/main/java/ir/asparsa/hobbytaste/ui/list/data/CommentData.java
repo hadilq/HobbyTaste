@@ -22,6 +22,10 @@ public class CommentData extends BaseRecyclerData {
         return mCommentModel;
     }
 
+    public void setCommentModel(CommentModel commentModel) {
+        this.mCommentModel = commentModel;
+    }
+
     @Override public int getViewType() {
         return VIEW_TYPE;
     }
@@ -33,5 +37,9 @@ public class CommentData extends BaseRecyclerData {
         final CommentData other = (CommentData) otherObj;
         return (getCommentModel() == null && other.getCommentModel() == null) ||
                (getCommentModel() != null && getCommentModel().equals(other.getCommentModel()));
+    }
+
+    public void heartBeat() {
+        getCommentModel().heartBeat();
     }
 }
