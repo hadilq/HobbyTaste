@@ -63,6 +63,14 @@ public class StoresManager {
                 .subscribeOn(Schedulers.newThread());
     }
 
+    private Observable<StoreDto> getViewServiceObservable(
+            long id
+    ) {
+        return mStoreService
+                .storeViewed(id)
+                .subscribeOn(Schedulers.newThread());
+    }
+
     private Observable<Collection<StoreModel>> getLoadErrorObservable(final Throwable e) {
         return Observable.create(new Observable.OnSubscribe<Collection<StoreModel>>() {
             @Override public void call(Subscriber<? super Collection<StoreModel>> subscriber) {
@@ -110,6 +118,16 @@ public class StoresManager {
         Subject<StoreModel, StoreModel> subject = new SerializedSubject<>(PublishSubject.<StoreModel>create());
         Subscription subscription = subject.subscribe(observer);
         getLikeServiceObservable(store.getId(), store.isLiked()).subscribe(onNewStoreReceivedObserver(store, subject));
+        return subscription;
+    }
+
+    public Subscription viewed(
+            StoreModel store,
+            Observer<StoreModel> observer
+    ) {
+        Subject<StoreModel, StoreModel> subject = new SerializedSubject<>(PublishSubject.<StoreModel>create());
+        Subscription subscription = subject.subscribe(observer);
+        getViewServiceObservable(store.getId()).subscribe(onNewStoreReceivedObserver(store, subject));
         return subscription;
     }
 

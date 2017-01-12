@@ -53,6 +53,8 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
+
+        mSubscription.add(mStoresManager.viewed(getStoreModel(), getViewedObserver()));
     }
 
     @Override
@@ -142,6 +144,20 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
             @Override public void onNext(StoreModel storeModel) {
                 getArguments().putParcelable(BUNDLE_KEY_STORE, storeModel);
                 notifyStoreHeartBeat();
+            }
+        };
+    }
+
+    private Observer<StoreModel> getViewedObserver() {
+        return new Observer<StoreModel>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+            }
+
+            @Override public void onNext(StoreModel storeModel) {
+                getArguments().putParcelable(BUNDLE_KEY_STORE, storeModel);
             }
         };
     }

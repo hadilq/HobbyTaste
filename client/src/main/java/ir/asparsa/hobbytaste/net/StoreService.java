@@ -19,7 +19,7 @@ public interface StoreService {
     Observable<Collection<StoreDto>> loadStoreModels();
 
     @PUT(StoreServicePath.SERVICE + StoreServicePath.VIEWED)
-    Observable<Collection<StoreDto>> storeViewed(@Path("storeId") Long id);
+    Observable<StoreDto> storeViewed(@Path("storeId") Long id);
 
     @POST(StoreServicePath.SERVICE + StoreServicePath.COMMENTS)
     Observable<PageDto<StoreCommentDto>> loadComments(
