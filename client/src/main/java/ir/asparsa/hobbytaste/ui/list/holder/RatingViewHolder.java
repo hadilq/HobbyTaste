@@ -42,7 +42,7 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
         mViewedTextView.setText(itemView.getContext().getResources()
                                         .getString(R.string.viewed, data.getViewed()));
 
-        mHeartImageView.getDrawable().setColorFilter(
+        mHeartImageView.getDrawable().mutate().setColorFilter(
                 itemView.getResources().getColor(data.isLike() ? R.color.heart_on : R.color.heart_off),
                 PorterDuff.Mode.SRC_ATOP);
         mHeartImageView.setOnClickListener(new View.OnClickListener() {

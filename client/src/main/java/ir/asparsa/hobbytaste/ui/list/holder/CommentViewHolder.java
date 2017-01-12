@@ -47,7 +47,7 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
 
         mDateTimeTextView.setText(String.format(LanguageUtil.getLocale(), "%d", data.getCommentModel().getCreated()));
 
-        mHeartImageView.getDrawable().setColorFilter(
+        mHeartImageView.getDrawable().mutate().setColorFilter(
                 itemView.getResources()
                         .getColor(data.getCommentModel().isLiked() ? R.color.heart_on : R.color.heart_off),
                 PorterDuff.Mode.SRC_ATOP);
