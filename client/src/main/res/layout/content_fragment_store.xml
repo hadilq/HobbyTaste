@@ -2,7 +2,8 @@
 <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <FrameLayout
             android:id="@+id/content_nested"
@@ -16,5 +17,7 @@
             android:layout_margin="16dp"
             android:clickable="true"
             android:src="@drawable/add"
-            android:layout_gravity="bottom|right|end"/>
+            android:layout_gravity="bottom|end"
+            app:layout_anchorGravity="bottom|end"
+            app:layout_behavior="ir.asparsa.hobbytaste.ui.behavior.ShrinkBehavior"/>
 </android.support.design.widget.CoordinatorLayout>
