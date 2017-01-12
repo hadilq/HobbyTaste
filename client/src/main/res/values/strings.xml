@@ -17,6 +17,19 @@
     <string name="rating">%1$d %2$s</string>
     <string name="viewed">%1$d viewed</string>
 
+    <string name="month_0">فروردین</string>
+    <string name="month_1">اردیبهشت</string>
+    <string name="month_2">خرداد</string>
+    <string name="month_3">تیر</string>
+    <string name="month_4">مرداد</string>
+    <string name="month_5">شهریور</string>
+    <string name="month_6">مهر</string>
+    <string name="month_7">آبان</string>
+    <string name="month_8">آذر</string>
+    <string name="month_9">دی</string>
+    <string name="month_10">بهمن</string>
+    <string name="month_11">اسفند</string>
+
     <plurals name="like">
         <item quantity="one">like</item>
         <item quantity="other">likes</item>

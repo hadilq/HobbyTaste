@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.ui.list.holder;
 
+import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.view.View;
@@ -7,12 +8,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ir.asparsa.android.core.util.PersianCalendar;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import ir.asparsa.hobbytaste.ui.list.data.CommentData;
 import rx.Observer;
+
+import java.util.Calendar;
 
 /**
  * Created by hadi on 12/22/2016 AD.
@@ -45,7 +49,8 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
                                                  itemView.getContext().getResources().getQuantityString(
                                                          R.plurals.like, (int) data.getCommentModel().getRate())));
 
-        mDateTimeTextView.setText(String.format(LanguageUtil.getLocale(), "%d", data.getCommentModel().getCreated()));
+
+        mDateTimeTextView.setText(formatDatetime(data.getCommentModel().getCreated(), itemView.getContext()));
 
         mHeartImageView.getDrawable().mutate().setColorFilter(
                 itemView.getResources()
@@ -58,6 +63,54 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
                 }
             }
         });
+    }
+
+    private String formatDatetime(
+            long datetime,
+            Context context
+    ) {
+        PersianCalendar calendar = new PersianCalendar();
+        calendar.setTimeInMillis(datetime);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        return String.format(LanguageUtil.getLocale(), "%d %s %d %d:%d", day,
+                             getMonthString(month, context), year, hour, minute);
+    }
+
+    private String getMonthString(
+            int month,
+            Context context
+    ) {
+        switch (month) {
+            case 0:
+                return context.getString(R.string.month_0);
+            case 1:
+                return context.getString(R.string.month_1);
+            case 2:
+                return context.getString(R.string.month_2);
+            case 3:
+                return context.getString(R.string.month_3);
+            case 4:
+                return context.getString(R.string.month_4);
+            case 5:
+                return context.getString(R.string.month_5);
+            case 6:
+                return context.getString(R.string.month_6);
+            case 7:
+                return context.getString(R.string.month_7);
+            case 8:
+                return context.getString(R.string.month_8);
+            case 9:
+                return context.getString(R.string.month_9);
+            case 10:
+                return context.getString(R.string.month_10);
+            case 11:
+                return context.getString(R.string.month_11);
+        }
+        return "";
     }
 
     public static class OnHeartClick implements BaseRecyclerFragment.Event {
