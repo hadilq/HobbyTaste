@@ -140,11 +140,6 @@ public class CommentManager {
                 PublishSubject.<Collection<CommentModel>>create());
         Subscription subscription = subject.subscribe(observer);
 
-        if (constraint.getOffset() == 0L) {
-            requestServer(constraint, subject);
-            return subscription;
-        }
-
         getCountCommentsObservable(constraint.getStore())
                 .subscribe(onCountCommentsObserver(constraint, subject));
 
@@ -363,11 +358,10 @@ public class CommentManager {
             @Override public void onNext(Long count) {
                 L.i(
                         CommentManager.class,
-                        "Count comments: " + count + " " + constraint.getOffset() + constraint.getLimit()
+                        "Count comments: " + count + ", " + constraint.getOffset() + ", " + constraint.getLimit()
                 );
                 if (count < constraint.getOffset() + constraint.getLimit()) {
                     requestServer(constraint, observer);
-                    return;
                 }
 
                 loadFromDatabase(constraint, observer);
