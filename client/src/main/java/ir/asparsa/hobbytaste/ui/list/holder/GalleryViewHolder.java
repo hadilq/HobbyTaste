@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.database.model.BannerModel;
+import ir.asparsa.hobbytaste.ui.list.HorizontalSpaceItemDecoration;
 import ir.asparsa.hobbytaste.ui.list.data.GalleryData;
 import rx.Observer;
 
@@ -45,6 +47,10 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
         mAdapter = new Adapter();
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
+
+        mRecyclerView.addItemDecoration(new HorizontalSpaceItemDecoration((int) TypedValue
+                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10,
+                                itemView.getContext().getResources().getDisplayMetrics())));
     }
 
     @Override

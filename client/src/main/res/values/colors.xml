@@ -13,5 +13,7 @@
     <color name="heart_on">#df4c4c</color>
     <color name="heart_off">#948181</color>
 
+    <color name="background">#eff1f2f2</color>
+
 
 </resources>
