@@ -2,7 +2,6 @@ package ir.asparsa.hobbytaste.database.dao;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.j256.ormlite.dao.Dao;
 import ir.asparsa.common.database.model.Banner;
 import ir.asparsa.common.database.model.Store;
 import ir.asparsa.hobbytaste.database.DatabaseHelper;
@@ -113,9 +112,11 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
             list.add(oldModel);
         }
 
-        Dao.CreateOrUpdateStatus update = getDao().createOrUpdate(newModel);
+        getDao().createOrUpdate(newModel);
         if (list.isEmpty()) {
-            bannerDao.createAll(newModel.getBanners());
+            for (BannerModel newBanner : newModel.getBanners()) {
+                bannerDao.getDao().create(newBanner);
+            }
         } else {
             List<BannerModel> oldBannerList;
             if (oldModel == null) {
@@ -136,7 +137,7 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
                     }
                 }
                 if (!isFound) {
-                    bannerDao.delete(oldBanner);
+                    bannerDao.getDao().delete(oldBanner);
                 }
             }
 
@@ -149,10 +150,9 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
                     }
                 }
                 if (!isFound) {
-                    bannerDao.create(newBanner);
+                    bannerDao.getDao().create(newBanner);
                 }
             }
         }
-        return;
     }
 }
