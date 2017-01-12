@@ -10,10 +10,10 @@ import ir.asparsa.hobbytaste.core.util.LanguageUtil;
  */
 public class HorizontalSpaceItemDecoration extends RecyclerView.ItemDecoration {
 
-    private final int verticalSpaceHeight;
+    private final int horizontalSpaceWidth;
 
-    public HorizontalSpaceItemDecoration(int verticalSpaceHeight) {
-        this.verticalSpaceHeight = verticalSpaceHeight;
+    public HorizontalSpaceItemDecoration(int horizontalSpaceWidth) {
+        this.horizontalSpaceWidth = horizontalSpaceWidth;
     }
 
     @Override
@@ -25,9 +25,9 @@ public class HorizontalSpaceItemDecoration extends RecyclerView.ItemDecoration {
     ) {
         if (parent.getChildAdapterPosition(view) != parent.getAdapter().getItemCount() - 1) {
             if (LanguageUtil.isRTL()) {
-                outRect.left = verticalSpaceHeight;
+                outRect.left = horizontalSpaceWidth;
             } else {
-                outRect.right = verticalSpaceHeight;
+                outRect.right = horizontalSpaceWidth;
             }
         }
     }
