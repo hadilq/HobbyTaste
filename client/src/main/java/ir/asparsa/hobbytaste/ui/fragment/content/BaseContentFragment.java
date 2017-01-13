@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import ir.asparsa.android.ui.fragment.BaseFragment;
 import ir.asparsa.hobbytaste.R;
+import rx.Observer;
 
 /**
  * @author hadi
@@ -22,7 +23,10 @@ public abstract class BaseContentFragment extends BaseFragment {
     }
 
     @Nullable @Override public View onCreateView(
-            LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState
+    ) {
         return inflater.inflate(R.layout.content_fragment, container, false);
     }
 
@@ -35,6 +39,19 @@ public abstract class BaseContentFragment extends BaseFragment {
     public BackState onBackPressed() {
         return BackState.BACK_FRAGMENT;
     }
+
+    public FloatingActionButtonObserver getFloatingActionButtonObserver() {
+        return null;
+    }
+
+    public static abstract class FloatingActionButtonObserver implements Observer<View> {
+        @Override public void onCompleted() {
+        }
+
+        @Override public void onError(Throwable e) {
+        }
+    }
+
 
     public enum BackState {
         CLOSE_APP,

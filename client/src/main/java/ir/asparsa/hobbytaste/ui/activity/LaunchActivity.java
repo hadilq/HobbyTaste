@@ -4,9 +4,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -15,7 +15,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
-import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import ir.asparsa.hobbytaste.core.util.LaunchUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.ui.adapter.NavigationAdapter;
@@ -39,6 +38,8 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
     BottomNavigationView mBottomNavigationView;
     @BindView(R.id.view_pager)
     ViewPager mViewPager;
+    @BindView(R.id.fab)
+    FloatingActionButton mFloatingActionButton;
 
     private List<Integer> actionList = new ArrayList<Integer>() {{
         add(R.id.action_main);
@@ -57,12 +58,19 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(mPagerAdapter.pageToPos(NavigationAdapter.PAGE_MAIN));
         mViewPager.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View arg0, MotionEvent arg1) {
+            public boolean onTouch(
+                    View arg0,
+                    MotionEvent arg1
+            ) {
                 return true;
             }
         });
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            @Override public void onPageScrolled(
+                    int position,
+                    float positionOffset,
+                    int positionOffsetPixels
+            ) {
             }
 
             @Override public void onPageSelected(int position) {
@@ -114,6 +122,19 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         BaseContentFragment fragment = NavigationUtil.findTopFragment(getActiveFragmentManager());
         if (fragment != null) {
             mToolbar.setTitle(fragment.getHeaderTitle());
+
+            final BaseContentFragment.FloatingActionButtonObserver fabObserver = fragment
+                    .getFloatingActionButtonObserver();
+            if (fabObserver != null) {
+                mFloatingActionButton.setVisibility(View.VISIBLE);
+                mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+                    @Override public void onClick(View v) {
+                        fabObserver.onNext(v);
+                    }
+                });
+            } else {
+                mFloatingActionButton.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -121,7 +142,10 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         return mContainers[mViewPager.getCurrentItem()].getChildFragmentManager();
     }
 
-    public void addContainer(@NonNull BaseContainerFragment fragment, int pos) {
+    public void addContainer(
+            @NonNull BaseContainerFragment fragment,
+            int pos
+    ) {
         mContainers[pos] = fragment;
         fragment.getChildFragmentManager().addOnBackStackChangedListener(this);
     }

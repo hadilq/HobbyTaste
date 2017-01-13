@@ -2,13 +2,8 @@ package ir.asparsa.hobbytaste.ui.fragment.content;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
@@ -24,9 +19,6 @@ import ir.asparsa.hobbytaste.ui.fragment.recycler.StoreDetailsRecyclerFragment;
  */
 public class StoreDetailsContentFragment extends BaseContentFragment {
 
-    @BindView(R.id.fab)
-    FloatingActionButton mFab;
-
     public static StoreDetailsContentFragment instantiate(StoreModel store) {
 
         Bundle bundle = new Bundle();
@@ -39,26 +31,6 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
-    }
-
-    @Nullable @Override public View onCreateView(
-            LayoutInflater inflater,
-            @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState
-    ) {
-        View view = inflater.inflate(R.layout.content_fragment_store, container, false);
-        ButterKnife.bind(this, view);
-
-//        mFab.getDrawable().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
-        mFab.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) {
-                StoreModel store = getArguments().getParcelable(StoreDetailsRecyclerFragment.BUNDLE_KEY_STORE);
-                CommentDialogFragment
-                        .instantiate(store, new CommentDialogFragment.CommentDialogResultEvent(getTagName()))
-                        .show(getFragmentManager());
-            }
-        });
-        return view;
     }
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -99,5 +71,16 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
                 ((StoreDetailsRecyclerFragment) fragment).addComment(commentEvent.getComment());
             }
         }
+    }
+
+    @Override public FloatingActionButtonObserver getFloatingActionButtonObserver() {
+        return new FloatingActionButtonObserver() {
+            @Override public void onNext(View view) {
+                StoreModel store = getArguments().getParcelable(StoreDetailsRecyclerFragment.BUNDLE_KEY_STORE);
+                CommentDialogFragment
+                        .instantiate(store, new CommentDialogFragment.CommentDialogResultEvent(getTagName()))
+                        .show(getFragmentManager());
+            }
+        };
     }
 }
