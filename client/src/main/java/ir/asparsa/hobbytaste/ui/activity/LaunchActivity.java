@@ -97,7 +97,7 @@ public class LaunchActivity extends AppCompatActivity implements FragmentManager
 
     @Override public void onBackPressed() {
         FragmentManager activeFragmentManager = getActiveFragmentManager();
-        BaseContentFragment fragment = NavigationUtil.findTopFragment(activeFragmentManager, true);
+        BaseContentFragment fragment = NavigationUtil.findTopFragment(activeFragmentManager);
         if (fragment != null) {
             BaseContentFragment.BackState state = fragment.onBackPressed();
             switch (state) {
@@ -112,7 +112,7 @@ public class LaunchActivity extends AppCompatActivity implements FragmentManager
     }
 
     @Override public void onBackStackChanged() {
-        BaseContentFragment fragment = NavigationUtil.findTopFragment(getActiveFragmentManager(), true);
+        BaseContentFragment fragment = NavigationUtil.findTopFragment(getActiveFragmentManager());
         if (fragment != null) {
             mToolbar.setTitle(fragment.getHeaderTitle());
         }

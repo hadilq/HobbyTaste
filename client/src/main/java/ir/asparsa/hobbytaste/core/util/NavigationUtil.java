@@ -16,7 +16,9 @@ import junit.framework.Assert;
 public class NavigationUtil {
 
     public static void startContentFragment(
-            @NonNull FragmentManager fragmentManager, @NonNull BaseContentFragment fragment) {
+            @NonNull FragmentManager fragmentManager,
+            @NonNull BaseContentFragment fragment
+    ) {
         fragmentManager
                 .beginTransaction()
                 .replace(R.id.content, fragment, fragment.getTagName())
@@ -24,10 +26,13 @@ public class NavigationUtil {
                 .commit();
     }
 
-    public static void startNestedFragment(@NonNull FragmentManager fragmentManager, @NonNull BaseFragment fragment) {
+    public static void startNestedFragment(
+            @NonNull FragmentManager fragmentManager,
+            @NonNull BaseFragment fragment
+    ) {
         fragmentManager.beginTransaction()
-                .replace(R.id.content_nested, fragment, fragment.getTagName())
-                .commit();
+                       .replace(R.id.content_nested, fragment, fragment.getTagName())
+                       .commit();
     }
 
     public static void popBackStack(@NonNull FragmentManager activeFragmentManager) {
@@ -36,14 +41,15 @@ public class NavigationUtil {
 
     @Nullable
     public static BaseContentFragment findTopFragment(
-            @NonNull FragmentManager fragmentManager, boolean assertFragment) {
+            @NonNull FragmentManager fragmentManager
+    ) {
 
         Fragment fragment = fragmentManager.findFragmentById(R.id.content);
         if (fragment instanceof BaseContentFragment) {
             return (BaseContentFragment) fragment;
         }
-        if (fragment != null && assertFragment) {
-            Assert.fail("Fragment is not a content! It's " + (fragment == null ? null : fragment.getClass()));
+        if (fragment != null) {
+            Assert.fail("Fragment is not a content! It's " + fragment.getClass());
         }
         return null;
     }
