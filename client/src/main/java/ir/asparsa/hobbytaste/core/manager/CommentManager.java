@@ -185,30 +185,10 @@ public class CommentManager {
                 newComment.setId(oldComment.getId());
                 mCommentDao.create(newComment)
                            .subscribeOn(AndroidSchedulers.mainThread())
-                           .subscribe(onFinishHeartBeatObserver(newComment, observer));
+                           .subscribe(onFinishSavingCommentObserver(newComment, observer));
             }
         };
     }
-
-    private Observer<? super Dao.CreateOrUpdateStatus> onFinishHeartBeatObserver(
-            final CommentModel newComment,
-            final Observer<CommentModel> observer
-    ) {
-        return new Observer<Dao.CreateOrUpdateStatus>() {
-            @Override public void onCompleted() {
-                // Don't call observer's on completed method
-            }
-
-            @Override public void onError(Throwable e) {
-                observer.onError(e);
-            }
-
-            @Override public void onNext(Dao.CreateOrUpdateStatus createOrUpdateStatus) {
-                observer.onNext(newComment);
-            }
-        };
-    }
-
 
     private Observer<PageDto<StoreCommentDto>> onLoadObserver(
             final Constraint constraint,
