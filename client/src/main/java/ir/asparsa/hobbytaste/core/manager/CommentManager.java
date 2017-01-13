@@ -3,7 +3,6 @@ package ir.asparsa.hobbytaste.core.manager;
 import com.j256.ormlite.dao.Dao;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.common.net.dto.PageDto;
-import ir.asparsa.common.net.dto.ResponseDto;
 import ir.asparsa.common.net.dto.StoreCommentDto;
 import ir.asparsa.hobbytaste.database.dao.CommentDao;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
@@ -49,7 +48,7 @@ public class CommentManager {
                 .observeOn(Schedulers.newThread());
     }
 
-    private Observable<ResponseDto> getSaveServiceObservable(CommentModel comment) {
+    private Observable<StoreCommentDto> getSaveServiceObservable(CommentModel comment) {
         return mStoreService
                 .saveComment(
                         comment.getStoreId(),
@@ -95,9 +94,9 @@ public class CommentManager {
         }).observeOn(AndroidSchedulers.mainThread());
     }
 
-    private Observable<Void> getSaveErrorObservable(final Throwable e) {
-        return Observable.create(new Observable.OnSubscribe<Void>() {
-            @Override public void call(Subscriber<? super Void> subscriber) {
+    private Observable<CommentModel> getSaveErrorObservable(final Throwable e) {
+        return Observable.create(new Observable.OnSubscribe<CommentModel>() {
+            @Override public void call(Subscriber<? super CommentModel> subscriber) {
                 subscriber.onError(e);
             }
         }).observeOn(AndroidSchedulers.mainThread());
@@ -125,11 +124,17 @@ public class CommentManager {
         getLoadCommentsObservable(constraint).subscribe(observer);
     }
 
-    public void saveComment(
+    public Subscription saveComment(
             CommentModel comment,
-            final Observer<Void> observer
+            final Observer<CommentModel> observer
     ) {
-        getSaveCommentObservable(comment).subscribe(onSaveToDatabaseObserver(observer));
+        Subject<CommentModel, CommentModel> subject = new SerializedSubject<>(
+                PublishSubject.<CommentModel>create());
+        Subscription subscription = subject.subscribe(observer);
+
+        getSaveCommentObservable(comment).subscribe(onSaveToDatabaseObserver(subject));
+
+        return subscription;
     }
 
     public Subscription loadComments(
@@ -281,7 +286,7 @@ public class CommentManager {
     }
 
     private Observer<CommentModel> onSaveToDatabaseObserver(
-            final Observer<Void> observer
+            final Observer<CommentModel> observer
     ) {
         return new Observer<CommentModel>() {
             @Override public void onCompleted() {
@@ -294,37 +299,65 @@ public class CommentManager {
             @Override public void onNext(CommentModel comment) {
                 L.i(CommentManager.class, "Save new comments to database.");
                 getSaveServiceObservable(comment)
-                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(onSaveToServerObserver(comment, observer));
             }
         };
     }
 
-    private Observer<ResponseDto> onSaveToServerObserver(
+    private Observer<StoreCommentDto> onSaveToServerObserver(
             final CommentModel comment,
-            final Observer<Void> observer
+            final Observer<CommentModel> observer
     ) {
-        return new Observer<ResponseDto>() {
+        return new Observer<StoreCommentDto>() {
             @Override public void onCompleted() {
-                // Don't call observer's on completed method
             }
 
             @Override public void onError(final Throwable e) {
                 mCommentDao.delete(comment)
-                           .subscribeOn(Schedulers.newThread())
                            .subscribe(onDeleteOnUnSucceedRequestObserver(e, observer));
             }
 
-            @Override public void onNext(ResponseDto responseDto) {
+            @Override public void onNext(StoreCommentDto storeComment) {
                 L.i(CommentManager.class, "Saved on server.");
-                observer.onNext(null);
+                CommentModel newComment = CommentModel.newInstance(storeComment);
+                if (!comment.equals(newComment)) {
+                    mCommentDao.delete(comment)
+                               .subscribe(onDeleteOnUnSucceedRequestObserver(
+                                       new RuntimeException("Saved comment is not the same as received comment"),
+                                       observer));
+                    return;
+                }
+                newComment.setId(comment.getId());
+                mCommentDao.create(newComment)
+                           .subscribeOn(AndroidSchedulers.mainThread())
+                           .subscribe(onFinishSavingCommentObserver(newComment, observer));
+            }
+        };
+    }
+
+    private Observer<? super Dao.CreateOrUpdateStatus> onFinishSavingCommentObserver(
+            final CommentModel newComment,
+            final Observer<CommentModel> observer
+    ) {
+        return new Observer<Dao.CreateOrUpdateStatus>() {
+            @Override public void onCompleted() {
+                // Don't call observer's on completed method
+            }
+
+            @Override public void onError(Throwable e) {
+                observer.onError(e);
+
+            }
+
+            @Override public void onNext(Dao.CreateOrUpdateStatus createOrUpdateStatus) {
+                observer.onNext(newComment);
             }
         };
     }
 
     private Observer<Integer> onDeleteOnUnSucceedRequestObserver(
             final Throwable e,
-            final Observer<Void> observer
+            final Observer<CommentModel> observer
     ) {
         return new Observer<Integer>() {
             @Override public void onCompleted() {

@@ -29,7 +29,7 @@ public interface StoreService {
     );
 
     @PUT(StoreServicePath.SERVICE + StoreServicePath.COMMENTS)
-    Observable<ResponseDto> saveComment(
+    Observable<StoreCommentDto> saveComment(
             @Path("storeId") Long id,
             @Body StoreCommentDto comment
     );

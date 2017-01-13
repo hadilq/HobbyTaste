@@ -22,6 +22,7 @@ import ir.asparsa.hobbytaste.core.manager.CommentManager;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import rx.Observer;
+import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
 
@@ -43,6 +44,8 @@ public class CommentDialogFragment extends BaseDialogFragment {
     EditText mCommentEditText;
     @BindView(R.id.controller)
     DialogControlLayout mController;
+
+    private CompositeSubscription mSubscription = new CompositeSubscription();
 
     public static CommentDialogFragment instantiate(
             StoreModel store,
@@ -98,29 +101,33 @@ public class CommentDialogFragment extends BaseDialogFragment {
             return;
         }
 
-        final CommentModel comment = new CommentModel(description, store.getId());
-        mCommentManager.saveComment(
+        CommentModel comment = new CommentModel(description, store.getId());
+        mSubscription.add(mCommentManager.saveComment(
                 comment,
-                new Observer<Void>() {
+                new Observer<CommentModel>() {
                     @Override public void onCompleted() {
                     }
 
                     @Override public void onError(Throwable e) {
                         L.e(CommentDialogFragment.class, "Cannot send comment", e);
-                        mCommentLayout.setError(e.getLocalizedMessage());
+                        mCommentLayout.setError(getString(R.string.connection_error));
                     }
 
-                    @Override public void onNext(Void aVoid) {
+                    @Override public void onNext(CommentModel newComment) {
                         CommentDialogResultEvent event
                                 = (CommentDialogResultEvent) getOnDialogResultEvent();
                         event.setDialogResult(DialogResult.COMMIT);
-                        event.setComment(comment);
+                        event.setComment(newComment);
                         sendEvent();
                         dismiss();
                     }
-                });
+                }));
     }
 
+    @Override public void onDestroyView() {
+        mSubscription.clear();
+        super.onDestroyView();
+    }
 
     public static class CommentDialogResultEvent extends BaseOnDialogResultEvent {
 
