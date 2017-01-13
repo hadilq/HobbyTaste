@@ -29,7 +29,7 @@ import java.util.List;
  * @author hadi
  * @since 6/23/2016 AD
  */
-public class LaunchActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
+public class LaunchActivity extends BaseActivity implements FragmentManager.OnBackStackChangedListener {
 
     private final BaseContainerFragment[] mContainers = new BaseContainerFragment[NavigationAdapter.PAGE_COUNT];
 
@@ -48,7 +48,6 @@ public class LaunchActivity extends AppCompatActivity implements FragmentManager
 
     @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LanguageUtil.setupDefaultLocale(this);
         setContentView(R.layout.launcher_activity);
         ApplicationLauncher.mainComponent().inject(this);
 

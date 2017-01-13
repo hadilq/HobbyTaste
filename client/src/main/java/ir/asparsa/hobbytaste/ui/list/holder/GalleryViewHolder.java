@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.ui.list.holder;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -92,7 +93,7 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
         }
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.shot)
         ImageView mShot;
@@ -102,7 +103,8 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
             ButterKnife.bind(this, itemView);
         }
 
-        void onBindView(BannerModel banner) {
+        void onBindView(final BannerModel banner) {
+            boolean imageSet = false;
             if (TextUtils.isEmpty(banner.getThumbnailUrl())) {
                 if (TextUtils.isEmpty(banner.getMainUrl())) {
                     itemView.setVisibility(View.GONE);
@@ -110,12 +112,45 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
                     Picasso.with(itemView.getContext())
                            .load(banner.getMainUrl())
                            .into(mShot);
+                    imageSet = true;
                 }
             } else {
                 Picasso.with(itemView.getContext())
                        .load(banner.getThumbnailUrl())
                        .into(mShot);
+                imageSet = true;
             }
+
+            if (imageSet) {
+                mShot.setOnClickListener(new View.OnClickListener() {
+                    @Override public void onClick(View view) {
+                        if (mObserver != null) {
+                            mObserver.onNext(new OnScreenshotClick(banner, mShot.getDrawable()));
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    public static class OnScreenshotClick implements BaseRecyclerFragment.Event {
+        private BannerModel data;
+        private Drawable drawable;
+
+        OnScreenshotClick(
+                BannerModel data,
+                Drawable drawable
+        ) {
+            this.data = data;
+            this.drawable = drawable;
+        }
+
+        public BannerModel getData() {
+            return data;
+        }
+
+        public Drawable getDrawable() {
+            return drawable;
         }
     }
 

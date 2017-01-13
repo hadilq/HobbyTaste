@@ -10,6 +10,7 @@
     <string name="username_title">نام‌کاربری شما</string>
     <string name="username_is_empty">نام‌کابری شما خالی است</string>
     <string name="commit">باشه</string>
+    <string name="close">بستن</string>
     <string name="comment_title">نظر</string>
     <string name="comment_hint">لطفا نظر خود را وارد نمایید</string>
     <string name="comment_is_empty">نظر شما خالی است</string>
@@ -29,6 +30,7 @@
     <string name="month_9">دی</string>
     <string name="month_10">بهمن</string>
     <string name="month_11">اسفند</string>
+
 
     <plurals name="like">
         <item quantity="one">like</item>

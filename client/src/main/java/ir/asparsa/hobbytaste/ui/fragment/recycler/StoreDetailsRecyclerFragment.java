@@ -1,5 +1,8 @@
 package ir.asparsa.hobbytaste.ui.fragment.recycler;
 
+import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.util.SparseArrayCompat;
@@ -11,8 +14,10 @@ import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.CommentManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
+import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
+import ir.asparsa.hobbytaste.ui.activity.ScreenshotActivity;
 import ir.asparsa.hobbytaste.ui.list.data.CommentData;
 import ir.asparsa.hobbytaste.ui.list.data.GalleryData;
 import ir.asparsa.hobbytaste.ui.list.data.RatingData;
@@ -93,6 +98,9 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
                     onStoreHeartClick(((RatingViewHolder.OnHeartClick) t).getData());
                 } else if (t instanceof CommentViewHolder.OnHeartClick) {
                     onCommentHeartClick(((CommentViewHolder.OnHeartClick) t).getComment());
+                } else if (t instanceof GalleryViewHolder.OnScreenshotClick) {
+                    GalleryViewHolder.OnScreenshotClick onScreenshotClick = (GalleryViewHolder.OnScreenshotClick) t;
+                    onScreenshotClick(onScreenshotClick.getData(), onScreenshotClick.getDrawable());
                 }
             }
         };
@@ -126,6 +134,20 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
         comment.heartBeat();
         notifyCommentHeartBeat(comment);
         mSubscription.add(mCommentManager.heartBeat(comment.getCommentModel(), getCommentHeartBeatObserver(comment)));
+    }
+
+    private void onScreenshotClick(
+            BannerModel data,
+            Drawable drawable
+    ) {
+        Intent intent = new Intent(getContext(), ScreenshotActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(ScreenshotActivity.BUNDLE_KEY_MAIN_URL, data.getMainUrl());
+        intent.putExtra(ScreenshotActivity.BUNDLE_KEY_THUMBNAIL_URL, data.getThumbnailUrl());
+        if (drawable instanceof BitmapDrawable) {
+            intent.putExtra(ScreenshotActivity.BUNDLE_KEY_IMAGE, ((BitmapDrawable) drawable).getBitmap());
+        }
+        getContext().startActivity(intent);
     }
 
     private Observer<StoreModel> getStoreHeartBeatObserver(final RatingData data) {
