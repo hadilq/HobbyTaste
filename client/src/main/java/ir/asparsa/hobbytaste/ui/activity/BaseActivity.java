@@ -1,9 +1,12 @@
 package ir.asparsa.hobbytaste.ui.activity;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
+import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 import ir.asparsa.hobbytaste.core.util.LanguageUtil;
+
+import javax.inject.Inject;
 
 /**
  * Created by hadi on 1/13/2017 AD.
@@ -11,11 +14,14 @@ import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 public class BaseActivity extends AppCompatActivity {
 
 
-    @Override public void onCreate(
-            Bundle savedInstanceState,
-            PersistableBundle persistentState
+    @Inject
+    PreferencesManager mPreferencesManager;
+
+    @Override protected void onCreate(
+            Bundle savedInstanceState
     ) {
-        super.onCreate(savedInstanceState, persistentState);
-        LanguageUtil.setupDefaultLocale(this);
+        super.onCreate(savedInstanceState);
+        ApplicationLauncher.mainComponent().inject(this);
+        LanguageUtil.setupDefaultLocale(mPreferencesManager, this);
     }
 }

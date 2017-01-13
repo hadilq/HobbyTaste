@@ -4,7 +4,10 @@ import android.app.Application;
 import ir.asparsa.hobbytaste.core.dagger.AppModule;
 import ir.asparsa.hobbytaste.core.dagger.DaggerMainComponent;
 import ir.asparsa.hobbytaste.core.dagger.MainComponent;
+import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 import ir.asparsa.hobbytaste.core.util.LanguageUtil;
+
+import javax.inject.Inject;
 
 /**
  * @author hadi
@@ -12,22 +15,26 @@ import ir.asparsa.hobbytaste.core.util.LanguageUtil;
  */
 public class ApplicationLauncher extends Application {
 
-    private static MainComponent mMainComponent;
+    private static MainComponent sMainComponent;
+
+    @Inject
+    PreferencesManager mPreferencesManager;
 
     @Override public void onCreate() {
         super.onCreate();
 
-        LanguageUtil.setupDefaultLocale(this);
         setupDagger();
+        sMainComponent.inject(this);
+        LanguageUtil.setupDefaultLocale(mPreferencesManager, this);
     }
 
     private void setupDagger() {
-        mMainComponent = DaggerMainComponent.builder()
-                .appModule(new AppModule(this))
-                .build();
+        sMainComponent = DaggerMainComponent.builder()
+                                            .appModule(new AppModule(this))
+                                            .build();
     }
 
     public static MainComponent mainComponent() {
-        return mMainComponent;
+        return sMainComponent;
     }
 }

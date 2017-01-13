@@ -35,10 +35,9 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
     }
 
     @Override public void onBindView(final RatingData data) {
-        mRateTextView.setText(itemView.getContext().getResources()
-                                      .getString(R.string.rating, data.getRate(),
-                                                 itemView.getContext().getResources().getQuantityString(
-                                                         R.plurals.like, (int) data.getRate())));
+        mRateTextView.setText(itemView.getContext().getResources().getQuantityString(
+                R.plurals.like, (int) data.getRate(), data.getRate()));
+
         mViewedTextView.setText(itemView.getContext().getResources()
                                         .getString(R.string.viewed, data.getViewed()));
 

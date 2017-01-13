@@ -12,8 +12,15 @@ import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
+import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
+import ir.asparsa.hobbytaste.core.util.LanguageUtil;
+import ir.asparsa.hobbytaste.core.util.LaunchUtil;
+import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
+import ir.asparsa.hobbytaste.ui.fragment.dialog.LanguageDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.SetUsernameDialogFragment;
+import ir.asparsa.hobbytaste.ui.list.data.LanguageData;
 import ir.asparsa.hobbytaste.ui.list.data.UsernameData;
+import ir.asparsa.hobbytaste.ui.list.holder.LanguageViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.UserNameViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
 import rx.Observer;
@@ -27,6 +34,8 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
 
     @Inject
     AuthorizationManager mAuthorizationManager;
+    @Inject
+    PreferencesManager mPreferencesManager;
 
     public static SettingsRecyclerFragment instantiate() {
         Bundle bundle = new Bundle();
@@ -62,6 +71,8 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
             @Override public void onNext(T t) {
                 if (t instanceof UserNameViewHolder.UsernameClick) {
                     onUsernameClick(((UserNameViewHolder.UsernameClick) t).getUsername());
+                } else if (t instanceof LanguageViewHolder.LanguageClick) {
+                    onLanguageClick(((LanguageViewHolder.LanguageClick) t).getLangAbbreviation());
                 }
             }
         };
@@ -70,6 +81,7 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
     @Override protected SparseArrayCompat<Class<? extends BaseViewHolder>> getViewHoldersList() {
         SparseArrayCompat<Class<? extends BaseViewHolder>> array = super.getViewHoldersList();
         array.put(UsernameData.VIEW_TYPE, UserNameViewHolder.class.asSubclass(BaseViewHolder.class));
+        array.put(LanguageData.VIEW_TYPE, LanguageViewHolder.class.asSubclass(BaseViewHolder.class));
         return array;
     }
 
@@ -80,8 +92,15 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
         ).show(getFragmentManager());
     }
 
+    private void onLanguageClick(String language) {
+        LanguageDialogFragment.instantiate(
+                language,
+                new LanguageDialogFragment.OnChangeLanguageDialogResultEvent(getTagName())
+        ).show(getFragmentManager());
+    }
+
     @Override public void onEvent(BaseEvent event) {
-        L.i(this.getClass(), "event received: ");
+        L.i(this.getClass(), "event received ");
         if (event instanceof BaseDialogFragment.BaseOnDialogResultEvent &&
             ((BaseDialogFragment.BaseOnDialogResultEvent) event).getDialogResult() !=
             BaseDialogFragment.DialogResult.COMMIT) {
@@ -102,6 +121,15 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
 
             for (Integer index : mAdapter.findViewHolder(UserNameViewHolder.class)) {
                 mAdapter.notifyItemChanged(index);
+            }
+        } else if (event instanceof LanguageDialogFragment.OnChangeLanguageDialogResultEvent) {
+            if (LanguageUtil.setDefaultLanguage(
+                    mPreferencesManager,
+                    ((LanguageDialogFragment.OnChangeLanguageDialogResultEvent) event).getLanguage())) {
+
+                L.i(getClass(), "Language about to change");
+                getActivity().finish();
+                LaunchUtil.launch(getContext(), LaunchActivity.class);
             }
         }
     }

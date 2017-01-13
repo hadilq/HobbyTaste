@@ -1,6 +1,8 @@
 package ir.asparsa.hobbytaste.core.dagger;
 
 import dagger.Component;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
+import ir.asparsa.hobbytaste.ui.activity.BaseActivity;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
 import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.StoreDetailsContentFragment;
@@ -21,6 +23,10 @@ import javax.inject.Singleton;
 @Component(modules = {AppModule.class, NetServiceModule.class, DatabaseModule.class})
 public interface MainComponent {
 
+    void inject(ApplicationLauncher applicationLauncher);
+
+    void inject(BaseActivity baseActivity);
+
     void inject(LaunchActivity launchActivity);
 
     void inject(MainContentFragment mainContentFragment);
@@ -38,4 +44,5 @@ public interface MainComponent {
     void inject(CommentDialogFragment commentDialogFragment);
 
     void inject(StoreDetailsRecyclerFragment storeDetailsRecyclerFragment);
+
 }

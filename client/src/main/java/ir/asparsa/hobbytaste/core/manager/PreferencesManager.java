@@ -14,6 +14,7 @@ public class PreferencesManager extends CorePreferencesManager {
 
     public static final String KEY_USERNAME = getNotVersionedKey("KEY_USERNAME");
     public static final String KEY_AUTHORIZATION_TOKEN = getNotVersionedKey("KEY_AUTHORIZATION_TOKEN");
+    public static final String KEY_DEFAULT_LANGUAGE = getNotVersionedKey("KEY_DEFAULT_LANGUAGE");
 
     @Inject
     public PreferencesManager(Context context) {

@@ -1,40 +1,10 @@
 <resources>
-    <string name="app_name">Hobby Taste</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_main">اصلی</string>
-    <string name="title_settings">تنظیمات</string>
-    <string name="title_store_details">فروشگاه</string>
-    <string name="connection_error">مشکلی در برقراری ارتباط بوجود آمده‌است</string>
-    <string name="username_hint">لطفا نام‌کاربری دلخواه خود را وارد نمایید</string>
-    <string name="username">نام‌کاربری</string>
-    <string name="username_title">نام‌کاربری شما</string>
-    <string name="username_is_empty">نام‌کابری شما خالی است</string>
-    <string name="commit">باشه</string>
-    <string name="close">بستن</string>
-    <string name="comment_title">نظر</string>
-    <string name="comment_hint">لطفا نظر خود را وارد نمایید</string>
-    <string name="comment_is_empty">نظر شما خالی است</string>
-    <string name="comment_store_is_empty">مشکلی پیش آمده! لطفا دوباره این دیالوگ را باز نمایید</string>
-    <string name="rating">%1$d %2$s</string>
-    <string name="viewed">%1$d viewed</string>
+    <string name="app_name"
+            translatable="false">Hobby Taste</string>
 
-    <string name="month_0">فروردین</string>
-    <string name="month_1">اردیبهشت</string>
-    <string name="month_2">خرداد</string>
-    <string name="month_3">تیر</string>
-    <string name="month_4">مرداد</string>
-    <string name="month_5">شهریور</string>
-    <string name="month_6">مهر</string>
-    <string name="month_7">آبان</string>
-    <string name="month_8">آذر</string>
-    <string name="month_9">دی</string>
-    <string name="month_10">بهمن</string>
-    <string name="month_11">اسفند</string>
-
-
-    <plurals name="like">
-        <item quantity="one">like</item>
-        <item quantity="other">likes</item>
-    </plurals>
+    <string name="persian"
+            translatable="false">پارسی</string>
+    <string name="english"
+            translatable="false">English</string>
 
 </resources>

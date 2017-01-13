@@ -13,10 +13,10 @@
             android:textSize="@dimen/font_size_small"
             android:layout_marginStart="@dimen/horizontal_margin"
             android:textColor="@color/text"
-            android:text="@string/username_title"/>
+            android:text="@string/language_title"/>
 
     <TextView
-            android:id="@+id/username"
+            android:id="@+id/language"
             android:layout_width="match_parent"
             android:layout_height="@dimen/text_view_height"
             android:layout_below="@id/title"
@@ -30,7 +30,7 @@
     <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_below="@id/username"
+            android:layout_below="@id/language"
             android:background="@color/divider"
             android:layout_marginStart="@dimen/horizontal_margin"
             android:layout_marginEnd="@dimen/horizontal_margin"/>

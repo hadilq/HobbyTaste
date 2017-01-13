@@ -17,6 +17,8 @@ import ir.asparsa.hobbytaste.ui.list.data.CommentData;
 import rx.Observer;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  * Created by hadi on 12/22/2016 AD.
@@ -44,11 +46,8 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
     @Override public void onBindView(final CommentData data) {
         mCommentTextView.setText(data.getCommentModel().getDescription());
 
-        mRateTextView.setText(itemView.getContext().getResources()
-                                      .getString(R.string.rating, data.getCommentModel().getRate(),
-                                                 itemView.getContext().getResources().getQuantityString(
-                                                         R.plurals.like, (int) data.getCommentModel().getRate())));
-
+        mRateTextView.setText(itemView.getContext().getResources().getQuantityString(
+                R.plurals.like, (int) data.getCommentModel().getRate(), data.getCommentModel().getRate()));
 
         mDateTimeTextView.setText(formatDatetime(data.getCommentModel().getCreated(), itemView.getContext()));
 
@@ -69,14 +68,30 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
             long datetime,
             Context context
     ) {
+        if (LanguageUtil.LANGUAGE_EN.equals(Locale.getDefault().getLanguage())) {
+            GregorianCalendar calendar = new GregorianCalendar();
+            calendar.setTimeInMillis(datetime);
+            return formatCalendar(calendar, context);
+        }
         PersianCalendar calendar = new PersianCalendar();
         calendar.setTimeInMillis(datetime);
+        return formatCalendar(calendar, context);
+    }
+
+    private String formatCalendar(
+            Calendar calendar,
+            Context context
+    ) {
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
-        return String.format(LanguageUtil.getLocale(), "%d %s %d %d:%d", day,
+        if (LanguageUtil.LANGUAGE_EN.equals(Locale.getDefault().getLanguage())) {
+            return String.format(Locale.getDefault(), "%d %s %d %d:%d", day,
+                                 getMonthString(month, context), year, hour, minute);
+        }
+        return String.format(Locale.getDefault(), "%d %s %d %d:%d", day,
                              getMonthString(month, context), year, hour, minute);
     }
 
