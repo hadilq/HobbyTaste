@@ -57,7 +57,7 @@ public class TryAgainView extends RelativeLayout {
         });
 
         mProgressBar.getIndeterminateDrawable().setColorFilter(
-                getContext().getResources().getColor(R.color.colorPrimary), android.graphics.PorterDuff.Mode.SRC_IN);
+                getContext().getResources().getColor(R.color.progress_bar), android.graphics.PorterDuff.Mode.SRC_IN);
     }
 
     public void start() {
