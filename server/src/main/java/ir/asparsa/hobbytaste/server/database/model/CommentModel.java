@@ -30,32 +30,41 @@ public class CommentModel {
     @JoinColumn(name = Comment.Columns.STORE)
     private StoreModel store;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = Comment.Columns.CREATOR)
+    private AccountModel creator;
+
     public CommentModel() {
     }
 
     public CommentModel(
             String description,
             long hashCode,
-            StoreModel store
+            StoreModel store,
+            AccountModel creator
     ) {
         this.description = description;
         this.hashCode = hashCode;
         this.store = store;
         this.rate = 0L;
         this.created = System.currentTimeMillis();
+        this.creator = creator;
     }
 
     public StoreCommentDto convertToDto(
             boolean like
     ) {
-        return new StoreCommentDto(getDescription(), getCreated(), getStore().getId(), getHashCode(), getRate(), like);
+        return new StoreCommentDto(
+                getDescription(), getCreator().getUsername(), getCreated(), getStore().getId(), getHashCode(),
+                getRate(), like);
     }
 
     public static CommentModel newInstance(
             StoreCommentDto comment,
-            StoreModel store
+            StoreModel store,
+            AccountModel creator
     ) {
-        return new CommentModel(comment.getDescription(), comment.getHashCode(), store);
+        return new CommentModel(comment.getDescription(), comment.getHashCode(), store, creator);
     }
 
     public long getId() {
@@ -80,6 +89,10 @@ public class CommentModel {
 
     public StoreModel getStore() {
         return store;
+    }
+
+    public AccountModel getCreator() {
+        return creator;
     }
 
     public long getCreated() {

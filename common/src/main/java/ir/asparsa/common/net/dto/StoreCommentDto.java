@@ -7,6 +7,7 @@ package ir.asparsa.common.net.dto;
 public class StoreCommentDto {
 
     private String description;
+    private String creator;
     private Long created;
     private Long storeId;
     private Long hashCode;
@@ -18,6 +19,7 @@ public class StoreCommentDto {
 
     public StoreCommentDto(
             String description,
+            String creator,
             Long created,
             Long storeId,
             Long hashCode,
@@ -25,6 +27,7 @@ public class StoreCommentDto {
             Boolean like
     ) {
         this.description = description;
+        this.creator = creator;
         this.created = created;
         this.storeId = storeId;
         this.hashCode = hashCode;
@@ -46,6 +49,10 @@ public class StoreCommentDto {
 
     public long getRate() {
         return rate;
+    }
+
+    public String getCreator() {
+        return creator;
     }
 
     public long getCreated() {

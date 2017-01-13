@@ -25,6 +25,8 @@ public class CommentModel extends BaseModel implements Parcelable {
     private long rate;
     @DatabaseField(columnName = Comment.Columns.LIKE)
     private boolean liked;
+    @DatabaseField(columnName = Comment.Columns.CREATOR, canBeNull = false)
+    private String creator;
     @DatabaseField(columnName = Comment.Columns.CREATED)
     private long created;
     @DatabaseField(columnName = Comment.Columns.STORE, canBeNull = false)
@@ -40,6 +42,7 @@ public class CommentModel extends BaseModel implements Parcelable {
             String description,
             long rate,
             boolean like,
+            String creator,
             long created,
             long storeId,
             long hashCode
@@ -47,6 +50,7 @@ public class CommentModel extends BaseModel implements Parcelable {
         this.description = description;
         this.rate = rate;
         this.liked = like;
+        this.creator = creator;
         this.created = created;
         this.storeId = storeId;
         this.hashCode = hashCode;
@@ -54,18 +58,20 @@ public class CommentModel extends BaseModel implements Parcelable {
 
     public CommentModel(
             String description,
+            String creator,
             long storeId
     ) {
         this.description = description;
         this.storeId = storeId;
+        this.creator = creator;
         this.created = System.currentTimeMillis();
         this.hashCode = created ^ (((long) getDescription().hashCode()) << 31);
     }
 
     public static CommentModel newInstance(StoreCommentDto storeCommentDto) {
         return new CommentModel(storeCommentDto.getDescription(), storeCommentDto.getRate(), storeCommentDto.getLike(),
-                                storeCommentDto.getCreated(), storeCommentDto.getStoreId(),
-                                storeCommentDto.getHashCode());
+                                storeCommentDto.getCreator(), storeCommentDto.getCreated(),
+                                storeCommentDto.getStoreId(), storeCommentDto.getHashCode());
     }
 
     public long getId() {
@@ -86,6 +92,10 @@ public class CommentModel extends BaseModel implements Parcelable {
 
     public boolean isLiked() {
         return liked;
+    }
+
+    public String getCreator() {
+        return creator;
     }
 
     public long getCreated() {

@@ -16,15 +16,27 @@
             android:src="@drawable/heart"/>
 
     <TextView
-            android:id="@+id/comment"
+            android:id="@+id/creator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="@dimen/vertical_margin_half"
+            android:layout_marginTop="@dimen/vertical_margin_quarter"
+            android:layout_marginStart="@dimen/horizontal_margin"
+            android:layout_toStartOf="@id/heart"
+            android:textSize="@dimen/font_size_small"
+            android:textColor="@color/text_hint"/>
+
+    <TextView
+            android:id="@+id/comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/creator"
+            android:layout_marginTop="@dimen/vertical_margin_quarter"
             android:layout_marginBottom="@dimen/vertical_margin_half"
             android:layout_marginStart="@dimen/horizontal_margin"
-            android:layout_toStartOf="@id/heart"/>
-
+            android:layout_toStartOf="@id/heart"
+            android:textSize="@dimen/font_size_medium"
+            android:textColor="@color/text"/>
 
     <TextView
             android:id="@+id/rate"

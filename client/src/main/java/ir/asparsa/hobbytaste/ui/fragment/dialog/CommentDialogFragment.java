@@ -18,6 +18,7 @@ import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
+import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.manager.CommentManager;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
@@ -35,6 +36,8 @@ public class CommentDialogFragment extends BaseDialogFragment {
 
     @Inject
     CommentManager mCommentManager;
+    @Inject
+    AuthorizationManager mAuthorizationManager;
 
     @BindView(R.id.title)
     TextView mTitleTextView;
@@ -101,7 +104,7 @@ public class CommentDialogFragment extends BaseDialogFragment {
             return;
         }
 
-        CommentModel comment = new CommentModel(description, store.getId());
+        CommentModel comment = new CommentModel(description, mAuthorizationManager.getUsername(), store.getId());
         mSubscription.add(mCommentManager.saveComment(
                 comment,
                 new Observer<CommentModel>() {

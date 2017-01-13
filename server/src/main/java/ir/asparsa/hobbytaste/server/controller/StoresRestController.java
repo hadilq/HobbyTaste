@@ -6,7 +6,10 @@ import ir.asparsa.common.net.dto.StoreCommentDto;
 import ir.asparsa.common.net.dto.StoreDto;
 import ir.asparsa.common.net.path.StoreServicePath;
 import ir.asparsa.hobbytaste.server.database.model.*;
-import ir.asparsa.hobbytaste.server.database.repository.*;
+import ir.asparsa.hobbytaste.server.database.repository.CommentLikeRepository;
+import ir.asparsa.hobbytaste.server.database.repository.StoreCommentRepository;
+import ir.asparsa.hobbytaste.server.database.repository.StoreLikeRepository;
+import ir.asparsa.hobbytaste.server.database.repository.StoreRepository;
 import ir.asparsa.hobbytaste.server.exception.CommentNotFoundException;
 import ir.asparsa.hobbytaste.server.exception.InternalServerErrorException;
 import ir.asparsa.hobbytaste.server.exception.StoreNotFoundException;
@@ -154,7 +157,8 @@ import java.util.*;
     @RequestMapping(value = StoreServicePath.COMMENTS, method = RequestMethod.PUT)
     StoreCommentDto saveStoreComments(
             @PathVariable("storeId") Long id,
-            @RequestBody StoreCommentDto comment
+            @RequestBody StoreCommentDto comment,
+            HttpServletRequest request
     ) {
         logger.info("save stores comment request: storeId: " + id + ", comment: " + comment);
 
@@ -167,7 +171,14 @@ import java.util.*;
 
         CommentModel entity;
         if (!existComment.isPresent()) {
-            entity = CommentModel.newInstance(comment, storeModel.get());
+            AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
+            if (account == null) {
+                // This request must be authorized before, so this never should happened
+                logger.error("Account is null, header " + request.getHeader(tokenHeader));
+                throw new InternalServerErrorException();
+            }
+
+            entity = CommentModel.newInstance(comment, storeModel.get(), account);
             logger.info("Saved comment: " + entity);
             entity = storeCommentRepository.save(entity);
         } else {

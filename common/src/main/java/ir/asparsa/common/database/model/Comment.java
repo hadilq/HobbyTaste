@@ -11,6 +11,7 @@ public interface Comment {
         String DESCRIPTION = "description";
         String RATE = "rate";
         String CREATED = "created";
+        String CREATOR = "creator";
         String HASH_CODE = "hash_code";
         String STORE = "store";
         String LIKE = "like";

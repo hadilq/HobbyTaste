@@ -16,6 +16,7 @@
     <dimen name="horizontal_margin">32dp</dimen>
     <dimen name="horizontal_margin_double">64dp</dimen>
 
+    <dimen name="vertical_margin_quarter">8dp</dimen>
     <dimen name="vertical_margin_half">16dp</dimen>
     <dimen name="vertical_margin">32dp</dimen>
     <dimen name="vertical_margin_double">64dp</dimen>

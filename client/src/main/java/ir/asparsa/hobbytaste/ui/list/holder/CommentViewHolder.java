@@ -27,6 +27,8 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
 
     @BindView(R.id.comment)
     TextView mCommentTextView;
+    @BindView(R.id.creator)
+    TextView mCreatorTextView;
     @BindView(R.id.heart)
     ImageView mHeartImageView;
     @BindView(R.id.datetime)
@@ -45,6 +47,8 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
 
     @Override public void onBindView(final CommentData data) {
         mCommentTextView.setText(data.getCommentModel().getDescription());
+
+        mCreatorTextView.setText(data.getCommentModel().getCreator());
 
         mRateTextView.setText(itemView.getContext().getResources().getQuantityString(
                 R.plurals.like, (int) data.getCommentModel().getRate(), data.getCommentModel().getRate()));
