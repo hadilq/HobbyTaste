@@ -3,6 +3,7 @@ package ir.asparsa.hobbytaste.ui.activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
@@ -54,6 +55,7 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
 
         ButterKnife.bind(this);
         mToolbar.setTitleTextColor(getResources().getColor(R.color.toolbar_title));
+        setSupportActionBar(mToolbar);
         mPagerAdapter = new NavigationAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(mPagerAdapter.pageToPos(NavigationAdapter.PAGE_MAIN));
@@ -134,6 +136,16 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                 });
             } else {
                 mFloatingActionButton.setVisibility(View.GONE);
+            }
+
+            AppBarLayout.LayoutParams params =
+                    (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+            if (fragment.scrollToolbar()) {
+                params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+                                      | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+            } else {
+                params.setScrollFlags(0);
+
             }
         }
     }

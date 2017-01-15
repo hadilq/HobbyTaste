@@ -83,4 +83,8 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
             }
         };
     }
+
+    @Override public boolean scrollToolbar() {
+        return true;
+    }
 }

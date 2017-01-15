@@ -44,6 +44,10 @@ public abstract class BaseContentFragment extends BaseFragment {
         return null;
     }
 
+    public boolean scrollToolbar() {
+        return false;
+    }
+
     public static abstract class FloatingActionButtonObserver implements Observer<View> {
         @Override public void onCompleted() {
         }
