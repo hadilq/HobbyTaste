@@ -6,5 +6,6 @@
             translatable="false">پارسی</string>
     <string name="english"
             translatable="false">English</string>
+    <string name="title_add_store">اضافه‌کردن فروشگاه</string>
 
 </resources>

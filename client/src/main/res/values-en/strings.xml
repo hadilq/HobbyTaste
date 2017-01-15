@@ -21,6 +21,10 @@
     <string name="comment_is_empty">Comment is empty</string>
     <string name="comment_store_is_empty">A problem detected! Please reopen this dialog</string>
 
+    <string name="new_store_hint">Store name</string>
+    <string name="new_store_marker_empty">Please touch the map to choose store place</string>
+    <string name="new_store_name_empty">Please set a name for the store</string>
+
     <string name="month_0">January</string>
     <string name="month_1">February</string>
     <string name="month_2">March</string>

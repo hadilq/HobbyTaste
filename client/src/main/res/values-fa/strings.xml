@@ -21,6 +21,10 @@
     <string name="comment_is_empty">نظر شما خالی است</string>
     <string name="comment_store_is_empty">مشکلی پیش آمده! لطفا دوباره این دیالوگ را باز نمایید</string>
 
+    <string name="new_store_hint">نام فروشگاه</string>
+    <string name="new_store_marker_empty">لطفا مکان فروشگاه را روی نقشه مشخص نمایید</string>
+    <string name="new_store_name_empty">لطفا نام فروشگاه را مشخص نمایید</string>
+
     <string name="month_0">فروردین</string>
     <string name="month_1">اردیبهشت</string>
     <string name="month_2">خرداد</string>

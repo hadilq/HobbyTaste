@@ -56,6 +56,44 @@ public class MainContentFragment extends BaseContentFragment
         ApplicationLauncher.mainComponent().inject(this);
     }
 
+    @Nullable @Override public View onCreateView(
+            LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState
+    ) {
+        subscription.add(mStoresManager.loadStores(getDatabaseObserver()));
+        return inflater.inflate(R.layout.main_content_fragment, container, false);
+    }
+
+    @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
+        SupportMapFragment mapFragment;
+        if (fragment instanceof SupportMapFragment) {
+            mapFragment = (SupportMapFragment) fragment;
+        } else {
+            mapFragment = SupportMapFragment.newInstance();
+            getChildFragmentManager().beginTransaction()
+                                     .replace(R.id.content_nested, mapFragment)
+                                     .commit();
+        }
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override public void onDestroyView() {
+        mIsCameraMovedBefore = false;
+        for (Marker marker : mMarkers) {
+            marker.remove();
+        }
+        subscription.clear();
+        super.onDestroyView();
+    }
+
+
+    @Override protected String setHeaderTitle() {
+        return getString(R.string.title_main);
+    }
+
     private Observer<Collection<StoreModel>> getDatabaseObserver() {
         return new Observer<Collection<StoreModel>>() {
             @Override public void onCompleted() {
@@ -90,7 +128,6 @@ public class MainContentFragment extends BaseContentFragment
         }
     }
 
-
     private void fillMap() {
         if (mMap != null && mStores != null) {
             double accumulatedLat = 0d;
@@ -123,43 +160,6 @@ public class MainContentFragment extends BaseContentFragment
         }
     }
 
-    @Nullable @Override public View onCreateView(
-            LayoutInflater inflater,
-            @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState
-    ) {
-        subscription.add(mStoresManager.loadStores(getDatabaseObserver()));
-        return inflater.inflate(R.layout.main_content_fragment, container, false);
-    }
-
-    @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
-        SupportMapFragment mapFragment;
-        if (fragment instanceof SupportMapFragment) {
-            mapFragment = (SupportMapFragment) fragment;
-        } else {
-            mapFragment = SupportMapFragment.newInstance();
-            getChildFragmentManager().beginTransaction()
-                                     .replace(R.id.content_nested, mapFragment)
-                                     .commit();
-        }
-        mapFragment.getMapAsync(this);
-    }
-
-    @Override public void onDestroyView() {
-        mIsCameraMovedBefore = false;
-        for (Marker marker : mMarkers) {
-            marker.remove();
-        }
-        subscription.clear();
-        super.onDestroyView();
-    }
-
-    @Override protected String setHeaderTitle() {
-        return getString(R.string.title_main);
-    }
-
     @Override public BackState onBackPressed() {
         return BackState.CLOSE_APP;
     }
@@ -190,5 +190,13 @@ public class MainContentFragment extends BaseContentFragment
             }
         }
         return false;
+    }
+
+    @Override public FloatingActionButtonObserver getFloatingActionButtonObserver() {
+        return new FloatingActionButtonObserver() {
+            @Override public void onNext(View view) {
+                NavigationUtil.startContentFragment(getFragmentManager(), AddStoreContentFragment.instantiate());
+            }
+        };
     }
 }
