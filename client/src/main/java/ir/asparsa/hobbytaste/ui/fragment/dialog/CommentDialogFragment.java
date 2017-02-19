@@ -28,7 +28,8 @@ import rx.subscriptions.CompositeSubscription;
 import javax.inject.Inject;
 
 /**
- * Created by hadi on 12/15/2016 AD.
+ * @author hadi
+ * @since 12/15/2016 AD.
  */
 public class CommentDialogFragment extends BaseDialogFragment {
 
@@ -104,9 +105,9 @@ public class CommentDialogFragment extends BaseDialogFragment {
             return;
         }
 
-        CommentModel comment = new CommentModel(description, mAuthorizationManager.getUsername(), store.getId());
+        CommentModel comment = new CommentModel(description, mAuthorizationManager.getUsername());
         mSubscription.add(mCommentManager.saveComment(
-                comment,
+                store, comment,
                 new Observer<CommentModel>() {
                     @Override public void onCompleted() {
                     }

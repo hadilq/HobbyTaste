@@ -195,8 +195,19 @@ public class MainContentFragment extends BaseContentFragment
     @Override public FloatingActionButtonObserver getFloatingActionButtonObserver() {
         return new FloatingActionButtonObserver() {
             @Override public void onNext(View view) {
-                NavigationUtil.startContentFragment(getFragmentManager(), AddStoreContentFragment.instantiate());
+                NavigationUtil.startContentFragment(
+                        getFragmentManager(), AddStoreContentFragment
+                                .instantiate(new AddStoreContentFragment.StoreSaveResultEvent(getTagName())));
             }
         };
+    }
+
+    @Override public void onEvent(BaseEvent event) {
+        if (event instanceof AddStoreContentFragment.StoreSaveResultEvent) {
+            AddStoreContentFragment.StoreSaveResultEvent result = (AddStoreContentFragment.StoreSaveResultEvent) event;
+            if (mStores != null) {
+                mStores.add(result.getStoreModel());
+            }
+        }
     }
 }

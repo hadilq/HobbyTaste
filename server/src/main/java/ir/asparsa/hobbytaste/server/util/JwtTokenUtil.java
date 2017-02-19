@@ -1,4 +1,4 @@
-package ir.asparsa.hobbytaste.server.security;
+package ir.asparsa.hobbytaste.server.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

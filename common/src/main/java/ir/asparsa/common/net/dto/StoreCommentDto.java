@@ -9,7 +9,7 @@ public class StoreCommentDto {
     private String description;
     private String creator;
     private Long created;
-    private Long storeId;
+    private Long storeHashCode;
     private Long hashCode;
     private Long rate;
     private Boolean like;
@@ -21,7 +21,7 @@ public class StoreCommentDto {
             String description,
             String creator,
             Long created,
-            Long storeId,
+            Long storeHashCode,
             Long hashCode,
             Long rate,
             Boolean like
@@ -29,7 +29,7 @@ public class StoreCommentDto {
         this.description = description;
         this.creator = creator;
         this.created = created;
-        this.storeId = storeId;
+        this.storeHashCode = storeHashCode;
         this.hashCode = hashCode;
         this.rate = rate;
         this.like = like;
@@ -59,8 +59,8 @@ public class StoreCommentDto {
         return created;
     }
 
-    public long getStoreId() {
-        return storeId;
+    public long getStoreHashCode() {
+        return storeHashCode;
     }
 
     public long getHashCode() {

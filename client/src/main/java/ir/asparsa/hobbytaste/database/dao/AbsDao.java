@@ -74,13 +74,13 @@ public abstract class AbsDao<T extends BaseModel, ID> {
         });
     }
 
-    public Observable<Collection<Dao.CreateOrUpdateStatus>> createAll(final Collection<T> data) {
-        return Observable.create(new Observable.OnSubscribe<Collection<Dao.CreateOrUpdateStatus>>() {
-            @Override public void call(Subscriber<? super Collection<Dao.CreateOrUpdateStatus>> subscriber) {
+    public Observable<Collection<T>> createAll(final Collection<T> data) {
+        return Observable.create(new Observable.OnSubscribe<Collection<T>>() {
+            @Override public void call(Subscriber<? super Collection<T>> subscriber) {
                 try {
-                    Collection<Dao.CreateOrUpdateStatus> collection = new ArrayDeque<>();
+                    Collection<T> collection = new ArrayDeque<>();
                     for (T t : data) {
-                        collection.add(getDao().createOrUpdate(t));
+                        collection.add(getDao().createIfNotExists(t));
                     }
                     subscriber.onNext(collection);
                     subscriber.onCompleted();

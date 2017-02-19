@@ -55,13 +55,13 @@ public class CommentModel {
             boolean like
     ) {
         return new StoreCommentDto(
-                getDescription(), getCreator().getUsername(), getCreated(), getStore().getId(), getHashCode(),
+                getDescription(), getCreator().getUsername(), getCreated(), getStore().getHashCode(), getHashCode(),
                 getRate(), like);
     }
 
     public static CommentModel newInstance(
-            StoreCommentDto comment,
             StoreModel store,
+            StoreCommentDto comment,
             AccountModel creator
     ) {
         return new CommentModel(comment.getDescription(), comment.getHashCode(), store, creator);

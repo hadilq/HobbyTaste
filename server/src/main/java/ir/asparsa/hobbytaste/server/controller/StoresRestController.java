@@ -1,20 +1,19 @@
 package ir.asparsa.hobbytaste.server.controller;
 
 import ir.asparsa.common.database.model.Comment;
+import ir.asparsa.common.net.dto.BannerDto;
 import ir.asparsa.common.net.dto.PageDto;
 import ir.asparsa.common.net.dto.StoreCommentDto;
 import ir.asparsa.common.net.dto.StoreDto;
+import ir.asparsa.common.net.path.BannerServicePath;
 import ir.asparsa.common.net.path.StoreServicePath;
 import ir.asparsa.hobbytaste.server.database.model.*;
-import ir.asparsa.hobbytaste.server.database.repository.CommentLikeRepository;
-import ir.asparsa.hobbytaste.server.database.repository.StoreCommentRepository;
-import ir.asparsa.hobbytaste.server.database.repository.StoreLikeRepository;
-import ir.asparsa.hobbytaste.server.database.repository.StoreRepository;
-import ir.asparsa.hobbytaste.server.exception.CommentNotFoundException;
-import ir.asparsa.hobbytaste.server.exception.InternalServerErrorException;
-import ir.asparsa.hobbytaste.server.exception.StoreNotFoundException;
-import ir.asparsa.hobbytaste.server.security.JwtTokenUtil;
+import ir.asparsa.hobbytaste.server.database.repository.*;
+import ir.asparsa.hobbytaste.server.exception.*;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
+import ir.asparsa.hobbytaste.server.storage.StorageService;
+import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,8 @@ import rx.Observer;
 import rx.schedulers.Schedulers;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -46,6 +47,8 @@ import java.util.*;
     @Autowired
     StoreRepository storeRepository;
     @Autowired
+    StoreBannerRepository storeBannerRepository;
+    @Autowired
     StoreLikeRepository storeLikeRepository;
     @Autowired
     StoreCommentRepository storeCommentRepository;
@@ -53,7 +56,8 @@ import java.util.*;
     CommentLikeRepository commentLikeRepository;
     @Autowired
     JwtTokenUtil jwtTokenUtil;
-
+    @Autowired
+    StorageService storageService;
 
     StoresRestController() {
     }
@@ -84,14 +88,73 @@ import java.util.*;
         return collection;
     }
 
-    @RequestMapping(value = StoreServicePath.VIEWED, method = RequestMethod.PUT)
-    StoreDto storeViewed(
-            @PathVariable("storeId") Long id,
+    @RequestMapping(method = RequestMethod.PUT)
+    StoreDto saveStore(
+            @RequestBody StoreDto store,
             HttpServletRequest request
     ) {
-        logger.info("read stores request");
+        logger.info("Save store request");
 
-        Optional<StoreModel> storeModel = storeRepository.findById(id);
+        AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
+        if (account == null) {
+            // This request must be authorized before, so this never should happened
+            logger.error("Account is null, header " + request.getHeader(tokenHeader));
+            throw new InternalServerErrorException();
+        }
+
+        Optional<StoreModel> existStore = storeRepository.findByHashCode(store.getHashCode());
+        if (existStore.isPresent()) {
+            List<StoreLikeModel> storeLikes = storeLikeRepository.findByAccount(account);
+            boolean like = false;
+            for (StoreLikeModel storeLike : storeLikes) {
+                if (storeLike.getStore().equals(existStore.get())) {
+                    like = true;
+                    break;
+                }
+            }
+
+            return existStore.get().convertToDto(like);
+        }
+
+        logger.info("Store model about to save");
+        StoreModel storeModel = storeRepository.save(StoreModel.newInstance(store));
+        logger.info("Store model saved");
+        Collection<BannerModel> banners = new ArrayDeque<>();
+        if (store.getBanners() != null && store.getBanners().size() != 0) {
+            logger.info("Banners is not empty");
+            for (BannerDto banner : store.getBanners()) {
+                logger.info("1 Banner main: " + banner.getMainUrl() + ", thumbnail: " + banner.getMainUrl());
+                String mainFilename = storageService.getFilename(banner.getMainUrl());
+                String thumbnailFilename = storageService.getFilename(banner.getThumbnailUrl());
+                logger.info("2 Banner main: " + mainFilename + ", thumbnail: " + thumbnailFilename);
+                storageService.moveFromTmpToPermanent(mainFilename);
+                logger.info("3 Banner main: " + banner.getMainUrl() + ", thumbnail: " + banner.getMainUrl());
+                try {
+                    storageService.moveFromTmpToPermanent(thumbnailFilename);
+                } catch (StorageException e) {
+                    logger.info("Thumbnail is not available! ");
+                }
+                banners.add(storeBannerRepository.save(new BannerModel(
+                        storageService.getServerFileUrl(mainFilename),
+                        storageService.getServerFileUrl(thumbnailFilename),
+                        storeModel)));
+                logger.info("Banner saved to " + mainFilename + " with thumbnail of " + thumbnailFilename);
+            }
+        }
+        storeModel.setBanners(banners);
+        logger.info("Store saved");
+        return storeModel.convertToDto(false);
+    }
+
+
+    @RequestMapping(value = StoreServicePath.VIEWED, method = RequestMethod.PUT)
+    StoreDto storeViewed(
+            @PathVariable("storeHashCode") Long hashCode,
+            HttpServletRequest request
+    ) {
+        logger.info("view stores request");
+
+        Optional<StoreModel> storeModel = storeRepository.findByHashCode(hashCode);
         if (!storeModel.isPresent()) {
             throw new StoreNotFoundException();
         }
@@ -113,12 +176,12 @@ import java.util.*;
 
     @RequestMapping(value = StoreServicePath.COMMENTS, method = RequestMethod.POST)
     PageDto<StoreCommentDto> readStoreCommentsList(
-            @PathVariable("storeId") Long id,
+            @PathVariable("storeHashCode") Long hashCode,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size,
             HttpServletRequest request
     ) {
-        logger.info("read store comments request: storeId: " + id + ", page: " + page + ", size: " + size);
+        logger.info("read store comments request: storeHashCode: " + hashCode + ", page: " + page + ", size: " + size);
 
         AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
         if (account == null) {
@@ -127,7 +190,7 @@ import java.util.*;
             throw new InternalServerErrorException();
         }
 
-        Optional<StoreModel> storeModel = storeRepository.findById(id);
+        Optional<StoreModel> storeModel = storeRepository.findByHashCode(hashCode);
         if (!storeModel.isPresent()) {
             throw new StoreNotFoundException();
         }
@@ -156,13 +219,13 @@ import java.util.*;
 
     @RequestMapping(value = StoreServicePath.COMMENTS, method = RequestMethod.PUT)
     StoreCommentDto saveStoreComments(
-            @PathVariable("storeId") Long id,
+            @PathVariable("storeHashCode") Long hashCode,
             @RequestBody StoreCommentDto comment,
             HttpServletRequest request
     ) {
-        logger.info("save stores comment request: storeId: " + id + ", comment: " + comment);
+        logger.info("save stores comment request: storeHashCode: " + hashCode + ", comment: " + comment);
 
-        Optional<StoreModel> storeModel = storeRepository.findById(id);
+        Optional<StoreModel> storeModel = storeRepository.findByHashCode(hashCode);
         if (!storeModel.isPresent()) {
             throw new StoreNotFoundException();
         }
@@ -178,7 +241,7 @@ import java.util.*;
                 throw new InternalServerErrorException();
             }
 
-            entity = CommentModel.newInstance(comment, storeModel.get(), account);
+            entity = CommentModel.newInstance(storeModel.get(), comment, account);
             logger.info("Saved comment: " + entity);
             entity = storeCommentRepository.save(entity);
         } else {
@@ -189,13 +252,13 @@ import java.util.*;
 
     @RequestMapping(value = StoreServicePath.LIKE, method = RequestMethod.PUT)
     StoreDto saveStoreLike(
-            @PathVariable("storeId") Long id,
+            @PathVariable("storeHashCode") Long hashCode,
             @PathVariable("like") Boolean like,
             HttpServletRequest request
     ) {
-        logger.info("save store like request: storeId: " + id + ", liked: " + like);
+        logger.info("save store like request: storeHashCode: " + hashCode + ", liked: " + like);
 
-        Optional<StoreModel> storeModel = storeRepository.findById(id);
+        Optional<StoreModel> storeModel = storeRepository.findByHashCode(hashCode);
         if (!storeModel.isPresent()) {
             throw new StoreNotFoundException();
         }
@@ -246,15 +309,16 @@ import java.util.*;
 
     @RequestMapping(value = StoreServicePath.LIKE_COMMENT, method = RequestMethod.PUT)
     StoreCommentDto saveCommentLike(
-            @PathVariable("storeId") Long id,
+            @PathVariable("storeHashCode") Long storeHashCode,
             @PathVariable("commentHashCode") Long hashCode,
             @PathVariable("like") Boolean like,
             HttpServletRequest request
     ) {
         logger.info(
-                "save comment like request: storeId: " + id + ", comment hash code: " + hashCode + ", liked: " + like);
+                "save comment like request: storeHashCode: " + storeHashCode + ", comment hash code: " + hashCode +
+                ", liked: " + like);
 
-        Optional<StoreModel> storeModel = storeRepository.findById(id);
+        Optional<StoreModel> storeModel = storeRepository.findByHashCode(storeHashCode);
         if (!storeModel.isPresent()) {
             throw new StoreNotFoundException();
         }

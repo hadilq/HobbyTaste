@@ -5,8 +5,8 @@ package ir.asparsa.common.net.path;
  */
 public interface StoreServicePath {
     String SERVICE = "store";
-    String VIEWED = "/{storeId}/viewed";
-    String COMMENTS = "/{storeId}/comments";
-    String LIKE = "/{storeId}/liked/{like}";
-    String LIKE_COMMENT = "/{storeId}/comment/{commentHashCode}/like/{like}";
+    String VIEWED = "/{storeHashCode}/viewed";
+    String COMMENTS = "/{storeHashCode}/comments";
+    String LIKE = "/{storeHashCode}/liked/{like}";
+    String LIKE_COMMENT = "/{storeHashCode}/comment/{commentHashCode}/like/{like}";
 }

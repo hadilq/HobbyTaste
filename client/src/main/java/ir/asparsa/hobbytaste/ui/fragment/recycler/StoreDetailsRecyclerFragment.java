@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.util.SparseArrayCompat;
 import android.view.View;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
@@ -133,7 +134,13 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
     private void onCommentHeartClick(CommentData comment) {
         comment.heartBeat();
         notifyCommentHeartBeat(comment);
-        mSubscription.add(mCommentManager.heartBeat(comment.getCommentModel(), getCommentHeartBeatObserver(comment)));
+        StoreModel store = getArguments().getParcelable(BUNDLE_KEY_STORE);
+        if (store == null) {
+            L.e(getClass(), "Store is null!");
+            return;
+        }
+        mSubscription
+                .add(mCommentManager.heartBeat(store, comment.getCommentModel(), getCommentHeartBeatObserver(comment)));
     }
 
     private void onScreenshotClick(

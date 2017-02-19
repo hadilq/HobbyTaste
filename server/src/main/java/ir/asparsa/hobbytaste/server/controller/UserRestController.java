@@ -6,7 +6,7 @@ import ir.asparsa.hobbytaste.server.database.model.AccountModel;
 import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
 import ir.asparsa.hobbytaste.server.exception.EmptyUsernameException;
 import ir.asparsa.hobbytaste.server.exception.InternalServerErrorException;
-import ir.asparsa.hobbytaste.server.security.JwtTokenUtil;
+import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

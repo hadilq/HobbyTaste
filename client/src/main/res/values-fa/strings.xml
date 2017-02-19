@@ -2,6 +2,7 @@
     <string name="title_main">اصلی</string>
     <string name="title_settings">تنظیمات</string>
     <string name="title_store_details">فروشگاه</string>
+    <string name="title_add_banner">اضافه‌کردن تصویر</string>
 
     <string name="connection_error">مشکلی در برقراری ارتباط بوجود آمده‌است</string>
 
@@ -15,15 +16,27 @@
 
     <string name="commit">باشه</string>
     <string name="close">بستن</string>
+    <string name="next">ادامه</string>
+    <string name="choose">انتخاب</string>
+    <string name="finish">اتمام</string>
+    <string name="send">بفرست</string>
 
     <string name="comment_title">نظر</string>
     <string name="comment_hint">لطفا نظر خود را وارد نمایید</string>
     <string name="comment_is_empty">نظر شما خالی است</string>
     <string name="comment_store_is_empty">مشکلی پیش آمده! لطفا دوباره این دیالوگ را باز نمایید</string>
 
-    <string name="new_store_hint">نام فروشگاه</string>
+    <string name="new_store_name_hint">نام فروشگاه</string>
+    <string name="new_store_description_hint">توضیحات فروشگاه</string>
     <string name="new_store_marker_empty">لطفا مکان فروشگاه را روی نقشه مشخص نمایید</string>
     <string name="new_store_name_empty">لطفا نام فروشگاه را مشخص نمایید</string>
+    <string name="new_store_description_empty">لطفا توضیحاتی را اضافه نمایید</string>
+    <string name="new_store_at_least_banner">حداقل سه تصویر لازم است</string>
+    <string name="new_store_banner_is_empty">تصویری انتخاب نشده‌است یا تصویر آماده‌نشده‌است، که در این صورت کمی صبر کنید</string>
+    <string name="new_store_banner_is_not_sent">تصویر فرستاده نشده‌است</string>
+    <string name="new_store_banner_successfully_sent">تصویر با موفقیت فرستاده‌شده</string>
+    <string name="new_store_banner_successfully_prepared">تصویر با موفقیت آماده شده</string>
+    <string name="new_store_banner_error_prepared">تصویر آماده نشده‌است! لطفا دوباره تلاش نمایید.</string>
 
     <string name="month_0">فروردین</string>
     <string name="month_1">اردیبهشت</string>

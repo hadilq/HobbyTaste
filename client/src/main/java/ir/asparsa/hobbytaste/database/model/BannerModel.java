@@ -6,6 +6,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.common.database.model.Banner;
+import ir.asparsa.common.net.dto.BannerDto;
 
 /**
  * @author hadi
@@ -22,19 +23,21 @@ public class BannerModel extends BaseModel implements Parcelable {
     @DatabaseField(columnName = Banner.Columns.THUMBNAIL_URL)
     private String thumbnailUrl;
     @DatabaseField(columnName = Banner.Columns.STORE)
-    private long storeId;
+    private Long storeId;
 
     public BannerModel() {
     }
 
     public BannerModel(
             String mainUrl,
-            String thumbnailUrl,
-            long storeId
+            String thumbnailUrl
     ) {
         this.mainUrl = mainUrl;
         this.thumbnailUrl = thumbnailUrl;
-        this.storeId = storeId;
+    }
+
+    public BannerDto convertToDto() {
+        return new BannerDto(mainUrl, thumbnailUrl);
     }
 
     public long getId() {
@@ -47,6 +50,14 @@ public class BannerModel extends BaseModel implements Parcelable {
 
     public String getThumbnailUrl() {
         return thumbnailUrl;
+    }
+
+    public Long getStoreId() {
+        return storeId;
+    }
+
+    public void setStoreId(long storeId) {
+        this.storeId = storeId;
     }
 
     @Override public int describeContents() {
@@ -87,7 +98,9 @@ public class BannerModel extends BaseModel implements Parcelable {
         return ((getMainUrl() == null && other.getMainUrl() == null) ||
                 (getMainUrl() != null && getMainUrl().equals(other.getMainUrl()))) &&
                ((getThumbnailUrl() == null && other.getThumbnailUrl() == null) ||
-                (getThumbnailUrl() != null && getThumbnailUrl().equals(other.getThumbnailUrl())));
+                (getThumbnailUrl() != null && getThumbnailUrl().equals(other.getThumbnailUrl()))) &&
+               ((getStoreId() == null && other.getStoreId() == null) ||
+                (getStoreId() != null && getStoreId().equals(other.getStoreId())));
     }
 
     @Override public int hashCode() {

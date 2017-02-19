@@ -8,6 +8,9 @@ public class BannerDto {
     private String mainUrl;
     private String thumbnailUrl;
 
+    public BannerDto() {
+    }
+
     public BannerDto(String mainUrl, String thumbnailUrl) {
         this.mainUrl = mainUrl;
         this.thumbnailUrl = thumbnailUrl;

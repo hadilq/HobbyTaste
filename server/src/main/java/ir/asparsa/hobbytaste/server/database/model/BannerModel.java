@@ -64,7 +64,8 @@ public class BannerModel {
                 (getMainUrl() != null && getMainUrl().equals(other.getMainUrl()))) &&
                ((getThumbnailUrl() == null && other.getThumbnailUrl() == null) ||
                 (getThumbnailUrl() != null && getThumbnailUrl().equals(other.getThumbnailUrl()))) &&
-               ((getId() == other.getId()));
+               ((getStore() == null && other.getStore() == null) ||
+                (getStore() != null && getStore().equals(other.getStore())));
     }
 
     @Override
@@ -81,4 +82,5 @@ public class BannerModel {
                ", storeId=" + store.getId() +
                '}';
     }
+
 }

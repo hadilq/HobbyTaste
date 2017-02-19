@@ -12,6 +12,8 @@ import rx.Subscriber;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.sql.SQLDataException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,6 +49,43 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
 
                     }
                     subscriber.onNext(models);
+                    subscriber.onCompleted();
+                } catch (Exception e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
+
+    public Observable<StoreModel> findStore(final Long hashCode) {
+        return Observable.create(new Observable.OnSubscribe<StoreModel>() {
+            @Override public void call(Subscriber<? super StoreModel> subscriber) {
+                try {
+                    getDao().query(
+                            getDao().queryBuilder()
+                                    .where()
+                                    .eq(Store.Columns.HASH_CODE, hashCode)
+                                    .prepare());
+                } catch (SQLException e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
+
+    public Observable<Integer> delete(
+            final BannerDao bannerDao,
+            final StoreModel data
+    ) {
+        return Observable.create(new Observable.OnSubscribe<Integer>() {
+            @Override public void call(Subscriber<? super Integer> subscriber) {
+                try {
+                    if (data.getBanners() != null && data.getBanners().size() != 0) {
+                        for (BannerModel banner : data.getBanners()) {
+                            bannerDao.getDao().delete(banner);
+                        }
+                    }
+                    subscriber.onNext(getDao().delete(data));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);
@@ -105,19 +144,30 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
             list = getDao().query(
                     getDao().queryBuilder()
                             .where()
-                            .eq(Store.Columns.ID, newModel.getId())
+                            .eq(Store.Columns.HASH_CODE, newModel.getHashCode())
                             .prepare());
         } else {
+            if (oldModel.getId() == null) {
+                throw new SQLDataException("Id of old model is null " + oldModel);
+            }
             list = new ArrayList<>();
             list.add(oldModel);
         }
 
-        getDao().createOrUpdate(newModel);
         if (list.isEmpty()) {
+            newModel.setId(null);
+            newModel = getDao().createIfNotExists(newModel);
             for (BannerModel newBanner : newModel.getBanners()) {
+                newBanner.setStoreId(newModel.getId());
                 bannerDao.getDao().create(newBanner);
             }
         } else {
+            newModel.setId(list.get(0).getId());
+            getDao().update(newModel);
+            for (BannerModel bannerModel : newModel.getBanners()) {
+                bannerModel.setStoreId(newModel.getId());
+            }
+
             List<BannerModel> oldBannerList;
             if (oldModel == null) {
                 oldBannerList = bannerDao.getDao().query(
@@ -127,6 +177,9 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
                                  .prepare());
             } else {
                 oldBannerList = oldModel.getBanners();
+                for (BannerModel bannerModel : oldBannerList) {
+                    bannerModel.setStoreId(newModel.getId());
+                }
             }
             for (BannerModel oldBanner : oldBannerList) {
                 boolean isFound = false;

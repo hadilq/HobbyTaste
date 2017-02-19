@@ -2,6 +2,7 @@ package ir.asparsa.hobbytaste.database.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
@@ -19,18 +20,22 @@ import java.util.List;
 @DatabaseTable(tableName = Store.TABLE_NAME)
 public class StoreModel extends BaseModel implements Parcelable {
 
-    @DatabaseField(id = true, columnName = Store.Columns.ID, canBeNull = false)
-    private long id;
+    @DatabaseField(columnName = Store.Columns.ID, generatedId = true)
+    private Long id;
 
     @DatabaseField(columnName = Store.Columns.LAT, canBeNull = false)
     private double lat;
     @DatabaseField(columnName = Store.Columns.LON, canBeNull = false)
     private double lon;
 
-    @DatabaseField(columnName = Store.Columns.TITLE)
+    @DatabaseField(columnName = Store.Columns.TITLE, canBeNull = false)
     private String title;
-    @DatabaseField(columnName = Store.Columns.DESCRIPTION)
+    @DatabaseField(columnName = Store.Columns.DESCRIPTION, canBeNull = false)
     private String description;
+    @DatabaseField(columnName = Store.Columns.HASH_CODE, canBeNull = false)
+    private long hashCode;
+    @DatabaseField(columnName = Store.Columns.CREATED, canBeNull = false)
+    private long created;
     @DatabaseField(columnName = Store.Columns.RATE, canBeNull = false)
     private long rate;
     @DatabaseField(columnName = Store.Columns.VIEWED, canBeNull = false)
@@ -43,9 +48,27 @@ public class StoreModel extends BaseModel implements Parcelable {
     public StoreModel() {
     }
 
+    public StoreModel(
+            double lat,
+            double lon,
+            @NonNull String title,
+            @NonNull String description
+    ) {
+        this.lat = lat;
+        this.lon = lon;
+        this.title = title;
+        this.description = description;
+        this.rate = 0;
+        this.viewed = 0;
+        this.liked = false;
+        this.created = System.currentTimeMillis();
+        this.hashCode = (((created ^ (((long) getDescription().hashCode()) << 31)) ^ ((long) getTitle().hashCode())) ^
+                         Double.doubleToLongBits(getLat())) ^ Double.doubleToLongBits(getLat());
+        banners = new ArrayList<>();
+    }
+
     public static StoreModel instantiate(StoreDto storeDto) {
         StoreModel storeModel = new StoreModel();
-        storeModel.id = storeDto.getId();
         storeModel.lat = storeDto.getLat();
         storeModel.lon = storeDto.getLon();
         storeModel.title = storeDto.getTitle();
@@ -53,19 +76,35 @@ public class StoreModel extends BaseModel implements Parcelable {
         storeModel.viewed = storeDto.getViewed();
         storeModel.liked = storeDto.getLike();
         storeModel.description = storeDto.getDescription();
+        storeModel.hashCode = storeDto.getHashCode();
+        storeModel.created = storeDto.getCreated();
         List<BannerModel> banners = new ArrayList<>();
         if (storeDto.getBanners() != null && storeDto.getBanners().size() != 0) {
             for (BannerDto bannerDto : storeDto.getBanners()) {
                 banners.add(
-                        new BannerModel(bannerDto.getMainUrl(), bannerDto.getThumbnailUrl(), storeDto.getId()));
+                        new BannerModel(bannerDto.getMainUrl(), bannerDto.getThumbnailUrl()));
             }
         }
         storeModel.banners = banners;
         return storeModel;
     }
 
-    public long getId() {
+    public StoreDto convertToDto() {
+        List<BannerDto> banners = new ArrayList<>();
+        if (this.banners != null && this.banners.size() != 0) {
+            for (BannerModel banner : this.banners) {
+                banners.add(banner.convertToDto());
+            }
+        }
+        return new StoreDto(lat, lon, title, description, hashCode, banners);
+    }
+
+    public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public double getLon() {
@@ -84,6 +123,14 @@ public class StoreModel extends BaseModel implements Parcelable {
         return description;
     }
 
+    public long getHashCode() {
+        return hashCode;
+    }
+
+    public long getCreated() {
+        return created;
+    }
+
     public long getRate() {
         return rate;
     }
@@ -97,6 +144,9 @@ public class StoreModel extends BaseModel implements Parcelable {
     }
 
     public List<BannerModel> getBanners() {
+        if (banners == null) {
+            banners = new ArrayList<>();
+        }
         return banners;
     }
 
@@ -115,16 +165,7 @@ public class StoreModel extends BaseModel implements Parcelable {
             return false;
         }
         final StoreModel other = (StoreModel) otherObj;
-        return (getLat() == other.getLat() &&
-                getLon() == other.getLon() &&
-                getId() == other.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        long lat = Double.doubleToLongBits(getLat());
-        long lon = Double.doubleToLongBits(getLon());
-        return (int) (((lat ^ lat >> 31) ^ (lon ^ lon >> 31)) ^ (getId() ^ getId() >> 31));
+        return getHashCode() == other.getHashCode();
     }
 
     @Override public String toString() {
@@ -149,7 +190,7 @@ public class StoreModel extends BaseModel implements Parcelable {
             Parcel dest,
             int flags
     ) {
-        dest.writeLong(this.id);
+        dest.writeValue(this.id);
         dest.writeDouble(this.lat);
         dest.writeDouble(this.lon);
         dest.writeString(this.title);
@@ -160,7 +201,7 @@ public class StoreModel extends BaseModel implements Parcelable {
     }
 
     protected StoreModel(Parcel in) {
-        this.id = in.readLong();
+        this.id = (Long) in.readValue(Long.class.getClassLoader());
         this.lat = in.readDouble();
         this.lon = in.readDouble();
         this.title = in.readString();

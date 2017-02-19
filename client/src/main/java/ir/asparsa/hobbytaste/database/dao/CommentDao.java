@@ -95,12 +95,12 @@ public class CommentDao extends AbsDao<CommentModel, Integer> {
         });
     }
 
-    @Override public Observable<Collection<Dao.CreateOrUpdateStatus>> createAll(final Collection<CommentModel> data) {
-        return Observable.create(new Observable.OnSubscribe<Collection<Dao.CreateOrUpdateStatus>>() {
-            @Override public void call(Subscriber<? super Collection<Dao.CreateOrUpdateStatus>> subscriber) {
+    @Override public Observable<Collection<CommentModel>> createAll(final Collection<CommentModel> data) {
+        return Observable.create(new Observable.OnSubscribe<Collection<CommentModel>>() {
+            @Override public void call(Subscriber<? super Collection<CommentModel>> subscriber) {
                 try {
                     boolean exist;
-                    Collection<Dao.CreateOrUpdateStatus> collection = new ArrayDeque<>();
+                    Collection<CommentModel> collection = new ArrayDeque<>();
                     List<CommentModel> comments = getDao().queryForAll();
                     for (CommentModel newComment : data) {
                         exist = false;
@@ -113,7 +113,8 @@ public class CommentDao extends AbsDao<CommentModel, Integer> {
                             }
                         }
                         if (!exist) {
-                            collection.add(getDao().createOrUpdate(newComment));
+                            newComment.setId(null);
+                            collection.add(getDao().createIfNotExists(newComment));
                         }
                     }
                     subscriber.onNext(collection);

@@ -7,6 +7,7 @@ import ir.asparsa.android.core.logger.L;
 import ir.asparsa.common.net.dto.AuthenticateDto;
 import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
+import ir.asparsa.hobbytaste.net.BannerService;
 import ir.asparsa.hobbytaste.net.StoreService;
 import ir.asparsa.hobbytaste.net.UserService;
 import junit.framework.Assert;
@@ -41,6 +42,12 @@ public class NetServiceModule {
     @Singleton
     UserService provideUserService(Retrofit retrofit) {
         return retrofit.create(UserService.class);
+    }
+
+    @Provides
+    @Singleton
+    BannerService provideBannerService(Retrofit retrofit) {
+        return retrofit.create(BannerService.class);
     }
 
     @Provides

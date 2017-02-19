@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -117,6 +118,19 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                     NavigationUtil.popBackStack(activeFragmentManager);
                     break;
             }
+        }
+    }
+
+    @Override protected void onActivityResult(
+            int requestCode,
+            int resultCode,
+            Intent data
+    ) {
+        super.onActivityResult(requestCode, resultCode, data);
+        FragmentManager activeFragmentManager = getActiveFragmentManager();
+        BaseContentFragment fragment = NavigationUtil.findTopFragment(activeFragmentManager);
+        if (fragment != null) {
+            fragment.onActivityResult(requestCode, resultCode, data);
         }
     }
 

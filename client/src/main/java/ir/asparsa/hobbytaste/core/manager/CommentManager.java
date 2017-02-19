@@ -5,6 +5,7 @@ import ir.asparsa.android.core.logger.L;
 import ir.asparsa.common.net.dto.PageDto;
 import ir.asparsa.common.net.dto.StoreCommentDto;
 import ir.asparsa.hobbytaste.database.dao.CommentDao;
+import ir.asparsa.hobbytaste.database.dao.StoreDao;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.net.StoreService;
@@ -34,6 +35,8 @@ public class CommentManager {
     StoreService mStoreService;
     @Inject
     CommentDao mCommentDao;
+    @Inject
+    StoreDao mStoreDao;
 
     @Inject CommentManager() {
     }
@@ -41,29 +44,32 @@ public class CommentManager {
     private Observable<PageDto<StoreCommentDto>> getLoadServiceObservable(Constraint constraint) {
         return mStoreService
                 .loadComments(
-                        constraint.getStore().getId(), (int) (constraint.getOffset() / constraint.getLimit()),
+                        constraint.getStore().getHashCode(), (int) (constraint.getOffset() / constraint.getLimit()),
                         constraint.getLimit())
                 .retry(5)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.newThread());
     }
 
-    private Observable<StoreCommentDto> getSaveServiceObservable(CommentModel comment) {
+    private Observable<StoreCommentDto> getSaveServiceObservable(
+            StoreModel store,
+            CommentModel comment
+    ) {
         return mStoreService
                 .saveComment(
-                        comment.getStoreId(),
-                        new StoreCommentDto(comment.getDescription(), comment.getHashCode()))
+                        store.getHashCode(),
+                        comment.convertToDto())
                 .retry(5)
                 .subscribeOn(Schedulers.newThread());
     }
 
     private Observable<StoreCommentDto> getLikeServiceObservable(
-            long storeId,
-            long hashCode,
+            long storeHashCode,
+            long commentHashCode,
             boolean liked
     ) {
         return mStoreService
-                .likeComment(storeId, hashCode, liked)
+                .likeComment(storeHashCode, commentHashCode, liked)
                 .retry(5)
                 .subscribeOn(Schedulers.newThread());
     }
@@ -125,6 +131,7 @@ public class CommentManager {
     }
 
     public Subscription saveComment(
+            StoreModel store,
             CommentModel comment,
             final Observer<CommentModel> observer
     ) {
@@ -132,7 +139,7 @@ public class CommentManager {
                 PublishSubject.<CommentModel>create());
         Subscription subscription = subject.subscribe(observer);
 
-        getSaveCommentObservable(comment).subscribe(onSaveToDatabaseObserver(subject));
+        getSaveCommentObservable(comment).subscribe(onSaveToDatabaseObserver(store, subject));
 
         return subscription;
     }
@@ -152,17 +159,19 @@ public class CommentManager {
     }
 
     public Subscription heartBeat(
+            StoreModel store,
             CommentModel commentModel,
             Observer<CommentModel> observer
     ) {
         Subject<CommentModel, CommentModel> subject = new SerializedSubject<>(PublishSubject.<CommentModel>create());
         Subscription subscription = subject.subscribe(observer);
-        getLikeServiceObservable(commentModel.getStoreId(), commentModel.getHashCode(), commentModel.isLiked())
-                .subscribe(onCommentReceivedObserver(commentModel, subject));
+        getLikeServiceObservable(store.getHashCode(), commentModel.getHashCode(), commentModel.isLiked())
+                .subscribe(onCommentReceivedObserver(store, commentModel, subject));
         return subscription;
     }
 
     private Observer<StoreCommentDto> onCommentReceivedObserver(
+            final StoreModel store,
             final CommentModel oldComment,
             final Observer<CommentModel> observer
     ) {
@@ -175,7 +184,12 @@ public class CommentManager {
             }
 
             @Override public void onNext(StoreCommentDto storeCommentDto) {
-                CommentModel newComment = CommentModel.newInstance(storeCommentDto);
+                if (store.getHashCode() != storeCommentDto.getStoreHashCode()) {
+                    getLikeErrorObservable(new RuntimeException("Returned store from server is wrong"))
+                            .subscribe(observer);
+                    return;
+                }
+                CommentModel newComment = CommentModel.newInstance(store.getId(), storeCommentDto);
                 if (!newComment.equals(oldComment)) {
                     getLikeErrorObservable(new RuntimeException(
                             "New comment is different from old comment: " + oldComment + ", " + newComment))
@@ -207,7 +221,12 @@ public class CommentManager {
                                           " " + comments.getTotalElements());
                 List<CommentModel> list = new ArrayList<>();
                 for (StoreCommentDto storeCommentDto : comments.getList()) {
-                    list.add(CommentModel.newInstance(storeCommentDto));
+                    if (constraint.getStore().getHashCode() != storeCommentDto.getStoreHashCode()) {
+                        getLoadErrorObservable(new RuntimeException("Returned store from server is wrong"))
+                                .subscribe(observer);
+                        return;
+                    }
+                    list.add(CommentModel.newInstance(constraint.getStore().getId(), storeCommentDto));
                 }
                 mCommentDao.createAll(list)
                            .subscribe(onFinishLoadObserver(constraint, comments.getTotalElements(), observer));
@@ -215,12 +234,12 @@ public class CommentManager {
         };
     }
 
-    private Observer<? super Collection<Dao.CreateOrUpdateStatus>> onFinishLoadObserver(
+    private Observer<? super Collection<CommentModel>> onFinishLoadObserver(
             final Constraint constraint,
             final long totalElements,
             final Observer<Collection<CommentModel>> observer
     ) {
-        return new Observer<Collection<Dao.CreateOrUpdateStatus>>() {
+        return new Observer<Collection<CommentModel>>() {
             @Override public void onCompleted() {
             }
 
@@ -229,7 +248,7 @@ public class CommentManager {
                 getLoadErrorObservable(e).subscribe(observer);
             }
 
-            @Override public void onNext(Collection<Dao.CreateOrUpdateStatus> statuses) {
+            @Override public void onNext(Collection<CommentModel> comments) {
                 L.i(CommentManager.class, "Comments completely saved");
                 loadFromDatabase(constraint, observer);
 
@@ -266,6 +285,7 @@ public class CommentManager {
     }
 
     private Observer<CommentModel> onSaveToDatabaseObserver(
+            final StoreModel store,
             final Observer<CommentModel> observer
     ) {
         return new Observer<CommentModel>() {
@@ -278,13 +298,14 @@ public class CommentManager {
 
             @Override public void onNext(CommentModel comment) {
                 L.i(CommentManager.class, "Save new comments to database.");
-                getSaveServiceObservable(comment)
-                        .subscribe(onSaveToServerObserver(comment, observer));
+                getSaveServiceObservable(store, comment)
+                        .subscribe(onSaveToServerObserver(store, comment, observer));
             }
         };
     }
 
     private Observer<StoreCommentDto> onSaveToServerObserver(
+            final StoreModel store,
             final CommentModel comment,
             final Observer<CommentModel> observer
     ) {
@@ -299,7 +320,13 @@ public class CommentManager {
 
             @Override public void onNext(StoreCommentDto storeComment) {
                 L.i(CommentManager.class, "Saved on server.");
-                CommentModel newComment = CommentModel.newInstance(storeComment);
+                if (store.getHashCode() != storeComment.getStoreHashCode()) {
+                    mCommentDao.delete(comment)
+                               .subscribe(onDeleteOnUnSucceedRequestObserver(
+                                       new RuntimeException("Returned store from server is wrong"), observer));
+                    return;
+                }
+                CommentModel newComment = CommentModel.newInstance(store.getId(), storeComment);
                 if (!comment.equals(newComment)) {
                     mCommentDao.delete(comment)
                                .subscribe(onDeleteOnUnSucceedRequestObserver(

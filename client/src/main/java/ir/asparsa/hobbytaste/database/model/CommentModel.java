@@ -17,7 +17,7 @@ public class CommentModel extends BaseModel implements Parcelable {
 
 
     @DatabaseField(columnName = Comment.Columns.ID, generatedId = true)
-    private long id;
+    private Long id;
 
     @DatabaseField(columnName = Comment.Columns.DESCRIPTION, canBeNull = false)
     private String description;
@@ -58,27 +58,32 @@ public class CommentModel extends BaseModel implements Parcelable {
 
     public CommentModel(
             String description,
-            String creator,
-            long storeId
+            String creator
     ) {
         this.description = description;
-        this.storeId = storeId;
         this.creator = creator;
         this.created = System.currentTimeMillis();
         this.hashCode = created ^ (((long) getDescription().hashCode()) << 31);
     }
 
-    public static CommentModel newInstance(StoreCommentDto storeCommentDto) {
+    public static CommentModel newInstance(
+            long storeId,
+            StoreCommentDto storeCommentDto
+    ) {
         return new CommentModel(storeCommentDto.getDescription(), storeCommentDto.getRate(), storeCommentDto.getLike(),
                                 storeCommentDto.getCreator(), storeCommentDto.getCreated(),
-                                storeCommentDto.getStoreId(), storeCommentDto.getHashCode());
+                                storeId, storeCommentDto.getHashCode());
+    }
+
+    public StoreCommentDto convertToDto() {
+        return new StoreCommentDto(getDescription(), getHashCode());
     }
 
     public long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -178,4 +183,5 @@ public class CommentModel extends BaseModel implements Parcelable {
             return new CommentModel[size];
         }
     };
+
 }

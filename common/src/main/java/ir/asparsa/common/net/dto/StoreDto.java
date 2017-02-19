@@ -8,8 +8,6 @@ import java.util.List;
  */
 public class StoreDto {
 
-    private Long id;
-
     private Double lat;
     private Double lon;
 
@@ -18,10 +16,30 @@ public class StoreDto {
     private Long rate;
     private Boolean like;
     private String description;
+    private Long hashCode;
+    private Long created;
     private List<BannerDto> banners;
 
+    public StoreDto() {
+    }
+
     public StoreDto(
-            Long id,
+            Double lat,
+            Double lon,
+            String title,
+            String description,
+            Long hashCode,
+            List<BannerDto> banners
+    ) {
+        this.lat = lat;
+        this.lon = lon;
+        this.title = title;
+        this.description = description;
+        this.hashCode = hashCode;
+        this.banners = banners;
+    }
+
+    public StoreDto(
             Double lat,
             Double lon,
             String title,
@@ -29,9 +47,10 @@ public class StoreDto {
             Long rate,
             Boolean like,
             String description,
+            Long hashCode,
+            Long created,
             List<BannerDto> banners
     ) {
-        this.id = id;
         this.lat = lat;
         this.lon = lon;
         this.title = title;
@@ -39,11 +58,9 @@ public class StoreDto {
         this.rate = rate;
         this.like = like;
         this.description = description;
+        this.hashCode = hashCode;
+        this.created = created;
         this.banners = banners;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public Double getLat() {
@@ -68,6 +85,14 @@ public class StoreDto {
 
     public Boolean getLike() {
         return like;
+    }
+
+    public Long getHashCode() {
+        return hashCode;
+    }
+
+    public Long getCreated() {
+        return created;
     }
 
     public List<BannerDto> getBanners() {

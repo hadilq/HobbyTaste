@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.core.manager;
 
+import android.support.annotation.NonNull;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.common.net.dto.StoreDto;
 import ir.asparsa.hobbytaste.database.dao.BannerDao;
@@ -46,6 +47,12 @@ public class StoresManager {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    private Observable<StoreModel> getSaveStoresObservable(@NonNull final StoreModel newModel) {
+        return mStoreDao
+                .create(mBannerDao, null, newModel)
+                .subscribeOn(Schedulers.newThread());
+    }
+
     private Observable<Collection<StoreDto>> getLoadServiceObservable() {
         return mStoreService
                 .loadStoreModels()
@@ -53,21 +60,28 @@ public class StoresManager {
                 .subscribeOn(Schedulers.newThread());
     }
 
+    private Observable<StoreDto> getSaveServiceObservable(StoreDto store) {
+        return mStoreService
+                .saveStore(store)
+                .retry(5)
+                .subscribeOn(Schedulers.newThread());
+    }
+
     private Observable<StoreDto> getLikeServiceObservable(
-            long id,
+            long storeHashCode,
             boolean like
     ) {
         return mStoreService
-                .like(id, like)
+                .like(storeHashCode, like)
                 .retry(5)
                 .subscribeOn(Schedulers.newThread());
     }
 
     private Observable<StoreDto> getViewServiceObservable(
-            long id
+            long storeHashCode
     ) {
         return mStoreService
-                .storeViewed(id)
+                .storeViewed(storeHashCode)
                 .subscribeOn(Schedulers.newThread());
     }
 
@@ -117,7 +131,8 @@ public class StoresManager {
     ) {
         Subject<StoreModel, StoreModel> subject = new SerializedSubject<>(PublishSubject.<StoreModel>create());
         Subscription subscription = subject.subscribe(observer);
-        getLikeServiceObservable(store.getId(), store.isLiked()).subscribe(onNewStoreReceivedObserver(store, subject));
+        getLikeServiceObservable(store.getHashCode(), store.isLiked())
+                .subscribe(onNewStoreReceivedObserver(store, subject));
         return subscription;
     }
 
@@ -127,8 +142,75 @@ public class StoresManager {
     ) {
         Subject<StoreModel, StoreModel> subject = new SerializedSubject<>(PublishSubject.<StoreModel>create());
         Subscription subscription = subject.subscribe(observer);
-        getViewServiceObservable(store.getId()).subscribe(onNewStoreReceivedObserver(store, subject));
+        getViewServiceObservable(store.getHashCode()).subscribe(onNewStoreReceivedObserver(store, subject));
         return subscription;
+    }
+
+    public Subscription saveStore(
+            StoreModel store,
+            Observer<StoreModel> observer
+    ) {
+        Subject<StoreModel, StoreModel> subject = new SerializedSubject<>(PublishSubject.<StoreModel>create());
+        Subscription subscription = subject.subscribe(observer);
+        getSaveStoresObservable(store).subscribe(onSaveStoreObserver(subject));
+        return subscription;
+    }
+
+    private Observer<? super StoreModel> onSaveStoreObserver(final Observer<StoreModel> observer) {
+        return new Observer<StoreModel>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                getSaveErrorObservable(e).subscribe(observer);
+            }
+
+            @Override public void onNext(StoreModel storeModel) {
+                getSaveServiceObservable(storeModel.convertToDto())
+                        .subscribe(onSavedStoreReceivedObserver(storeModel, observer));
+            }
+        };
+    }
+
+    private Observer<? super StoreDto> onSavedStoreReceivedObserver(
+            final StoreModel oldStore,
+            final Observer<StoreModel> observer
+    ) {
+        return new Observer<StoreDto>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                mStoreDao.delete(mBannerDao, oldStore).subscribe(onDeleteOnUnSucceedRequestObserver(e, observer));
+            }
+
+            @Override public void onNext(StoreDto storeDto) {
+                StoreModel newStore = StoreModel.instantiate(storeDto);
+                mStoreDao.create(mBannerDao, oldStore, newStore)
+                         .subscribeOn(AndroidSchedulers.mainThread())
+                         .subscribe(onFinishSavingObserver(observer));
+            }
+        };
+    }
+
+    private Observer<? super Integer> onDeleteOnUnSucceedRequestObserver(
+            final Throwable e,
+            final Observer<StoreModel> observer
+    ) {
+        return new Observer<Integer>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable ee) {
+                ee.initCause(e);
+                getSaveErrorObservable(ee).subscribe(observer);
+            }
+
+            @Override public void onNext(Integer integer) {
+                L.i(StoresManager.class, "Successfully deleted from local database, the unsaved store on server.");
+                getSaveErrorObservable(e).subscribe(observer);
+            }
+        };
     }
 
     private Observer<? super List<StoreModel>> getLoadObserver(final Observer<Collection<StoreModel>> observer) {
@@ -232,4 +314,6 @@ public class StoresManager {
             }
         };
     }
+
+
 }

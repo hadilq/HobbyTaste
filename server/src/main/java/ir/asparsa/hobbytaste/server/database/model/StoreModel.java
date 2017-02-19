@@ -31,10 +31,15 @@ public class StoreModel implements Serializable {
     private String title;
     @Column(name = Store.Columns.DESCRIPTION)
     private String description;
+    @Column(name = Store.Columns.HASH_CODE)
+    private long hashCode;
+    @Column(name = Store.Columns.CREATED)
+    private long created;
     @Column(name = Store.Columns.VIEWED)
-    private Long viewed;
+    private long viewed;
     @Column(name = Store.Columns.RATE)
-    private Long rate;
+    private long rate;
+
 
     @OneToMany(mappedBy = "store", fetch = FetchType.EAGER)
     @Column(name = Store.Columns.BANNERS)
@@ -43,20 +48,15 @@ public class StoreModel implements Serializable {
     StoreModel() {
     }
 
-    public StoreModel(
-            double lat,
-            double lon,
-            String title,
-            String description,
-            Long rate,
-            Long viewed
-    ) {
-        this.lat = lat;
-        this.lon = lon;
-        this.title = title;
-        this.description = description;
-        this.viewed = viewed;
-        this.rate = rate;
+    public static StoreModel newInstance(StoreDto store) {
+        StoreModel storeModel = new StoreModel();
+        storeModel.lat = store.getLat();
+        storeModel.lon = store.getLon();
+        storeModel.title = store.getTitle();
+        storeModel.description = store.getDescription();
+        storeModel.hashCode = store.getHashCode();
+        storeModel.created = System.currentTimeMillis();
+        return storeModel;
     }
 
     public StoreDto convertToDto(boolean like) {
@@ -66,7 +66,7 @@ public class StoreModel implements Serializable {
                 banners.add(new BannerDto(banner.getMainUrl(), banner.getThumbnailUrl()));
             }
         }
-        return new StoreDto(id, lat, lon, title, viewed, rate, like, description, banners);
+        return new StoreDto(lat, lon, title, viewed, rate, like, description, hashCode, created, banners);
     }
 
     public long getId() {
@@ -89,19 +89,27 @@ public class StoreModel implements Serializable {
         return description;
     }
 
-    public Long getViewed() {
+    public long getHashCode() {
+        return hashCode;
+    }
+
+    public long getCreated() {
+        return created;
+    }
+
+    public long getViewed() {
         return viewed;
     }
 
-    public Long increaseViewed() {
+    public long increaseViewed() {
         return ++viewed;
     }
 
-    public Long getRate() {
+    public long getRate() {
         return rate;
     }
 
-    public Long increaseRate() {
+    public long increaseRate() {
         return ++rate;
     }
 
@@ -123,16 +131,7 @@ public class StoreModel implements Serializable {
             return false;
         }
         final StoreModel other = (StoreModel) otherObj;
-        return (getLat() == other.getLat() &&
-                getLon() == other.getLon() &&
-                getId() == other.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        long lat = Double.doubleToLongBits(getLat());
-        long lon = Double.doubleToLongBits(getLon());
-        return (int) (((lat ^ lat >> 31) ^ (lon ^ lon >> 31)) ^ (getId() ^ getId() >> 31));
+        return getHashCode() == other.getHashCode();
     }
 
     @Override public String toString() {
