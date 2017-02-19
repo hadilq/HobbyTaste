@@ -11,9 +11,14 @@ import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 public class HorizontalSpaceItemDecoration extends RecyclerView.ItemDecoration {
 
     private final int horizontalSpaceWidth;
+    private final int horizontalSpaceEdgeWidth;
 
-    public HorizontalSpaceItemDecoration(int horizontalSpaceWidth) {
+    public HorizontalSpaceItemDecoration(
+            int horizontalSpaceWidth,
+            int horizontalSpaceEdgeWidth
+    ) {
         this.horizontalSpaceWidth = horizontalSpaceWidth;
+        this.horizontalSpaceEdgeWidth = horizontalSpaceEdgeWidth;
     }
 
     @Override
@@ -23,11 +28,25 @@ public class HorizontalSpaceItemDecoration extends RecyclerView.ItemDecoration {
             RecyclerView parent,
             RecyclerView.State state
     ) {
-        if (parent.getChildAdapterPosition(view) != parent.getAdapter().getItemCount() - 1) {
+        int position = parent.getChildAdapterPosition(view);
+        if (position != parent.getAdapter().getItemCount() - 1) {
             if (LanguageUtil.isRTL()) {
                 outRect.left = horizontalSpaceWidth;
             } else {
                 outRect.right = horizontalSpaceWidth;
+            }
+        } else {
+            if (LanguageUtil.isRTL()) {
+                outRect.left = horizontalSpaceEdgeWidth;
+            } else {
+                outRect.right = horizontalSpaceEdgeWidth;
+            }
+        }
+        if (position == 0) {
+            if (LanguageUtil.isRTL()) {
+                outRect.right = horizontalSpaceEdgeWidth;
+            } else {
+                outRect.left = horizontalSpaceEdgeWidth;
             }
         }
     }

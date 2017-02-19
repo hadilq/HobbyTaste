@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.squareup.picasso.Picasso;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
@@ -49,9 +50,11 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        mRecyclerView.addItemDecoration(new HorizontalSpaceItemDecoration((int) TypedValue
-                .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10,
-                                itemView.getContext().getResources().getDisplayMetrics())));
+        mRecyclerView.addItemDecoration(new HorizontalSpaceItemDecoration(
+                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10,
+                                                itemView.getContext().getResources().getDisplayMetrics()),
+                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 2,
+                                                itemView.getContext().getResources().getDisplayMetrics())));
     }
 
     @Override
@@ -105,6 +108,7 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
 
         void onBindView(final BannerModel banner) {
             boolean imageSet = false;
+            L.i(getClass(), "mainUrl: " + banner.getMainUrl() + ", thumbnailUrl: " + banner.getThumbnailUrl());
             if (TextUtils.isEmpty(banner.getThumbnailUrl())) {
                 if (TextUtils.isEmpty(banner.getMainUrl())) {
                     itemView.setVisibility(View.GONE);
