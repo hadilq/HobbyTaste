@@ -105,7 +105,7 @@ public class CommentDialogFragment extends BaseDialogFragment {
             return;
         }
 
-        CommentModel comment = new CommentModel(description, mAuthorizationManager.getUsername());
+        CommentModel comment = new CommentModel(description, mAuthorizationManager.getUsername(), store.getId());
         mSubscription.add(mCommentManager.saveComment(
                 store, comment,
                 new Observer<CommentModel>() {

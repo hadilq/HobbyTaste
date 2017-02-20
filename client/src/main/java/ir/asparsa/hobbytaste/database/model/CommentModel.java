@@ -58,10 +58,12 @@ public class CommentModel extends BaseModel implements Parcelable {
 
     public CommentModel(
             String description,
-            String creator
+            String creator,
+            long storeId
     ) {
         this.description = description;
         this.creator = creator;
+        this.storeId = storeId;
         this.created = System.currentTimeMillis();
         this.hashCode = created ^ (((long) getDescription().hashCode()) << 31);
     }
