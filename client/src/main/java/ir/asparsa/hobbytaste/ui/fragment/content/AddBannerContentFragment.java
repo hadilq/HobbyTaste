@@ -24,6 +24,7 @@ import ir.asparsa.android.ui.fragment.dialog.ProgressDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.common.net.dto.BannerDto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
+import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.core.retrofit.ProgressRequestBody;
@@ -280,6 +281,10 @@ public class AddBannerContentFragment extends BaseContentFragment {
             try {
                 final Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
                 mBannerImageView.setImageBitmap(bitmap);
+                if (bitmap.getByteCount() > BuildConfig.MAX_FILE_SIZE) {
+                    mHintTextView.setText(getString(R.string.new_store_banner_error_max_size));
+                    return;
+                }
 
                 Observable.create(new Observable.OnSubscribe<Void>() {
                     @Override public void call(Subscriber<? super Void> subscriber) {

@@ -33,11 +33,12 @@
     <string name="new_store_name_empty">Please set a name for the store</string>
     <string name="new_store_description_empty">Please describe the location</string>
     <string name="new_store_at_least_banner">At least three picture is needed</string>
-    <string name="new_store_banner_is_empty">No picture selected or picture is not prepared, in this case, wait please</string>
+    <string name="new_store_banner_is_empty">No picture selected or picture is not prepared.</string>
     <string name="new_store_banner_is_not_sent">Picture is not sent</string>
     <string name="new_store_banner_successfully_sent">Picture is uploaded successfully</string>
     <string name="new_store_banner_successfully_prepared">Picture is prepared successfully</string>
     <string name="new_store_banner_error_prepared">Picture isn\'t prepared, please try again!</string>
+    <string name="new_store_banner_error_max_size">Picture isn\'t prepared, size of the picture is more than 5MB!</string>
     <string name="new_store_saving">Saving to server …</string>
     <string name="new_store_preparing">Preparing picture …</string>
     <string name="new_store_uploading">Uploading picture …</string>
