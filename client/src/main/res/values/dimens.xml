@@ -14,5 +14,7 @@
 
     <dimen name="heart_size">35dp</dimen>
 
+    <dimen name="banner_max_size">200dp</dimen>
+
 
 </resources>

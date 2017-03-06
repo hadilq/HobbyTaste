@@ -1,36 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_marginTop="?attr/actionBarSize">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <ImageView
-            android:id="@+id/banner"
+    <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/vertical_margin_half"
-            android:scaleType="fitCenter"
-            android:src="@drawable/choose_image"/>
+            android:layout_marginTop="?attr/actionBarSize">
 
-    <TextView
-            android:id="@+id/hint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/vertical_margin_half"
-            android:layout_marginStart="@dimen/horizontal_margin"
-            android:layout_marginEnd="@dimen/horizontal_margin"
-            android:textSize="@dimen/font_size_small"
-            android:textColor="@color/text_hint"
-            android:text="@string/new_store_at_least_banner"/>
+        <ImageView
+                android:id="@+id/banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxHeight="@dimen/banner_max_size"
+                android:layout_marginTop="@dimen/vertical_margin_half"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:src="@drawable/choose_image"/>
 
-    <ir.asparsa.android.ui.view.DialogControlLayout
-            android:id="@+id/controller"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/vertical_margin_half"
-            android:layout_marginBottom="@dimen/vertical_margin_half"
-            android:layout_marginStart="@dimen/horizontal_margin_half"
-            android:layout_marginEnd="@dimen/horizontal_margin_half"/>
+        <TextView
+                android:id="@+id/hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_margin_half"
+                android:layout_marginStart="@dimen/horizontal_margin"
+                android:layout_marginEnd="@dimen/horizontal_margin"
+                android:textSize="@dimen/font_size_small"
+                android:textColor="@color/text_hint"
+                android:text="@string/new_store_at_least_banner"/>
 
-</LinearLayout>
+        <ir.asparsa.android.ui.view.DialogControlLayout
+                android:id="@+id/controller"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_margin_half"
+                android:layout_marginBottom="@dimen/vertical_margin_half"
+                android:layout_marginStart="@dimen/horizontal_margin_half"
+                android:layout_marginEnd="@dimen/horizontal_margin_half"/>
+
+    </LinearLayout>
+</ScrollView>
