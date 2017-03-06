@@ -15,6 +15,7 @@
     <dimen name="heart_size">35dp</dimen>
 
     <dimen name="banner_max_size">200dp</dimen>
+    <dimen name="add_store_text_height">55dp</dimen>
 
 
 </resources>

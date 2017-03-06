@@ -7,10 +7,13 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -75,6 +78,23 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
             mLatlng = new LatLng(store.getLat(), store.getLon());
             setMarker(mLatlng);
         }
+
+        mStoreDescriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(
+                    TextView v,
+                    int actionId,
+                    KeyEvent event
+            ) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    actionGoToNext(
+                            mLatlng,
+                            mStoreNameEditText.getText().toString(),
+                            mStoreDescriptionEditText.getText().toString());
+                }
+                return false;
+            }
+        });
 
         mController.setCommitText(getString(R.string.next))
                    .arrange();
