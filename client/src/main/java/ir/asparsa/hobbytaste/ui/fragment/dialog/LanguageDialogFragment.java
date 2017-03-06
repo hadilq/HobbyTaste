@@ -11,6 +11,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ir.asparsa.android.ui.fragment.dialog.BaseBottomDialogFragment;
 import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.hobbytaste.R;
@@ -19,7 +20,7 @@ import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 /**
  * Created by hadi on 12/15/2016 AD.
  */
-public class LanguageDialogFragment extends BaseDialogFragment {
+public class LanguageDialogFragment extends BaseBottomDialogFragment {
 
     public static final String BUNDLE_KEY_LANGUAGE = "BUNDLE_KEY_STORE";
 

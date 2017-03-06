@@ -6,19 +6,21 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.BaseFragment;
+import ir.asparsa.android.ui.fragment.dialog.ProgressDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.common.net.dto.BannerDto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
@@ -69,6 +71,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
 
     private String mFilePath;
     private BannerModel mBanner;
+    private ProgressDialogFragment mProgressDialog;
     private final CompositeSubscription mSubscription = new CompositeSubscription();
 
     public static AddBannerContentFragment instantiate(
@@ -165,6 +168,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
                 mHintTextView.setText("");
                 store.getBanners().add(mBanner);
                 mSubscription.add(mStoresManager.saveStore(store, getStoreSaveObserver()));
+                showProgressDialog(R.string.new_store_saving);
             }
 
             @Override public void onNeutral() {
@@ -193,6 +197,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
                                                 .subscribeOn(Schedulers.newThread())
                                                 .observeOn(AndroidSchedulers.mainThread())
                                                 .subscribe(getFileUploadObserver()));
+                showProgressDialog(R.string.new_store_uploading);
             }
         };
     }
@@ -205,11 +210,13 @@ public class AddBannerContentFragment extends BaseContentFragment {
             @Override public void onError(Throwable e) {
                 L.e(AddBannerContentFragment.class, "Cannot save store", e);
                 mHintTextView.setText(getString(R.string.connection_error));
+                dismissProgressDialog();
             }
 
             @Override public void onNext(StoreModel storeModel) {
                 L.i(AddBannerContentFragment.class, "Store is saved" + storeModel);
                 sendEvent(storeModel);
+                dismissProgressDialog();
             }
         };
     }
@@ -248,12 +255,14 @@ public class AddBannerContentFragment extends BaseContentFragment {
             @Override public void onError(Throwable e) {
                 L.e(AddBannerContentFragment.class, "Banner is not uploaded", e);
                 mHintTextView.setText(getString(R.string.connection_error));
+                dismissProgressDialog();
             }
 
             @Override public void onNext(BannerDto bannerDto) {
                 mBanner = new BannerModel(bannerDto.getMainUrl(), bannerDto.getThumbnailUrl());
                 L.i(AddBannerContentFragment.class, "Banner is uploaded " + mBanner);
                 mHintTextView.setText(getString(R.string.new_store_banner_successfully_sent));
+                dismissProgressDialog();
             }
         };
     }
@@ -286,6 +295,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
 
                             mFilePath = filePath;
                             getArguments().putString(BUNDLE_KEY_BITMAP_FILE_PATH, mFilePath);
+                            subscriber.onNext(null);
                         } catch (IOException e) {
                             subscriber.onError(e);
                         }
@@ -294,16 +304,16 @@ public class AddBannerContentFragment extends BaseContentFragment {
                           .observeOn(AndroidSchedulers.mainThread())
                           .subscribe(new Action1<Void>() {
                               @Override public void call(Void aVoid) {
-                                  Toast.makeText(
-                                          getContext(), R.string.new_store_banner_successfully_prepared,
-                                          Toast.LENGTH_SHORT)
-                                       .show();
+                                  mHintTextView.setText(getString(R.string.new_store_banner_successfully_prepared));
+                                  dismissProgressDialog();
                               }
                           }, new Action1<Throwable>() {
                               @Override public void call(Throwable throwable) {
                                   mHintTextView.setText(getString(R.string.new_store_banner_error_prepared));
+                                  dismissProgressDialog();
                               }
                           });
+                showProgressDialog(R.string.new_store_preparing);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -313,5 +323,24 @@ public class AddBannerContentFragment extends BaseContentFragment {
 
     @Override protected String setHeaderTitle() {
         return getString(R.string.title_add_banner);
+    }
+
+    private void showProgressDialog(@StringRes int message) {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
+        mProgressDialog = ProgressDialogFragment.newInstance(getString(message));
+
+        new Handler().post(new Runnable() {
+            @Override public void run() {
+                mProgressDialog.show(getFragmentManager());
+            }
+        });
+    }
+
+    private void dismissProgressDialog() {
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
     }
 }

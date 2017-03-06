@@ -14,6 +14,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.android.core.logger.L;
+import ir.asparsa.android.ui.fragment.dialog.BaseBottomDialogFragment;
 import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
@@ -31,7 +32,7 @@ import javax.inject.Inject;
  * @author hadi
  * @since 12/15/2016 AD.
  */
-public class CommentDialogFragment extends BaseDialogFragment {
+public class CommentDialogFragment extends BaseBottomDialogFragment {
 
     public static final String BUNDLE_KEY_STORE = "BUNDLE_KEY_STORE";
 

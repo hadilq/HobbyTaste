@@ -3,7 +3,7 @@ package ir.asparsa.android.ui.fragment.dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -16,9 +16,10 @@ import ir.asparsa.android.ui.fragment.BaseFragment;
 import java.util.List;
 
 /**
- * Created by hadi on 12/15/2016 AD.
+ * @author hadi
+ * @since 12/15/2016 AD.
  */
-public abstract class BaseDialogFragment extends DialogFragment implements IDialogFragment {
+public abstract class BaseBottomDialogFragment extends BottomSheetDialogFragment implements IDialogFragment {
 
     @Nullable @Override public View onCreateView(
             LayoutInflater inflater,

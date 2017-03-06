@@ -3,6 +3,7 @@
     <string name="title_settings">Settings</string>
     <string name="title_store_details">Store</string>
     <string name="title_add_banner">Adding picture</string>
+    <string name="title_add_store">Adding store</string>
 
     <string name="connection_error">Connection problem</string>
 
@@ -37,6 +38,9 @@
     <string name="new_store_banner_successfully_sent">Picture is uploaded successfully</string>
     <string name="new_store_banner_successfully_prepared">Picture is prepared successfully</string>
     <string name="new_store_banner_error_prepared">Picture isn\'t prepared, please try again!</string>
+    <string name="new_store_saving">Saving to server …</string>
+    <string name="new_store_preparing">Preparing picture …</string>
+    <string name="new_store_uploading">Uploading picture …</string>
 
     <string name="month_0">January</string>
     <string name="month_1">February</string>

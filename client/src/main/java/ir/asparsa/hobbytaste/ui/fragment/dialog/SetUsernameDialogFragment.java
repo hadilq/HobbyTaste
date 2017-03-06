@@ -14,6 +14,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.android.core.logger.L;
+import ir.asparsa.android.ui.fragment.dialog.BaseBottomDialogFragment;
 import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.common.net.dto.AuthenticateDto;
@@ -29,7 +30,7 @@ import javax.inject.Inject;
 /**
  * Created by hadi on 12/15/2016 AD.
  */
-public class SetUsernameDialogFragment extends BaseDialogFragment {
+public class SetUsernameDialogFragment extends BaseBottomDialogFragment {
 
     public static final String BUNDLE_KEY_USERNAME = "BUNDLE_KEY_STORE";
 

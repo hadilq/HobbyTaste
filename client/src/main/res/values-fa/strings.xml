@@ -3,6 +3,7 @@
     <string name="title_settings">تنظیمات</string>
     <string name="title_store_details">فروشگاه</string>
     <string name="title_add_banner">اضافه‌کردن تصویر</string>
+    <string name="title_add_store">اضافه‌کردن فروشگاه</string>
 
     <string name="connection_error">مشکلی در برقراری ارتباط بوجود آمده‌است</string>
 
@@ -37,6 +38,9 @@
     <string name="new_store_banner_successfully_sent">تصویر با موفقیت فرستاده‌شده</string>
     <string name="new_store_banner_successfully_prepared">تصویر با موفقیت آماده شده</string>
     <string name="new_store_banner_error_prepared">تصویر آماده نشده‌است! لطفا دوباره تلاش نمایید.</string>
+    <string name="new_store_saving">در حال ذخیره‌کردن در سرور …</string>
+    <string name="new_store_preparing">در حال آماده‌سازی تصویر …</string>
+    <string name="new_store_uploading">در حال فرستادن تصویر …</string>
 
     <string name="month_0">فروردین</string>
     <string name="month_1">اردیبهشت</string>
