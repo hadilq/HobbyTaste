@@ -35,6 +35,7 @@ import ir.asparsa.hobbytaste.database.model.StoreModel;
 public class AddStoreContentFragment extends BaseContentFragment implements OnMapReadyCallback {
 
     public static final String BUNDLE_KEY_DIALOG_RESULT_EVENT = "BUNDLE_KEY_DIALOG_RESULT_EVENT";
+    private static final String BUNDLE_KEY_STORE = "BUNDLE_KEY_STORE";
     // Tehran
     private final double INITIAL_LAT = 35.7952119d;
     private final double INITIAL_LON = 51.4062329d;
@@ -69,7 +70,9 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
         View view = inflater.inflate(R.layout.add_store_content_fragment, container, false);
         ButterKnife.bind(this, view);
 
-        if (mLatlng != null) {
+        StoreModel store = getArguments().getParcelable(BUNDLE_KEY_STORE);
+        if (store != null) {
+            mLatlng = new LatLng(store.getLat(), store.getLon());
             setMarker(mLatlng);
         }
 
@@ -153,10 +156,13 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
         }
         mStoreNameInputLayout.setError("");
         mStoreDescriptionInputLayout.setError("");
+        StoreModel store = new StoreModel(latLng.latitude, latLng.longitude, storeName, storeDescription);
+        getArguments().putParcelable(BUNDLE_KEY_STORE, store);
+
         AddStoreContentFragment.StoreSaveResultEvent
                 event = getArguments().getParcelable(BUNDLE_KEY_DIALOG_RESULT_EVENT);
         NavigationUtil.startContentFragment(getFragmentManager(), AddBannerContentFragment.instantiate(
-                event, new StoreModel(latLng.latitude, latLng.longitude, storeName, storeDescription)));
+                event, store));
     }
 
     public static class StoreSaveResultEvent extends BaseDialogFragment.BaseOnDialogResultEvent {
