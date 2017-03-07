@@ -89,9 +89,4 @@ import java.awt.image.BufferedImage;
         logger.info("File saved to " + mainUrl + ", thumbnail is " + thumbnailUrl);
         return new BannerDto(mainUrl, thumbnailUrl);
     }
-
-    @ExceptionHandler(StorageFileNotFoundException.class)
-    public ResponseEntity handleStorageFileNotFound(StorageFileNotFoundException exc) {
-        return ResponseEntity.notFound().build();
-    }
 }
