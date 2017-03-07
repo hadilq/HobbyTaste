@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">client-core</string>
     <string name="try_again_message">Please try again</string>
     <string name="please_wait">Please wait …</string>
 </resources>
