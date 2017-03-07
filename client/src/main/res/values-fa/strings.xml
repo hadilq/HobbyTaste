@@ -38,7 +38,7 @@
     <string name="new_store_banner_successfully_sent">تصویر با موفقیت فرستاده‌شده</string>
     <string name="new_store_banner_successfully_prepared">تصویر با موفقیت آماده شده</string>
     <string name="new_store_banner_error_prepared">تصویر آماده نشده‌است! لطفا دوباره تلاش نمایید.</string>
-    <string name="new_store_banner_error_max_size">تصویر آماده نشده‌است! اندازه فایل بیشتر از ۵MB می‌باشد.</string>
+    <string name="new_store_banner_error_max_size">تصویر آماده نشده‌است! اندازه فایل بیشتر از ۱۰MB می‌باشد.</string>
     <string name="new_store_saving">در حال ذخیره‌کردن در سرور …</string>
     <string name="new_store_preparing">در حال آماده‌سازی تصویر …</string>
     <string name="new_store_uploading">در حال فرستادن تصویر …</string>

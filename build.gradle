@@ -64,7 +64,7 @@ subprojects {
     ext.global_serverScheme = "http"
 
     ext.global_jwtHeader= "Authorization"
-    ext.global_maxFileSize= "5MB"
+    ext.global_maxFileSize= "10MB"
 
     afterEvaluate { project ->
         if (project.hasProperty("android")) {

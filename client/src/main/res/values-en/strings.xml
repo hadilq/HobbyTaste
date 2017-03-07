@@ -38,7 +38,7 @@
     <string name="new_store_banner_successfully_sent">Picture is uploaded successfully</string>
     <string name="new_store_banner_successfully_prepared">Picture is prepared successfully</string>
     <string name="new_store_banner_error_prepared">Picture isn\'t prepared, please try again!</string>
-    <string name="new_store_banner_error_max_size">Picture isn\'t prepared, size of the picture is more than 5MB!</string>
+    <string name="new_store_banner_error_max_size">Picture isn\'t prepared, size of the picture is more than 10MB!</string>
     <string name="new_store_saving">Saving to server …</string>
     <string name="new_store_preparing">Preparing picture …</string>
     <string name="new_store_uploading">Uploading picture …</string>
