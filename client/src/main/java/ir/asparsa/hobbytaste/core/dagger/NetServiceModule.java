@@ -8,12 +8,12 @@ import ir.asparsa.common.net.dto.AuthenticateDto;
 import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.net.BannerService;
+import ir.asparsa.hobbytaste.core.retrofit.RxErrorHandlingCallAdapterFactory;
 import ir.asparsa.hobbytaste.net.StoreService;
 import ir.asparsa.hobbytaste.net.UserService;
 import junit.framework.Assert;
 import okhttp3.*;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observer;
 
@@ -127,6 +127,6 @@ public class NetServiceModule {
         return new Retrofit.Builder()
                 .baseUrl(BuildConfig.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create());
+                .addCallAdapterFactory(RxErrorHandlingCallAdapterFactory.create());
     }
 }

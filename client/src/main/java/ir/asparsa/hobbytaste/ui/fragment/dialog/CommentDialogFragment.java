@@ -15,12 +15,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.dialog.BaseBottomDialogFragment;
-import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
+import ir.asparsa.common.net.dto.ErrorDto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.manager.CommentManager;
+import ir.asparsa.hobbytaste.core.retrofit.RetrofitException;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import rx.Observer;
@@ -115,7 +116,16 @@ public class CommentDialogFragment extends BaseBottomDialogFragment {
 
                     @Override public void onError(Throwable e) {
                         L.e(CommentDialogFragment.class, "Cannot send comment", e);
-                        mCommentLayout.setError(getString(R.string.connection_error));
+                        ErrorDto error = null;
+                        if (e instanceof RetrofitException) {
+                            error = ((RetrofitException) e).getErrorBody();
+                        }
+
+                        if (error == null) {
+                            mCommentLayout.setError(getString(R.string.connection_error));
+                        } else {
+                            mCommentLayout.setError(error.getLocalizedMessage());
+                        }
                     }
 
                     @Override public void onNext(CommentModel newComment) {

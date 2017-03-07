@@ -17,4 +17,12 @@ public class ErrorDto extends ResponseDto {
         this.detailMessage = detailMessage;
         this.localizedMessage = localizedMessage;
     }
+
+    public String getDetailMessage() {
+        return detailMessage;
+    }
+
+    public String getLocalizedMessage() {
+        return localizedMessage;
+    }
 }

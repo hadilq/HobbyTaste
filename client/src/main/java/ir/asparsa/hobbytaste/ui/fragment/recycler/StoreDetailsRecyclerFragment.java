@@ -7,14 +7,17 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.util.SparseArrayCompat;
 import android.view.View;
+import android.widget.Toast;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
+import ir.asparsa.common.net.dto.ErrorDto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.CommentManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
+import ir.asparsa.hobbytaste.core.retrofit.RetrofitException;
 import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
@@ -167,6 +170,12 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
                 store.heartBeat();
                 data.setLike(store.isLiked());
                 data.setRate(store.getRate());
+                if (e instanceof RetrofitException) {
+                    ErrorDto error = ((RetrofitException) e).getErrorBody();
+                    if (error != null) {
+                        Toast.makeText(getContext(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
                 notifyStoreHeartBeat();
             }
 
@@ -198,6 +207,12 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
 
             @Override public void onError(Throwable e) {
                 comment.heartBeat();
+                if (e instanceof RetrofitException) {
+                    ErrorDto error = ((RetrofitException) e).getErrorBody();
+                    if (error != null) {
+                        Toast.makeText(getContext(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
                 notifyCommentHeartBeat(comment);
             }
 

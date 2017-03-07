@@ -61,7 +61,7 @@ public class MainContentFragment extends BaseContentFragment
             @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState
     ) {
-        subscription.add(mStoresManager.loadStores(getDatabaseObserver()));
+        subscription.add(mStoresManager.loadStores(getStoreObserver()));
         return inflater.inflate(R.layout.main_content_fragment, container, false);
     }
 
@@ -94,14 +94,14 @@ public class MainContentFragment extends BaseContentFragment
         return getString(R.string.title_main);
     }
 
-    private Observer<Collection<StoreModel>> getDatabaseObserver() {
+    private Observer<Collection<StoreModel>> getStoreObserver() {
         return new Observer<Collection<StoreModel>>() {
             @Override public void onCompleted() {
                 L.i(MainContentFragment.class, "Refresh request gets completed");
             }
 
             @Override public void onError(Throwable e) {
-                L.w(MainContentFragment.class, "Database gets error", e);
+                L.w(MainContentFragment.class, "Store gets error", e);
             }
 
             @Override public void onNext(Collection<StoreModel> stores) {

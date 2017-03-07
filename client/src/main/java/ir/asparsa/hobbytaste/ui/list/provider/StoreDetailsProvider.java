@@ -7,8 +7,10 @@ import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.data.DataObserver;
 import ir.asparsa.android.ui.list.provider.AbsListProvider;
+import ir.asparsa.common.net.dto.ErrorDto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.CommentManager;
+import ir.asparsa.hobbytaste.core.retrofit.RetrofitException;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.list.data.CommentData;
@@ -70,7 +72,15 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
 
     @Override public void onError(Throwable e) {
         L.e(getClass(), "An error happened!", e);
-        mOnInsertData.onError(e.getLocalizedMessage());
+        ErrorDto error = null;
+        if (e instanceof RetrofitException) {
+            error = ((RetrofitException) e).getErrorBody();
+        }
+        if (error == null) {
+            mOnInsertData.onError(e.getLocalizedMessage());
+        } else {
+            mOnInsertData.onError(((RetrofitException) e).getErrorBody().getLocalizedMessage());
+        }
     }
 
     @Override public void onNext(final Collection<CommentModel> collection) {

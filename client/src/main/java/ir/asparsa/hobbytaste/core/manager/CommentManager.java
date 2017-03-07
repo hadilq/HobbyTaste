@@ -26,7 +26,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Created by hadi on 12/18/2016 AD.
+ * @author hadi
+ * @since 12/18/2016 AD.
  */
 @Singleton
 public class CommentManager {
