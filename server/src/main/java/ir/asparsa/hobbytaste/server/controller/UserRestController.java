@@ -5,14 +5,13 @@ import ir.asparsa.common.net.path.UserServicePath;
 import ir.asparsa.hobbytaste.server.database.model.AccountModel;
 import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
 import ir.asparsa.hobbytaste.server.exception.EmptyUsernameException;
-import ir.asparsa.hobbytaste.server.exception.InternalServerErrorException;
-import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
+import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
+import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,9 +28,6 @@ import java.util.Random;
 @RequestMapping(WebSecurityConfig.ENTRY_POINT_API + "/" + UserServicePath.SERVICE) class UserRestController {
 
     private final static Logger logger = LoggerFactory.getLogger(UserRestController.class);
-
-    @Value("${jwt.header}")
-    private String tokenHeader;
 
     @Autowired
     AccountRepository accountRepository;
@@ -54,19 +50,15 @@ import java.util.Random;
     @RequestMapping(value = UserServicePath.USERNAME, method = RequestMethod.POST)
     AuthenticateDto changeUsername(
             @RequestParam("new") String username,
+            @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
             HttpServletRequest request
     ) {
         if (StringUtils.isEmpty(username)) {
-            throw new EmptyUsernameException();
+            throw new EmptyUsernameException("Username is empty", Strings.USERNAME_IS_EMPTY, locale);
         }
         logger.info("username: " + username);
 
-        AccountModel account = jwtTokenUtil.parseToken(request.getHeader(tokenHeader));
-        if (account == null) {
-            // This request must be authorized before, so this never should happened
-            logger.error("Account is null, header " + request.getHeader(tokenHeader));
-            throw new InternalServerErrorException();
-        }
+        AccountModel account = jwtTokenUtil.getAccountModel(request, locale);
 
         account.setUsername(username);
         accountRepository.save(account);
@@ -101,4 +93,6 @@ import java.util.Random;
             buf[idx] = symbols[random.nextInt(symbols.length)];
         return new String(buf);
     }
+
+
 }

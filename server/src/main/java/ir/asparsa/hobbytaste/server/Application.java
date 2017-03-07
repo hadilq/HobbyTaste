@@ -16,6 +16,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
 @SpringBootApplication
 @EnableConfigurationProperties({StorageProperties.class, ServerProperties.class})
@@ -153,5 +154,13 @@ public class Application {
 //            storageService.deleteAll();
             storageService.init();
         };
+    }
+
+    @Bean
+    public ReloadableResourceBundleMessageSource messageSource() {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("classpath:lang/messages");
+        messageSource.setCacheSeconds(100); //reload messages every 100 seconds
+        return messageSource;
     }
 }

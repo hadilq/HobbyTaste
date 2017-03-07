@@ -12,10 +12,11 @@ public interface StorageService {
 
     void store(
             MultipartFile file,
-            String fileName
+            String fileName,
+            String locale
     );
 
-    Stream<Path> loadAll();
+    Stream<Path> loadAll(String locale);
 
     Path load(String filename);
 
@@ -23,11 +24,11 @@ public interface StorageService {
 
     boolean exists(String filename);
 
-    Resource loadAsResource(String filename);
+    Resource loadAsResource(String filename, String locale);
 
-    Resource loadTmpAsResource(String filename);
+    Resource loadTmpAsResource(String filename, String locale);
 
-    void moveFromTmpToPermanent(String filename);
+    void moveFromTmpToPermanent(String filename, String locale);
 
     void deleteAll();
 
@@ -35,6 +36,6 @@ public interface StorageService {
 
     String getTmpServerFileUrl(String fileName);
 
-    String getFilename(String url);
+    String getFilename(String url, String locale);
 
 }

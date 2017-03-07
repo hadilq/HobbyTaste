@@ -6,14 +6,20 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Storage error")  // 404
 public class StorageFileNotFoundException extends StorageException {
 
-    public StorageFileNotFoundException(String message) {
-        super(message);
+    public StorageFileNotFoundException(
+            String message,
+            String localizedMessageKey,
+            String local
+    ) {
+        super(message, localizedMessageKey, local);
     }
 
     public StorageFileNotFoundException(
             String message,
-            Throwable cause
+            Throwable cause,
+            String localizedMessageKey,
+            String local
     ) {
-        super(message, cause);
+        super(message, cause, localizedMessageKey, local);
     }
 }

@@ -3,13 +3,13 @@ package ir.asparsa.hobbytaste.server.controller;
 import ir.asparsa.common.net.dto.BannerDto;
 import ir.asparsa.common.net.path.BannerServicePath;
 import ir.asparsa.hobbytaste.server.exception.StorageFileNotFoundException;
+import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
 import ir.asparsa.hobbytaste.server.storage.StorageService;
 import ir.asparsa.hobbytaste.server.util.ImageUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -32,19 +32,17 @@ import java.awt.image.BufferedImage;
     @Autowired
     ImageUtil imageUtil;
 
-    @Value("${server.realAddress}")
-    private String serverAddress;
-    @Value("${server.scheme}")
-    private String scheme;
-
     public BannerRestController() {
     }
 
     @RequestMapping(value = BannerServicePath.IMAGE, method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Resource> serveFile(@PathVariable("filename") String filename) {
+    public ResponseEntity<Resource> serveFile(
+            @PathVariable("filename") String filename,
+            @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale
+    ) {
         logger.info("Server file " + filename);
-        Resource file = storageService.loadAsResource(filename);
+        Resource file = storageService.loadAsResource(filename, locale);
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
@@ -53,9 +51,12 @@ import java.awt.image.BufferedImage;
 
     @RequestMapping(value = BannerServicePath.TMP, method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Resource> serveTmpFile(@PathVariable("filename") String filename) {
+    public ResponseEntity<Resource> serveTmpFile(
+            @PathVariable("filename") String filename,
+            @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale
+    ) {
         logger.info("Server tmp file " + filename);
-        Resource file = storageService.loadTmpAsResource(filename);
+        Resource file = storageService.loadTmpAsResource(filename, locale);
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
@@ -64,7 +65,8 @@ import java.awt.image.BufferedImage;
 
     @RequestMapping(method = RequestMethod.POST)
     public BannerDto handleFileUpload(
-            @RequestParam("file") MultipartFile file
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale
     ) {
         logger.info("Server file " + file.getName() + ", Content type " + file.getContentType() + ", file size " +
                     file.getSize());
@@ -73,7 +75,7 @@ import java.awt.image.BufferedImage;
         do {
             fileName = "" + System.currentTimeMillis() + "-" + file.getName().hashCode() + ".jpeg";
         } while (storageService.exists(fileName));
-        storageService.store(file, fileName);
+        storageService.store(file, fileName, locale);
         String mainUrl = storageService.getTmpServerFileUrl(fileName);
         String thumbnailUrl = mainUrl;
         String thumbnailFileName = "thumbnail-" + fileName;

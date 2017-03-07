@@ -3,6 +3,7 @@ package ir.asparsa.hobbytaste.server.security;
 
 import ir.asparsa.hobbytaste.server.database.model.AccountModel;
 import ir.asparsa.hobbytaste.server.exception.JwtTokenMalformedException;
+import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.model.AuthenticatedUser;
 import ir.asparsa.hobbytaste.server.security.model.JwtAuthenticationToken;
 import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
@@ -53,7 +54,8 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
         AccountModel parsedUser = jwtTokenUtil.parseToken(token);
 
         if (parsedUser == null) {
-            throw new JwtTokenMalformedException("JWT token is not valid");
+            throw new JwtTokenMalformedException(
+                    "JWT token is not valid", Strings.JWT_TOKEN_NOT_VALID, Strings.DEFAULT_LOCALE);
         }
 
         List<GrantedAuthority> authorityList = AuthorityUtils.commaSeparatedStringToAuthorityList(parsedUser.getRole());

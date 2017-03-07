@@ -1,8 +1,10 @@
 package ir.asparsa.hobbytaste.server.security;
 
 import ir.asparsa.hobbytaste.server.exception.JwtTokenMissingException;
+import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.model.JwtAuthenticationToken;
-import org.springframework.beans.factory.annotation.Value;
+import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -21,8 +23,8 @@ import java.io.IOException;
  */
 public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessingFilter {
 
-    @Value("${jwt.header}")
-    private String tokenHeader;
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
 
     public JwtAuthenticationTokenFilter(RequestMatcher matcher) {
         super(matcher);
@@ -32,11 +34,15 @@ public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessi
      * Attempt to authenticate request - basically just pass over to another method to authenticate request headers
      */
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
-        String authToken = request.getHeader(tokenHeader);
+    public Authentication attemptAuthentication(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        String authToken = request.getHeader(jwtTokenUtil.getHeader());
 
         if (authToken == null) {
-            throw new JwtTokenMissingException("No JWT token found in request headers");
+            throw new JwtTokenMissingException(
+                    "No JWT token found in request headers", Strings.NO_JWT_HEADER_FOUND, Strings.DEFAULT_LOCALE);
         }
 
 //        String authToken = header.substring(7);
@@ -58,7 +64,11 @@ public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessi
      */
     @Override
     protected void successfulAuthentication(
-            HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult)
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain chain,
+            Authentication authResult
+    )
             throws IOException, ServletException {
         super.successfulAuthentication(request, response, chain, authResult);
 

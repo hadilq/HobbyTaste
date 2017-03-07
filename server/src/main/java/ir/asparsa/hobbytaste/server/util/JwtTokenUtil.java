@@ -6,6 +6,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import ir.asparsa.hobbytaste.server.database.model.AccountModel;
 import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
+import ir.asparsa.hobbytaste.server.exception.InternalServerErrorException;
+import ir.asparsa.hobbytaste.server.resources.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 /**
@@ -28,6 +31,8 @@ public class JwtTokenUtil {
 
     @Value("${jwt.secret}")
     private String secret;
+    @Value("${jwt.header}")
+    private String header;
 
     @Autowired
     AccountRepository accountRepository;
@@ -86,5 +91,21 @@ public class JwtTokenUtil {
                    .setClaims(claims)
                    .signWith(SignatureAlgorithm.HS512, secret)
                    .compact();
+    }
+
+    public AccountModel getAccountModel(HttpServletRequest request, String locale) {
+        String header = request.getHeader(this.header);
+        AccountModel account = parseToken(header);
+        if (account == null) {
+            // This request must be authorized before, so this never should happened
+            String msg = "Account is null, header: " + header;
+            logger.error(msg);
+            throw new InternalServerErrorException(msg, Strings.ACCOUNT_NOT_FOUND, locale);
+        }
+        return account;
+    }
+
+    public String getHeader() {
+        return header;
     }
 }

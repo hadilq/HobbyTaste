@@ -1,6 +1,7 @@
 package ir.asparsa.hobbytaste.server.exception;
 
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 
 /**
@@ -8,11 +9,23 @@ import org.springframework.security.core.AuthenticationException;
  *
  * @author pascal alma
  */
+@ResponseStatus(value = HttpStatus.NON_AUTHORITATIVE_INFORMATION, reason = "Missing")  // 203
+public class JwtTokenMissingException extends BaseAuthenticationException {
 
-public class JwtTokenMissingException extends AuthenticationException {
+    public JwtTokenMissingException(
+            String message,
+            String localizedMessageKey,
+            String local
+    ) {
+        super(message, localizedMessageKey, local);
+    }
 
-
-    public JwtTokenMissingException(String msg) {
-        super(msg);
+    public JwtTokenMissingException(
+            String message,
+            Throwable cause,
+            String localizedMessageKey,
+            String local
+    ) {
+        super(message, cause, localizedMessageKey, local);
     }
 }
