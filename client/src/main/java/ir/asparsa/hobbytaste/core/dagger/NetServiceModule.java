@@ -92,7 +92,7 @@ public class NetServiceModule {
         }
 
         return original.newBuilder()
-                       .header("Authorization", authorizationManager.getToken())
+                       .header(BuildConfig.Authorization, authorizationManager.getToken())
                        .header("Accept", "application/json")
                        .method(original.method(), original.body())
                        .build();

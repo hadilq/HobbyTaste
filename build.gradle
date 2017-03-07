@@ -59,6 +59,13 @@ subprojects {
     ext.global_picassoVersion = "2.5.2"
     ext.global_junitVersion = "4.12"
 
+    ext.global_serverAddress = "192.168.1.7"
+    ext.global_serverPort = "8090"
+    ext.global_serverScheme = "http"
+
+    ext.global_jwtHeader= "Authorization"
+    ext.global_maxFileSize= "5MB"
+
     afterEvaluate { project ->
         if (project.hasProperty("android")) {
             android {

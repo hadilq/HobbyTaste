@@ -4,6 +4,8 @@ def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
+def maxFileSizeInByte = "$global_maxFileSize".replace("MB", " * ${(int) Math.pow(2, 20)}")
+
 android {
     signingConfigs {
         config {
@@ -26,8 +28,9 @@ android {
     defaultConfig {
         applicationId "ir.asparsa.hobbytaste"
 
-        buildConfigField 'String', 'BASE_URL', '"http://192.168.1.7:8090/api/v1/"'
-        buildConfigField 'int', 'MAX_FILE_SIZE', '5242880'
+        buildConfigField 'String', 'BASE_URL', "\"$global_serverScheme://$global_serverAddress:$global_serverPort/api/v1/\""
+        buildConfigField 'String', 'Authorization', "\"$global_jwtHeader\""
+        buildConfigField 'int', 'MAX_FILE_SIZE', "$maxFileSizeInByte"
     }
 
     buildTypes {

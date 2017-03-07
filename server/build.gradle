@@ -1,11 +1,10 @@
-
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 
 jar {
     baseName = 'gs-managing-transactions'
-    version =  '0.1.0'
+    version = '0.1.0'
 }
 
 sourceCompatibility = 1.8
@@ -14,6 +13,49 @@ targetCompatibility = 1.8
 repositories {
     mavenCentral()
 }
+
+def properties = new Properties()
+def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
+propertiesFile.createNewFile()
+
+//################### DataSource Configuration ##########################
+properties.setProperty("spring.datasource.url", "jdbc:mysql://192.168.1.34:3306/hobbytaste?useUnicode=yes&characterEncoding=utf8&CharSet=utf8mb4")
+properties.setProperty("spring.datasource.driver-class-name", "com.mysql.jdbc.Driver")
+properties.setProperty("spring.datasource.username", "taste")
+properties.setProperty("spring.datasource.password", "hadi")
+properties.setProperty("spring.datasource.testWhileIdle", "rue")
+properties.setProperty("spring.datasource.validationQuery", "SELECT 1")
+properties.setProperty("spring.datasource.initSQL", "\"SET NAMES 'utf8mb4'\"")
+properties.setProperty("spring.jpa.hibernate.naming-strategy", "org.hibernate.cfg.ImprovedNamingStrategy")
+properties.setProperty("spring.jpa.properties.hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect")
+
+//###################         JPA MySql        ##########################
+properties.setProperty("spring.jpa.database", "MYSQL")
+properties.setProperty("spring.jpa.show-sql", "true")
+properties.setProperty("spring.jpa.generate-ddl", "true")
+properties.setProperty("spring.jpa.hibernate.ddl-auto", "update")
+
+//###################          Server          ##########################
+properties.setProperty("server.address", "$global_serverAddress")
+properties.setProperty("server.realAddress", "$global_serverAddress:$global_serverPort")
+properties.setProperty("server.scheme", "$global_serverScheme")
+properties.setProperty("server.port", "$global_serverPort")
+
+//###################         Security         ##########################
+properties.setProperty("jwt.secret", "lkjdaskdfv")
+properties.setProperty("jwt.header", "$global_jwtHeader")
+
+//###################      Storage Service     ##########################
+properties.setProperty("storage.location", "${project.rootDir}/server/upload-banners-dir")
+properties.setProperty("storage.location.tmp", "${project.rootDir}/server/upload-banners-dir-tmp")
+
+//###################       Image Service      ##########################
+properties.setProperty("image.maxLongHeight", "1750")
+properties.setProperty("spring.http.multipart.max-file-size", "$global_maxFileSize")
+properties.setProperty("spring.http.multipart.max-request-size", "5MB")
+
+
+properties.store(propertiesFile.newWriter(), null)
 
 dependencies {
     compile(project(':common'))
