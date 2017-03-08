@@ -23,7 +23,7 @@ public class NavigationUtil {
         try {
             fragmentManager
                     .beginTransaction()
-                    .setCustomAnimations(R.anim.come, R.anim.back)
+                    .setCustomAnimations(R.anim.come, 0, 0, R.anim.back)
                     .replace(R.id.content, fragment, fragment.getTagName())
                     .addToBackStack(fragment.getTagName())
                     .commit();
@@ -38,6 +38,7 @@ public class NavigationUtil {
     ) {
         try {
             fragmentManager.beginTransaction()
+                           .setCustomAnimations(R.anim.come, R.anim.back)
                            .replace(R.id.content_nested, fragment, fragment.getTagName())
                            .commit();
         } catch (Exception e) {

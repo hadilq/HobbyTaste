@@ -50,10 +50,6 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
         return getString(R.string.title_store_details);
     }
 
-    @Override public BackState onBackPressed() {
-        return BackState.BACK_FRAGMENT;
-    }
-
     @Override public void onEvent(BaseEvent event) {
         L.i(getClass(), "event received: ");
         if (event instanceof BaseDialogFragment.BaseOnDialogResultEvent &&
