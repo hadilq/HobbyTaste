@@ -34,6 +34,8 @@ import java.util.List;
 public class MainContentFragment extends BaseContentFragment
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
+    private static final String BUNDLE_KEY_CAMERA = "BUNDLE_KEY_CAMERA";
+
     @Inject
     AuthorizationManager mAuthorizationManager;
     @Inject
@@ -42,7 +44,6 @@ public class MainContentFragment extends BaseContentFragment
     private GoogleMap mMap;
     private List<StoreModel> mStores;
     private List<Marker> mMarkers = new ArrayList<>();
-    private boolean mIsCameraMovedBefore = false;
     private CompositeSubscription subscription = new CompositeSubscription();
 
     public static MainContentFragment instantiate() {
@@ -69,19 +70,17 @@ public class MainContentFragment extends BaseContentFragment
         super.onActivityCreated(savedInstanceState);
         Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
         SupportMapFragment mapFragment;
-        if (fragment instanceof SupportMapFragment) {
-            mapFragment = (SupportMapFragment) fragment;
-        } else {
+        if (!(fragment instanceof SupportMapFragment)) {
             mapFragment = SupportMapFragment.newInstance();
             getChildFragmentManager().beginTransaction()
                                      .replace(R.id.content_nested, mapFragment)
                                      .commit();
+            mapFragment.getMapAsync(this);
         }
-        mapFragment.getMapAsync(this);
     }
 
     @Override public void onDestroyView() {
-        mIsCameraMovedBefore = false;
+        getArguments().putParcelable(BUNDLE_KEY_CAMERA, mMap.getCameraPosition());
         for (Marker marker : mMarkers) {
             marker.remove();
         }
@@ -150,11 +149,13 @@ public class MainContentFragment extends BaseContentFragment
                                 .icon(icon));
                 mMarkers.add(marker);
             }
-            if (!mIsCameraMovedBefore) {
+            CameraPosition camera = getArguments().getParcelable(BUNDLE_KEY_CAMERA);
+            if (camera == null) {
                 LatLng latLng = new LatLng(accumulatedLat / mStores.size(), accumulatedLon / mStores.size());
-                mIsCameraMovedBefore = true;
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
                 MapUtil.zoom(mMap, latLng);
+            } else {
+                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(camera));
             }
             mMap.setOnMarkerClickListener(this);
         }
