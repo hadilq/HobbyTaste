@@ -1,2 +1,5 @@
 /build
-/src/main/java/resources/application.properties
+/src/main/resources/application.properties
+/upload-banners-dir
+/upload-banners-dir-tmp
+
