@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.BaseFragment;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.fragment.content.BaseContentFragment;
@@ -19,24 +20,37 @@ public class NavigationUtil {
             @NonNull FragmentManager fragmentManager,
             @NonNull BaseContentFragment fragment
     ) {
-        fragmentManager
-                .beginTransaction()
-                .replace(R.id.content, fragment, fragment.getTagName())
-                .addToBackStack(fragment.getTagName())
-                .commit();
+        try {
+            fragmentManager
+                    .beginTransaction()
+                    .setCustomAnimations(R.anim.come, R.anim.back)
+                    .replace(R.id.content, fragment, fragment.getTagName())
+                    .addToBackStack(fragment.getTagName())
+                    .commit();
+        } catch (Exception e) {
+            L.e(NavigationUtil.class.getClass(), "start content problem!", e);
+        }
     }
 
     public static void startNestedFragment(
             @NonNull FragmentManager fragmentManager,
             @NonNull BaseFragment fragment
     ) {
-        fragmentManager.beginTransaction()
-                       .replace(R.id.content_nested, fragment, fragment.getTagName())
-                       .commit();
+        try {
+            fragmentManager.beginTransaction()
+                           .replace(R.id.content_nested, fragment, fragment.getTagName())
+                           .commit();
+        } catch (Exception e) {
+            L.e(NavigationUtil.class.getClass(), "start nested problem!", e);
+        }
     }
 
     public static void popBackStack(@NonNull FragmentManager activeFragmentManager) {
-        activeFragmentManager.popBackStack();
+        try {
+            activeFragmentManager.popBackStack();
+        } catch (Exception e) {
+            L.e(NavigationUtil.class.getClass(), "Back problem!", e);
+        }
     }
 
     @Nullable
