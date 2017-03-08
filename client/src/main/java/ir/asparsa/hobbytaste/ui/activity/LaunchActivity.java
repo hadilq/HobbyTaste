@@ -60,14 +60,6 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         mPagerAdapter = new NavigationAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(mPagerAdapter.pageToPos(NavigationAdapter.PAGE_MAIN));
-        mViewPager.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(
-                    View arg0,
-                    MotionEvent arg1
-            ) {
-                return true;
-            }
-        });
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override public void onPageScrolled(
                     int position,
