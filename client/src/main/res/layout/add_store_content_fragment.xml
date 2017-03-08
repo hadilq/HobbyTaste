@@ -48,11 +48,11 @@
             <EditText
                     android:id="@+id/store_description"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/add_store_text_height"
+                    android:layout_height="wrap_content"
                     android:lines="2"
                     android:maxLines="3"
                     android:maxLength="100"
-                    android:inputType="textPersonName"
+                    android:inputType="textMultiLine"
                     android:textSize="@dimen/font_size_medium"
                     android:hint="@string/new_store_description_hint"/>
         </android.support.design.widget.TextInputLayout>

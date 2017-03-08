@@ -32,6 +32,8 @@
                 android:lines="3"
                 android:maxLines="5"
                 android:maxLength="500"
+                android:inputType="textMultiLine"
+                android:textSize="@dimen/font_size_medium"
                 android:hint="@string/comment_hint"/>
 
     </android.support.design.widget.TextInputLayout>
