@@ -91,7 +91,7 @@ public class MainContentFragment extends BaseContentFragment
 
 
     @Override protected String setHeaderTitle() {
-        return getString(R.string.title_main);
+        return getString(R.string.app_name);
     }
 
     private Observer<Collection<StoreModel>> getStoreObserver() {
