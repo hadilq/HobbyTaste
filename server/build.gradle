@@ -14,6 +14,10 @@ repositories {
     mavenCentral()
 }
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 def properties = new Properties()
 def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
 propertiesFile.createNewFile()
@@ -42,7 +46,7 @@ properties.setProperty("server.scheme", "$global_serverScheme")
 properties.setProperty("server.port", "$global_serverPort")
 
 //###################         Security         ##########################
-properties.setProperty("jwt.secret", "lkjdaskdfv")
+properties.setProperty("jwt.secret", "${keystoreProperties['jwtSecret']}")
 properties.setProperty("jwt.header", "$global_jwtHeader")
 
 //###################      Storage Service     ##########################
