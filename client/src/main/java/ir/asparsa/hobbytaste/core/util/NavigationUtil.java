@@ -38,7 +38,7 @@ public class NavigationUtil {
     ) {
         try {
             fragmentManager.beginTransaction()
-                           .setCustomAnimations(R.anim.come, R.anim.back)
+                           .setCustomAnimations(R.anim.back, 0)
                            .replace(R.id.content_nested, fragment, fragment.getTagName())
                            .commit();
         } catch (Exception e) {
