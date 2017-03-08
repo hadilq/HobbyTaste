@@ -7,7 +7,8 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * Created by hadi on 1/12/2017 AD.
+ * @author hadi
+ * @since 1/12/2017 AD.
  */
 public class ShrinkBehavior extends CoordinatorLayout.Behavior<FloatingActionButton> {
 
@@ -45,10 +46,5 @@ public class ShrinkBehavior extends CoordinatorLayout.Behavior<FloatingActionBut
         } else if (dyConsumed < 0 && child.getVisibility() != View.VISIBLE) {
             child.show();
         }
-//        float percentComplete = -dyConsumed / target.getHeight();
-//        float scaleFactor = 1 - percentComplete;
-//
-//        child.setScaleX(scaleFactor);
-//        child.setScaleY(scaleFactor);
     }
 }

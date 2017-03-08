@@ -11,7 +11,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -134,14 +133,14 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
             final BaseContentFragment.FloatingActionButtonObserver fabObserver = fragment
                     .getFloatingActionButtonObserver();
             if (fabObserver != null) {
-                mFloatingActionButton.setVisibility(View.VISIBLE);
+                mFloatingActionButton.show();
                 mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
                     @Override public void onClick(View v) {
                         fabObserver.onNext(v);
                     }
                 });
             } else {
-                mFloatingActionButton.setVisibility(View.GONE);
+                mFloatingActionButton.hide();
             }
 
             AppBarLayout.LayoutParams params =
