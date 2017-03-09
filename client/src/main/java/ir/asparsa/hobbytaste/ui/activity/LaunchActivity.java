@@ -88,7 +88,6 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                     }
                 });
 
-
         LaunchUtil.launch(this, SplashActivity.class);
     }
 
@@ -146,11 +145,12 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
             AppBarLayout.LayoutParams params =
                     (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
             if (fragment.scrollToolbar()) {
-                params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
-                                      | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS);
+                params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
+                                      AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS |
+                                      AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
+                );
             } else {
                 params.setScrollFlags(0);
-
             }
         }
     }
