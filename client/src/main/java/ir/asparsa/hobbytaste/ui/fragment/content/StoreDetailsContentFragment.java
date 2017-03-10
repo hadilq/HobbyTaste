@@ -47,6 +47,10 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
     }
 
     @Override protected String setHeaderTitle() {
+        StoreModel store = getArguments().getParcelable(StoreDetailsRecyclerFragment.BUNDLE_KEY_STORE);
+        if (store != null) {
+            return store.getTitle();
+        }
         return getString(R.string.title_store_details);
     }
 
