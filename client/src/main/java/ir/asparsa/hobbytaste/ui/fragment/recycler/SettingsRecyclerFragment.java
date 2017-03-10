@@ -117,10 +117,10 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
 
             for (BaseRecyclerData data : mAdapter.findData(UsernameData.class)) {
                 ((UsernameData) data).setUsername(usernameEvent.getUsername());
-            }
-
-            for (Integer index : mAdapter.findViewHolder(UserNameViewHolder.class)) {
-                mAdapter.notifyItemChanged(index);
+                int index = mAdapter.getList().indexOf(data);
+                if (index != -1) {
+                    mAdapter.notifyItemChanged(index);
+                }
             }
         } else if (event instanceof LanguageDialogFragment.OnChangeLanguageDialogResultEvent) {
             if (LanguageUtil.setDefaultLanguage(

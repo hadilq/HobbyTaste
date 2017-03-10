@@ -50,7 +50,8 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
                 if (mStore.getBanners() != null && mStore.getBanners().size() != 0) {
                     deque.add(new GalleryData(mStore.getBanners()));
                 }
-                deque.add(new RatingData(mStore.getRate(), mStore.getViewed(), mStore.isLiked()));
+                deque.add(new RatingData(mStore.getRate(), mStore.getViewed(), mStore.getDescription(),
+                                         mStore.isLiked()));
             }
 
             @Override public void onNext(BaseRecyclerData baseRecyclerData) {

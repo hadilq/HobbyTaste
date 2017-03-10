@@ -6,7 +6,8 @@ import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
 
 /**
- * Created by hadi on 12/22/2016 AD.
+ * @author hadi
+ * @since 12/22/2016 AD.
  */
 public class CommentData extends BaseRecyclerData {
 

@@ -38,22 +38,37 @@
             android:textSize="@dimen/font_size_medium"
             android:textColor="@color/text"/>
 
-    <TextView
-            android:id="@+id/rate"
+    <LinearLayout
+            android:id="@+id/rate_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/comment"
             android:layout_toStartOf="@id/heart"
             android:layout_marginStart="@dimen/horizontal_margin_half"
-            android:textSize="@dimen/font_size_small"
-            android:textColor="@color/text_hint"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+        <TextView
+                android:id="@+id/rate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/font_size_small"
+                android:textColor="@color/text_hint"/>
+
+        <ImageView
+                android:id="@+id/rate_tail"
+                android:layout_width="@dimen/tail_size"
+                android:layout_height="@dimen/tail_size"
+                android:layout_marginStart="@dimen/horizontal_margin_eighth"
+                android:src="@drawable/heart"/>
+    </LinearLayout>
 
     <TextView
             android:id="@+id/datetime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toStartOf="@id/rate"
-            android:layout_alignBaseline="@id/rate"
+            android:layout_toStartOf="@id/rate_layout"
+            android:layout_alignBottom="@id/rate_layout"
             android:layout_alignParentStart="true"
             android:layout_marginStart="@dimen/horizontal_margin"
             android:textSize="@dimen/font_size_small"
@@ -62,7 +77,7 @@
     <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_below="@id/rate"
+            android:layout_below="@id/rate_layout"
             android:layout_toStartOf="@id/heart"
             android:layout_marginStart="@dimen/horizontal_margin"
             android:background="@color/divider"/>

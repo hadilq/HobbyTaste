@@ -196,17 +196,6 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public List<Integer> findViewHolder(Class<? extends BaseViewHolder> clazz) {
-        List<Integer> list = new ArrayList<>();
-        for (int i = 0; i < getItemCount(); ++i) {
-            RecyclerView.ViewHolder holder = mRecyclerView.findViewHolderForAdapterPosition(i);
-            if (clazz.isInstance(holder)) {
-                list.add(i);
-            }
-        }
-        return list;
-    }
-
     public List<BaseRecyclerData> findData(Class<? extends BaseRecyclerData> clazz) {
         List<BaseRecyclerData> list = new ArrayList<>();
         for (BaseRecyclerData data : mList) {
@@ -215,9 +204,5 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
             }
         }
         return list;
-    }
-
-    public List<BaseRecyclerData> getDataList() {
-        return new ArrayList<>(mList);
     }
 }

@@ -98,7 +98,9 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
             }
 
             @Override public void onNext(T t) {
-                if (t instanceof RatingViewHolder.OnHeartClick) {
+                if (t instanceof RatingViewHolder.OnArrowClick) {
+                    onArrowClick(((RatingViewHolder.OnArrowClick) t).getData());
+                } else if (t instanceof RatingViewHolder.OnHeartClick) {
                     onStoreHeartClick(((RatingViewHolder.OnHeartClick) t).getData());
                 } else if (t instanceof CommentViewHolder.OnHeartClick) {
                     onCommentHeartClick(((CommentViewHolder.OnHeartClick) t).getComment());
@@ -123,6 +125,15 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
             Assert.fail("Store cannot be null!");
         }
         return store;
+    }
+
+
+    private void onArrowClick(RatingData data) {
+        data.setShowDescription(!data.isShowDescription());
+        int index = mAdapter.getList().indexOf(data);
+        if (index != -1) {
+            mAdapter.notifyItemChanged(index);
+        }
     }
 
     private void onStoreHeartClick(RatingData data) {
@@ -224,27 +235,20 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
     }
 
     private void notifyStoreHeartBeat() {
-        List<Integer> list = mAdapter.findViewHolder(RatingViewHolder.class);
-        for (Integer integer : list) {
-            mAdapter.notifyItemChanged(integer);
+        List<BaseRecyclerData> list = mAdapter.findData(RatingData.class);
+        for (BaseRecyclerData data : list) {
+            int index = mAdapter.getList().indexOf(data);
+            if (index != -1) {
+                mAdapter.notifyItemChanged(index);
+            }
         }
     }
 
     private void notifyCommentHeartBeat(CommentData comment) {
-        int index = findViewHolder(comment);
+        int index = mAdapter.getList().indexOf(comment);
         if (index != -1) {
             mAdapter.notifyItemChanged(index);
         }
-    }
-
-    private int findViewHolder(CommentData comment) {
-        List<BaseRecyclerData> list = mAdapter.getDataList();
-        for (BaseRecyclerData data : list) {
-            if (data.equals(comment)) {
-                return list.indexOf(data);
-            }
-        }
-        return -1;
     }
 
     public void addComment(CommentModel comment) {
