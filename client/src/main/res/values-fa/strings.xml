@@ -55,11 +55,4 @@
     <string name="month_9">دی</string>
     <string name="month_10">بهمن</string>
     <string name="month_11">اسفند</string>
-
-    <plurals name="like">
-        <item quantity="one">%d نفر دوست‌داشته</item>
-        <item quantity="other">%d نفر دوست‌داشته‌اند</item>
-    </plurals>
-    <string name="viewed">%1$d بار دیده‌شده</string>
-
 </resources>

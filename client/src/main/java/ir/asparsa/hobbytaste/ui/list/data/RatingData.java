@@ -4,7 +4,8 @@ import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.hobbytaste.R;
 
 /**
- * Created by hadi on 12/14/2016 AD.
+ * @author hadi
+ * @since 12/14/2016 AD.
  */
 public class RatingData extends BaseRecyclerData {
 
@@ -12,16 +13,20 @@ public class RatingData extends BaseRecyclerData {
 
     private long mRate;
     private long mViewed;
+    private String description;
     private boolean mLike;
+    private boolean showDescription = false;
 
     public RatingData(
-            long rate,
-            long viewed,
-            boolean like
+            long mRate,
+            long mViewed,
+            String description,
+            boolean mLike
     ) {
-        this.mRate = rate;
-        this.mViewed = viewed;
-        this.mLike = like;
+        this.mRate = mRate;
+        this.mViewed = mViewed;
+        this.description = description;
+        this.mLike = mLike;
     }
 
     @Override public int getViewType() {
@@ -50,6 +55,18 @@ public class RatingData extends BaseRecyclerData {
 
     public void setLike(boolean mLike) {
         this.mLike = mLike;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isShowDescription() {
+        return showDescription;
+    }
+
+    public void setShowDescription(boolean showDescription) {
+        this.showDescription = showDescription;
     }
 
     @Override public boolean equals(Object otherObj) {

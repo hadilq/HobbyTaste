@@ -13,9 +13,11 @@
     <dimen name="dialog_width">300dp</dimen>
 
     <dimen name="heart_size">35dp</dimen>
+    <dimen name="arrow_size">15dp</dimen>
 
     <dimen name="banner_max_size">200dp</dimen>
     <dimen name="add_store_text_height">55dp</dimen>
+    <dimen name="tail_size">14dp</dimen>
 
 
 </resources>

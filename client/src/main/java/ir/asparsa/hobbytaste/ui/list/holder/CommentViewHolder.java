@@ -21,7 +21,8 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 /**
- * Created by hadi on 12/22/2016 AD.
+ * @author hadi
+ * @since 12/22/2016 AD.
  */
 public class CommentViewHolder extends BaseViewHolder<CommentData> {
 
@@ -35,6 +36,8 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
     TextView mDateTimeTextView;
     @BindView(R.id.rate)
     TextView mRateTextView;
+    @BindView(R.id.rate_tail)
+    ImageView mRateTailImageView;
 
     public CommentViewHolder(
             View itemView,
@@ -43,6 +46,9 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
     ) {
         super(itemView, observer, savedInstanceState);
         ButterKnife.bind(this, itemView);
+
+        mRateTailImageView.getDrawable().mutate()
+                          .setColorFilter(itemView.getResources().getColor(R.color.heart_on), PorterDuff.Mode.SRC_ATOP);
     }
 
     @Override public void onBindView(final CommentData data) {
@@ -50,8 +56,7 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
 
         mCreatorTextView.setText(data.getCommentModel().getCreator());
 
-        mRateTextView.setText(itemView.getContext().getResources().getQuantityString(
-                R.plurals.like, (int) data.getCommentModel().getRate(), data.getCommentModel().getRate()));
+        mRateTextView.setText(String.format(Locale.getDefault(), "%d", data.getCommentModel().getRate()));
 
         mDateTimeTextView.setText(formatDatetime(data.getCommentModel().getCreated(), itemView.getContext()));
 

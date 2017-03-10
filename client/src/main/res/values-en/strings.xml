@@ -55,11 +55,4 @@
     <string name="month_9">October</string>
     <string name="month_10">November</string>
     <string name="month_11">December</string>
-
-    <plurals name="like">
-        <item quantity="one">%d like</item>
-        <item quantity="other">%d likes</item>
-    </plurals>
-    <string name="viewed">%1$d viewed</string>
-
 </resources>

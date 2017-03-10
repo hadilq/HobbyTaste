@@ -1,36 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
+
+    <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/vertical_margin_quarter"
+            android:paddingBottom="@dimen/vertical_margin_quarter"
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+        <RelativeLayout
+                android:id="@+id/dashboard"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/vertical_margin_half">
+                android:layout_height="wrap_content">
 
-    <ImageView
-            android:id="@+id/heart"
-            android:layout_width="@dimen/heart_size"
-            android:layout_height="@dimen/heart_size"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="@dimen/horizontal_margin"
-            android:src="@drawable/heart"/>
+            <ImageView
+                    android:id="@+id/heart"
+                    android:layout_width="@dimen/heart_size"
+                    android:layout_height="@dimen/heart_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/horizontal_margin"
+                    android:src="@drawable/heart"/>
+
+            <ImageView
+                    android:id="@+id/arrow"
+                    android:layout_width="@dimen/arrow_size"
+                    android:layout_height="@dimen/arrow_size"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/horizontal_margin"
+                    android:src="@drawable/down_arrow"/>
+
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/heart"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/horizontal_margin"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                <TextView
+                        android:id="@+id/rate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/font_size_small"
+                        android:textColor="@color/text_hint"/>
+
+                <ImageView
+                        android:id="@+id/rate_tail"
+                        android:layout_width="@dimen/tail_size"
+                        android:layout_height="@dimen/tail_size"
+                        android:layout_marginStart="@dimen/horizontal_margin_eighth"
+                        android:src="@drawable/heart"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@id/arrow"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/horizontal_margin"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                <TextView
+                        android:id="@+id/viewed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/font_size_small"
+                        android:textColor="@color/text_hint"/>
+
+                <ImageView
+                        android:id="@+id/viewed_tail"
+                        android:layout_width="@dimen/tail_size"
+                        android:layout_height="@dimen/tail_size"
+                        android:layout_marginStart="@dimen/horizontal_margin_eighth"
+                        android:src="@drawable/eye"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+    </FrameLayout>
 
     <TextView
-            android:id="@+id/rate"
-            android:layout_width="wrap_content"
+            android:id="@+id/store_description"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/heart"
-            android:layout_centerVertical="true"
             android:layout_marginStart="@dimen/horizontal_margin"
-            android:textSize="@dimen/font_size_small"
-            android:textColor="@color/text_hint"/>
-
-    <TextView
-            android:id="@+id/viewed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/horizontal_margin"
-            android:textSize="@dimen/font_size_small"
-            android:textColor="@color/text_hint"/>
-
-</RelativeLayout>
+            android:layout_marginBottom="@dimen/vertical_margin"
+            android:textColor="@color/text"
+            android:textSize="@dimen/font_size_small"/>
+</LinearLayout>

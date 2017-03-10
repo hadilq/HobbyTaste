@@ -9,6 +9,8 @@
     <dimen name="try_again_height">100dp</dimen>
     <dimen name="progress_bar_size">35dp</dimen>
 
+    <dimen name="horizontal_margin_eighth">4dp</dimen>
+    <dimen name="horizontal_margin_quarter">8dp</dimen>
     <dimen name="horizontal_margin_half">16dp</dimen>
     <dimen name="horizontal_margin">32dp</dimen>
     <dimen name="horizontal_margin_double">64dp</dimen>
