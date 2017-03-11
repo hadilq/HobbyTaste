@@ -17,10 +17,8 @@ import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.dialog.BaseBottomDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.common.net.dto.AuthenticateDto;
-import ir.asparsa.common.net.dto.ErrorDto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
-import ir.asparsa.hobbytaste.core.retrofit.RetrofitException;
 import ir.asparsa.hobbytaste.net.UserService;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -104,15 +102,7 @@ public class SetUsernameDialogFragment extends BaseBottomDialogFragment {
 
                         @Override public void onError(Throwable e) {
                             L.e(SetUsernameDialogFragment.class, "Cannot send comment", e);
-                            ErrorDto error = null;
-                            if (e instanceof RetrofitException) {
-                                error = ((RetrofitException) e).getErrorBody();
-                            }
-                            if (error == null) {
-                                mUsernameLayout.setError(e.getLocalizedMessage());
-                            } else {
-                                mUsernameLayout.setError(error.getLocalizedMessage());
-                            }
+                            mUsernameLayout.setError(e.getLocalizedMessage());
                         }
 
                         @Override public void onNext(AuthenticateDto authenticateDto) {

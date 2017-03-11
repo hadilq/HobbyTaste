@@ -1,13 +1,17 @@
 package ir.asparsa.hobbytaste.core.retrofit;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.common.net.dto.ErrorDto;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
+import ir.asparsa.hobbytaste.R;
 import okhttp3.ResponseBody;
 import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 
@@ -16,6 +20,10 @@ import java.lang.annotation.Annotation;
  * @since 3/7/2017 AD.
  */
 public class RetrofitException extends RuntimeException {
+
+    @Inject
+    Context mContext;
+
     public static RetrofitException httpError(
             String url,
             Response response,
@@ -70,6 +78,7 @@ public class RetrofitException extends RuntimeException {
         this.response = response;
         this.kind = kind;
         this.retrofit = retrofit;
+        ApplicationLauncher.mainComponent().inject(this);
     }
 
     /**
@@ -100,12 +109,25 @@ public class RetrofitException extends RuntimeException {
         return retrofit;
     }
 
+    @Override public String getLocalizedMessage() {
+        switch (kind) {
+            case HTTP:
+                ErrorDto errorDto = getErrorBody();
+                if (errorDto != null) {
+                    return errorDto.getLocalizedMessage();
+                }
+                break;
+            case UNEXPECTED:
+                throw this;
+        }
+        return mContext.getString(R.string.connection_error);
+    }
+
     /**
      * HTTP response body converted to specified {@code type}. {@code null} if there is no
      * response.
      */
-    @Nullable
-    public ErrorDto getErrorBody() {
+    @Nullable private ErrorDto getErrorBody() {
         if (response == null || response.errorBody() == null) {
             return null;
         }

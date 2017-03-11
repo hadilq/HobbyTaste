@@ -23,13 +23,11 @@ import ir.asparsa.android.ui.fragment.BaseFragment;
 import ir.asparsa.android.ui.fragment.dialog.ProgressDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.common.net.dto.BannerDto;
-import ir.asparsa.common.net.dto.ErrorDto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.core.retrofit.ProgressRequestBody;
-import ir.asparsa.hobbytaste.core.retrofit.RetrofitException;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
@@ -212,15 +210,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
 
             @Override public void onError(Throwable e) {
                 L.e(AddBannerContentFragment.class, "Cannot save store", e);
-                ErrorDto error = null;
-                if (e instanceof RetrofitException) {
-                    error = ((RetrofitException) e).getErrorBody();
-                }
-                if (error == null) {
-                    mHintTextView.setText(getString(R.string.connection_error));
-                } else {
-                    mHintTextView.setText(((RetrofitException) e).getErrorBody().getLocalizedMessage());
-                }
+                mHintTextView.setText(e.getLocalizedMessage());
                 dismissProgressDialog();
             }
 
@@ -265,16 +255,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
 
             @Override public void onError(Throwable e) {
                 L.e(AddBannerContentFragment.class, "Banner is not uploaded", e);
-                ErrorDto error = null;
-                if (e instanceof RetrofitException) {
-                    error = ((RetrofitException) e).getErrorBody();
-                }
-
-                if (error == null) {
-                    mHintTextView.setText(getString(R.string.connection_error));
-                } else {
-                    mHintTextView.setText(error.getLocalizedMessage());
-                }
+                mHintTextView.setText(e.getLocalizedMessage());
                 dismissProgressDialog();
             }
 

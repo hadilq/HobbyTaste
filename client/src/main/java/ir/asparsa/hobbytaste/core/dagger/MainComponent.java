@@ -2,6 +2,7 @@ package ir.asparsa.hobbytaste.core.dagger;
 
 import dagger.Component;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
+import ir.asparsa.hobbytaste.core.retrofit.RetrofitException;
 import ir.asparsa.hobbytaste.ui.activity.BaseActivity;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
 import ir.asparsa.hobbytaste.ui.fragment.content.AddBannerContentFragment;
@@ -47,4 +48,6 @@ public interface MainComponent {
     void inject(StoreDetailsRecyclerFragment storeDetailsRecyclerFragment);
 
     void inject(AddBannerContentFragment addBannerContentFragment);
+
+    void inject(RetrofitException retrofitException);
 }
