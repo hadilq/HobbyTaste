@@ -7,11 +7,13 @@ import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
 import ir.asparsa.hobbytaste.server.exception.EmptyUsernameException;
 import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
+import ir.asparsa.hobbytaste.server.security.model.AuthenticatedUser;
 import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,14 +53,14 @@ import java.util.Random;
     AuthenticateDto changeUsername(
             @RequestParam("new") String username,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
-            HttpServletRequest request
+            @AuthenticationPrincipal AuthenticatedUser user
     ) {
         if (StringUtils.isEmpty(username)) {
             throw new EmptyUsernameException("Username is empty", Strings.USERNAME_IS_EMPTY, locale);
         }
         logger.info("username: " + username);
 
-        AccountModel account = jwtTokenUtil.getAccountModel(request, locale);
+        AccountModel account = user.getAccount();
 
         account.setUsername(username);
         accountRepository.save(account);

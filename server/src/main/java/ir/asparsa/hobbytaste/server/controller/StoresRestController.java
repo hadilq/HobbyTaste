@@ -13,8 +13,8 @@ import ir.asparsa.hobbytaste.server.exception.StorageException;
 import ir.asparsa.hobbytaste.server.exception.StoreNotFoundException;
 import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
+import ir.asparsa.hobbytaste.server.security.model.AuthenticatedUser;
 import ir.asparsa.hobbytaste.server.storage.StorageService;
-import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +22,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import rx.Observable;
 import rx.Observer;
 import rx.schedulers.Schedulers;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -50,8 +50,6 @@ import java.util.*;
     @Autowired
     CommentLikeRepository commentLikeRepository;
     @Autowired
-    JwtTokenUtil jwtTokenUtil;
-    @Autowired
     StorageService storageService;
 
     StoresRestController() {
@@ -60,12 +58,11 @@ import java.util.*;
     @RequestMapping(method = RequestMethod.GET)
     Collection<StoreDto> readStores(
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
-            HttpServletRequest request
+            @AuthenticationPrincipal AuthenticatedUser user
     ) {
         logger.info("read stores request");
 
-        AccountModel account = jwtTokenUtil.getAccountModel(request, locale);
-        List<StoreLikeModel> storeLikes = storeLikeRepository.findByAccount(account);
+        List<StoreLikeModel> storeLikes = storeLikeRepository.findByAccount(user.getAccount());
 
         Collection<StoreDto> collection = new LinkedList<>();
         for (StoreModel storeModel : storeRepository.findAll()) {
@@ -85,15 +82,13 @@ import java.util.*;
     StoreDto saveStore(
             @RequestBody StoreDto store,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
-            HttpServletRequest request
+            @AuthenticationPrincipal AuthenticatedUser user
     ) {
         logger.info("Save store request");
 
-        AccountModel account = jwtTokenUtil.getAccountModel(request, locale);
-
         Optional<StoreModel> existStore = storeRepository.findByHashCode(store.getHashCode());
         if (existStore.isPresent()) {
-            boolean like = isLiked(account, existStore.get());
+            boolean like = isLiked(user.getAccount(), existStore.get());
 
             return existStore.get().convertToDto(like);
         }
@@ -132,13 +127,13 @@ import java.util.*;
     StoreDto storeViewed(
             @PathVariable("storeHashCode") Long hashCode,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
-            HttpServletRequest request
+            @AuthenticationPrincipal AuthenticatedUser user
     ) {
         logger.info("view stores request");
 
         Optional<StoreModel> storeModel = getStoreModel(hashCode, locale);
-        AccountModel account = jwtTokenUtil.getAccountModel(request, locale);
-        Optional<StoreLikeModel> storeLike = storeLikeRepository.findByAccountAndStore(account, storeModel.get());
+        Optional<StoreLikeModel> storeLike = storeLikeRepository
+                .findByAccountAndStore(user.getAccount(), storeModel.get());
 
         storeModel.get().increaseViewed();
         Observable.create((Observable.OnSubscribe<Void>) subscriber -> storeRepository.save(storeModel.get()))
@@ -154,11 +149,9 @@ import java.util.*;
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
-            HttpServletRequest request
+            @AuthenticationPrincipal AuthenticatedUser user
     ) {
         logger.info("read store comments request: storeHashCode: " + hashCode + ", page: " + page + ", size: " + size);
-
-        AccountModel account = jwtTokenUtil.getAccountModel(request, locale);
 
         Optional<StoreModel> storeModel = getStoreModel(hashCode, locale);
 
@@ -167,7 +160,8 @@ import java.util.*;
         ));
         Page<CommentModel> comments = storeCommentRepository.findByStore(storeModel.get(), pageable);
 
-        List<CommentLikeModel> commentLikes = commentLikeRepository.findByAccountAndStore(account, storeModel.get());
+        List<CommentLikeModel> commentLikes = commentLikeRepository
+                .findByAccountAndStore(user.getAccount(), storeModel.get());
         List<StoreCommentDto> list = new ArrayList<>();
         for (CommentModel comment : comments) {
             boolean like = isLikedComment(commentLikes, comment);
@@ -183,7 +177,7 @@ import java.util.*;
             @PathVariable("storeHashCode") Long hashCode,
             @RequestBody StoreCommentDto comment,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
-            HttpServletRequest request
+            @AuthenticationPrincipal AuthenticatedUser user
     ) {
         logger.info("save stores comment request: storeHashCode: " + hashCode + ", comment: " + comment);
 
@@ -193,9 +187,8 @@ import java.util.*;
 
         CommentModel entity;
         if (!existComment.isPresent()) {
-            AccountModel account = jwtTokenUtil.getAccountModel(request, locale);
 
-            entity = CommentModel.newInstance(storeModel.get(), comment, account);
+            entity = CommentModel.newInstance(storeModel.get(), comment, user.getAccount());
             logger.info("Saved comment: " + entity);
             entity = storeCommentRepository.save(entity);
         } else {
@@ -209,13 +202,13 @@ import java.util.*;
             @PathVariable("storeHashCode") Long hashCode,
             @PathVariable("like") Boolean like,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
-            HttpServletRequest request
+            @AuthenticationPrincipal AuthenticatedUser user
     ) {
         logger.info("save store like request: storeHashCode: " + hashCode + ", liked: " + like);
 
         Optional<StoreModel> storeModel = getStoreModel(hashCode, locale);
 
-        AccountModel account = jwtTokenUtil.getAccountModel(request, locale);
+        AccountModel account = user.getAccount();
 
         StoreLikeModel storeLiked = getStoreLikeModel(account, storeModel.get());
 
@@ -253,7 +246,7 @@ import java.util.*;
             @PathVariable("commentHashCode") Long hashCode,
             @PathVariable("like") Boolean like,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
-            HttpServletRequest request
+            @AuthenticationPrincipal AuthenticatedUser user
     ) {
         logger.info(
                 "save comment like request: storeHashCode: " + storeHashCode + ", comment hash code: " + hashCode +
@@ -263,7 +256,7 @@ import java.util.*;
 
         Optional<CommentModel> commentModel = getCommentModel(hashCode, storeModel.get(), locale);
 
-        AccountModel account = jwtTokenUtil.getAccountModel(request, locale);
+        AccountModel account = user.getAccount();
 
         CommentLikeModel commentLiked = getCommentLikeModel(storeModel.get(), commentModel.get(), account);
 

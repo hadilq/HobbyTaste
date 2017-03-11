@@ -93,18 +93,6 @@ public class JwtTokenUtil {
                    .compact();
     }
 
-    public AccountModel getAccountModel(HttpServletRequest request, String locale) {
-        String header = request.getHeader(this.header);
-        AccountModel account = parseToken(header);
-        if (account == null) {
-            // This request must be authorized before, so this never should happened
-            String msg = "Account is null, header: " + header;
-            logger.error(msg);
-            throw new InternalServerErrorException(msg, Strings.ACCOUNT_NOT_FOUND, locale);
-        }
-        return account;
-    }
-
     public String getHeaderKey() {
         return header;
     }
