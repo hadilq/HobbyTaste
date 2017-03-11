@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Random;
 
 /**
@@ -76,16 +75,16 @@ import java.util.Random;
             tmp.append(ch);
         for (char ch = 'A'; ch <= 'Z'; ++ch)
             tmp.append(ch);
-//        tmp.appendCodePoint(0x1F600);
-//        tmp.appendCodePoint(0x1F601);
-//        tmp.appendCodePoint(0x1F602);
-//        tmp.appendCodePoint(0x1F603);
-//        tmp.appendCodePoint(0x1F604);
-//        tmp.appendCodePoint(0x1F605);
-//        tmp.appendCodePoint(0x1F606);
-//        tmp.appendCodePoint(0x1F609);
-//        tmp.appendCodePoint(0x1F923);
-//        tmp.appendCodePoint(0x1F60A);
+        tmp.appendCodePoint(0x1F600);
+        tmp.appendCodePoint(0x1F601);
+        tmp.appendCodePoint(0x1F602);
+        tmp.appendCodePoint(0x1F603);
+        tmp.appendCodePoint(0x1F604);
+        tmp.appendCodePoint(0x1F605);
+        tmp.appendCodePoint(0x1F606);
+        tmp.appendCodePoint(0x1F609);
+        tmp.appendCodePoint(0x1F923);
+        tmp.appendCodePoint(0x1F60A);
         char[] symbols = tmp.toString().toCharArray();
 
         Random random = new Random();

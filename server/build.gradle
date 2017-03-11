@@ -3,64 +3,99 @@ apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 
 jar {
-    baseName = 'gs-managing-transactions'
-    version = '0.1.0'
+    baseName = 'hobbytaste-server'
+    version = "${global_versionName}.0"
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-repositories {
-    mavenCentral()
-}
-
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
-def properties = new Properties()
-def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
-propertiesFile.createNewFile()
+def generateDefaultConfiguration = { properties ->
+    //################### DataSource Configuration ##########################
+    properties.setProperty("spring.datasource.testWhileIdle", "rue")
+    properties.setProperty("spring.datasource.validationQuery", "SELECT 1")
+    properties.setProperty("spring.jpa.hibernate.naming-strategy", "org.hibernate.cfg.ImprovedNamingStrategy")
 
-//################### DataSource Configuration ##########################
-properties.setProperty("spring.datasource.url", "jdbc:mysql://192.168.1.34:3306/hobbytaste?useUnicode=yes&characterEncoding=utf8&CharSet=utf8mb4")
-properties.setProperty("spring.datasource.driver-class-name", "com.mysql.jdbc.Driver")
-properties.setProperty("spring.datasource.username", "taste")
-properties.setProperty("spring.datasource.password", "hadi")
-properties.setProperty("spring.datasource.testWhileIdle", "rue")
-properties.setProperty("spring.datasource.validationQuery", "SELECT 1")
-properties.setProperty("spring.datasource.initSQL", "\"SET NAMES 'utf8mb4'\"")
-properties.setProperty("spring.jpa.hibernate.naming-strategy", "org.hibernate.cfg.ImprovedNamingStrategy")
-properties.setProperty("spring.jpa.properties.hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect")
+    //###################         JPA MySql        ##########################
+    properties.setProperty("spring.jpa.show-sql", "true")
+    properties.setProperty("spring.jpa.generate-ddl", "true")
+    properties.setProperty("spring.jpa.hibernate.ddl-auto", "update")
 
-//###################         JPA MySql        ##########################
-properties.setProperty("spring.jpa.database", "MYSQL")
-properties.setProperty("spring.jpa.show-sql", "true")
-properties.setProperty("spring.jpa.generate-ddl", "true")
-properties.setProperty("spring.jpa.hibernate.ddl-auto", "update")
+    //###################         Security         ##########################
+    properties.setProperty("jwt.secret", "${keystoreProperties['jwtSecret']}")
+    properties.setProperty("jwt.header", "$global_jwtHeader")
+    properties.setProperty("security.request.minInterval", '1000')
 
-//###################          Server          ##########################
-properties.setProperty("server.address", "$global_serverAddress")
-properties.setProperty("server.realAddress", "$global_serverAddress:$global_serverPort")
-properties.setProperty("server.scheme", "$global_serverScheme")
-properties.setProperty("server.port", "$global_serverPort")
+    //###################      Storage Service     ##########################
+    properties.setProperty("storage.location", "${project.rootDir}/server/upload-banners-dir")
+    properties.setProperty("storage.location.tmp", "${project.rootDir}/server/upload-banners-dir-tmp")
 
-//###################         Security         ##########################
-properties.setProperty("jwt.secret", "${keystoreProperties['jwtSecret']}")
-properties.setProperty("jwt.header", "$global_jwtHeader")
-properties.setProperty("security.request.minInterval", '1000')
+    //###################       Image Service      ##########################
+    properties.setProperty("image.maxLongHeight", "1750")
+    properties.setProperty("spring.http.multipart.max-file-size", "$global_maxFileSize")
+    properties.setProperty("spring.http.multipart.max-request-size", "5MB")
+}
 
-//###################      Storage Service     ##########################
-properties.setProperty("storage.location", "${project.rootDir}/server/upload-banners-dir")
-properties.setProperty("storage.location.tmp", "${project.rootDir}/server/upload-banners-dir-tmp")
+def developConfiguration = {
+    println "developConfig " + project.name
+    def properties = new Properties()
+    def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
+    propertiesFile.createNewFile()
+    generateDefaultConfiguration(properties)
 
-//###################       Image Service      ##########################
-properties.setProperty("image.maxLongHeight", "1750")
-properties.setProperty("spring.http.multipart.max-file-size", "$global_maxFileSize")
-properties.setProperty("spring.http.multipart.max-request-size", "5MB")
+    //###################          Server          ##########################
+    properties.setProperty("server.address", "$global_serverAddress")
+    properties.setProperty("server.scheme", "$global_serverScheme")
+    properties.setProperty("server.port", "$global_serverPort")
+    properties.setProperty("server.realAddress", "$global_serverAddress:$global_serverPort")
+    properties.setProperty("server.realScheme", "$global_serverScheme")
+
+    properties.store(propertiesFile.newWriter(), null)
+}
 
 
-properties.store(propertiesFile.newWriter(), null)
+def productConfiguration = {
+    println "productConfig  " + project.name
+    def properties = new Properties()
+    def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
+    propertiesFile.createNewFile()
+    generateDefaultConfiguration(properties)
+
+    //################### DataSource Configuration ##########################
+    properties.setProperty("spring.datasource.platform", "postgres")
+    properties.setProperty("spring.datasource.url", "jdbc:postgresql://localhost:5432/hobbytastedb")
+    properties.setProperty("spring.datasource.driver-class-name", "org.postgresql.Driver")
+    properties.setProperty("spring.datasource.username", "hobbytaste")
+    properties.setProperty("spring.datasource.password", "${keystoreProperties['postgresDbPass']}")
+
+    //###################         JPA MySql        ##########################
+    properties.setProperty("spring.jpa.database", "POSTGRESQL")
+
+    //###################          Server          ##########################
+    properties.setProperty("server.address", "$global_productServerAddress")
+    properties.setProperty("server.scheme", "$global_productServerScheme")
+    properties.setProperty("server.port", "$global_productServerPort")
+    properties.setProperty("server.realAddress", "$global_productServerRealAddress")
+    properties.setProperty("server.realScheme", "$global_productServerRealScheme")
+
+    properties.store(propertiesFile.newWriter(), null)
+}
+
+task deployProduct(dependsOn: 'bootRepackage')
+
+task runDevelop(dependsOn: 'bootRun')
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(deployProduct)) {
+        productConfiguration()
+    } else if (taskGraph.hasTask(runDevelop)) {
+        developConfiguration()
+    }
+}
 
 dependencies {
     compile(project(':common'))
@@ -72,7 +107,8 @@ dependencies {
     compile('org.apache.commons:commons-lang3:3.5')
     compile 'io.jsonwebtoken:jjwt:0.7.0'
     compile "io.reactivex:rxjava:$global_rxjavaVersion"
-    runtime('mysql:mysql-connector-java')
+    runtime('org.postgresql:postgresql:9.4.1212')
+    runtime('com.h2database:h2:1.4.193')
 
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

@@ -12,7 +12,7 @@ public class ServerProperties {
 
     @Value("${server.realAddress}")
     private String serverAddress;
-    @Value("${server.scheme}")
+    @Value("${server.realScheme}")
     private String scheme;
 
 
