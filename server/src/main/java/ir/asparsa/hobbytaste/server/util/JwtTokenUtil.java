@@ -105,7 +105,7 @@ public class JwtTokenUtil {
         return account;
     }
 
-    public String getHeader() {
+    public String getHeaderKey() {
         return header;
     }
 }

@@ -48,6 +48,7 @@ properties.setProperty("server.port", "$global_serverPort")
 //###################         Security         ##########################
 properties.setProperty("jwt.secret", "${keystoreProperties['jwtSecret']}")
 properties.setProperty("jwt.header", "$global_jwtHeader")
+properties.setProperty("security.request.minInterval", '1000')
 
 //###################      Storage Service     ##########################
 properties.setProperty("storage.location", "${project.rootDir}/server/upload-banners-dir")

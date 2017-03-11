@@ -12,7 +12,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 /**
- * Created by hadi on 12/30/2016 AD.
+ * @author hadi
+ * @since 12/30/2016 AD.
  */
 public interface CommentLikeRepository extends JpaRepository<CommentLikeModel, Long> {
 

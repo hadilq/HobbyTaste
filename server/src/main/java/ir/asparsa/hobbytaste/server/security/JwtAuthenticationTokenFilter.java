@@ -38,16 +38,15 @@ public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessi
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        String authToken = request.getHeader(jwtTokenUtil.getHeader());
+        String authToken = request.getHeader(jwtTokenUtil.getHeaderKey());
 
         if (authToken == null) {
             throw new JwtTokenMissingException(
                     "No JWT token found in request headers", Strings.NO_JWT_HEADER_FOUND, Strings.DEFAULT_LOCALE);
         }
 
-//        String authToken = header.substring(7);
-
-        JwtAuthenticationToken authRequest = new JwtAuthenticationToken(authToken);
+        JwtAuthenticationToken authRequest = new JwtAuthenticationToken(
+                authToken, request.getRemoteAddr(), request.getRequestURI(), request.getRequestedSessionId());
 
         return getAuthenticationManager().authenticate(authRequest);
     }

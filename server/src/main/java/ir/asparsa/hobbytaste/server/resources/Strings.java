@@ -20,4 +20,5 @@ public interface Strings {
     String CANNOT_MOVE_FILE = "exception.cannot_move_file";
     String CANNOT_INIT_STORAGE = "exception.cannot_init_storage";
     String FILENAME_NOT_FOUND = "exception.filename_not_found";
+    String SECURITY_DDOS = "exception.security_ddos";
 }

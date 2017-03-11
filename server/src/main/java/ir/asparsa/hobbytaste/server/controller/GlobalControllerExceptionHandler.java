@@ -50,6 +50,11 @@ public class GlobalControllerExceptionHandler {
         return getErrorDto(e);
     }
 
+    @ExceptionHandler(DdosSecurityException.class)
+    private ErrorDto handleException(DdosSecurityException e) {
+        return getErrorDto(e);
+    }
+
     @ExceptionHandler(StorageException.class)
     private ErrorDto handleException(StorageException e) {
         return getErrorDto(e);
