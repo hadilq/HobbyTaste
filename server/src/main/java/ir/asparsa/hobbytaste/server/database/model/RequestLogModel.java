@@ -22,8 +22,6 @@ public class RequestLogModel {
     private String address;
     @Column(name = RequestLog.Columns.URI)
     private String uri;
-    @Column(name = RequestLog.Columns.SESSION_ID)
-    private String sessionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = RequestLog.Columns.ACCOUNT)
@@ -33,13 +31,11 @@ public class RequestLogModel {
             long datetime,
             String address,
             String uri,
-            String sessionId,
             AccountModel account
     ) {
         this.datetime = datetime;
         this.address = address;
         this.uri = uri;
-        this.sessionId = sessionId;
         this.account = account;
     }
 
@@ -53,10 +49,6 @@ public class RequestLogModel {
 
     public String getUri() {
         return uri;
-    }
-
-    public String getSessionId() {
-        return sessionId;
     }
 
     public AccountModel getAccount() {

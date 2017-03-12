@@ -46,7 +46,7 @@ public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessi
         }
 
         JwtAuthenticationToken authRequest = new JwtAuthenticationToken(
-                authToken, request.getRemoteAddr(), request.getRequestURI(), request.getRequestedSessionId());
+                authToken, request.getRemoteAddr(), request.getRequestURI());
 
         return getAuthenticationManager().authenticate(authRequest);
     }

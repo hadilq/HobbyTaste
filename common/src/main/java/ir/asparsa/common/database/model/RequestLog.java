@@ -5,7 +5,7 @@ package ir.asparsa.common.database.model;
  * @since 3/10/2017 AD.
  */
 public interface RequestLog {
-    String TABLE_NAME = "request_like";
+    String TABLE_NAME = "requests_log";
 
     interface Columns {
         String DATETIME = "datetime";

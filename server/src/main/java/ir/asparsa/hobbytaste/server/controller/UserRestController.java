@@ -9,6 +9,7 @@ import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
 import ir.asparsa.hobbytaste.server.security.model.AuthenticatedUser;
 import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
+import ir.asparsa.hobbytaste.server.util.RequestLogUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Random;
 
 /**
@@ -31,19 +33,23 @@ import java.util.Random;
     private final static Logger logger = LoggerFactory.getLogger(UserRestController.class);
 
     @Autowired
-    AccountRepository accountRepository;
+    private AccountRepository accountRepository;
     @Autowired
-    JwtTokenUtil jwtTokenUtil;
+    private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private RequestLogUtil requestLogUtil;
 
     public UserRestController() {
     }
 
     @RequestMapping(value = UserServicePath.AUTHENTICATE, method = RequestMethod.POST)
-    AuthenticateDto authorization() {
+    AuthenticateDto authorization(HttpServletRequest request) {
         String username = generateUsername();
-        logger.info("username: " + username);
+        logger.info("New username: " + username);
         AccountModel account = new AccountModel(username, "USER");
         account = accountRepository.save(account);
+
+        requestLogUtil.asyncLog(request, account);
 
         return new AuthenticateDto(jwtTokenUtil.generateToken(account), username);
     }

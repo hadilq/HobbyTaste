@@ -16,19 +16,16 @@ public class JwtAuthenticationToken extends UsernamePasswordAuthenticationToken 
     private String token;
     private String address;
     private String uri;
-    private String sessionId;
 
     public JwtAuthenticationToken(
             String token,
             String address,
-            String uri,
-            String sessionId
+            String uri
     ) {
         super(null, null);
         this.token = token;
         this.address = address;
         this.uri = uri;
-        this.sessionId = sessionId;
     }
 
     public String getToken() {
@@ -41,10 +38,6 @@ public class JwtAuthenticationToken extends UsernamePasswordAuthenticationToken 
 
     public String getUri() {
         return uri;
-    }
-
-    public String getSessionId() {
-        return sessionId;
     }
 
     @Override
