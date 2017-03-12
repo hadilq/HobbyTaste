@@ -17,7 +17,8 @@ import javax.inject.Inject;
 import java.util.Locale;
 
 /**
- * Created by hadi on 12/14/2016 AD.
+ * @author hadi
+ * @since 12/14/2016 AD.
  */
 public class SettingsProvider extends AbsListProvider {
 

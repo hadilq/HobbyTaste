@@ -135,7 +135,7 @@ public class RetrofitException extends RuntimeException {
         try {
             return converter.convert(response.errorBody());
         } catch (IOException e) {
-            L.e(getClass(), "Cannot convert to error dto", e);
+            L.w(getClass(), "Cannot convert to error dto", e);
         }
         return null;
     }
