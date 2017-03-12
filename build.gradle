@@ -67,7 +67,7 @@ subprojects {
     ext.global_productServerPort = "8090"
     ext.global_productServerScheme = "http"
     ext.global_productServerRealAddress = "hobbytaste.asparsa.ir"
-    ext.global_productServerRealScheme = "hobbytaste.asparsa.ir"
+    ext.global_productServerRealScheme = "https"
 
     ext.global_jwtHeader= "Authorization"
     ext.global_maxFileSize= "10MB"

@@ -6,6 +6,8 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 def maxFileSizeInByte = "$global_maxFileSize".replace("MB", " * ${(int) Math.pow(2, 20)}")
 
+def defaultPackageName = "ir.asparsa.hobbytaste"
+
 android {
     signingConfigs {
         config {
@@ -21,14 +23,11 @@ android {
             output.outputFile = new File(
                     output.outputFile.parent,
                     output.outputFile.name.replace(".apk", "-${variant.versionName}.apk")
-                            .replace("client", "HobbyTaste"))
+                            .replace("client", "FreeMap"))
         }
     }
 
     defaultConfig {
-        applicationId "ir.asparsa.hobbytaste"
-
-        buildConfigField 'String', 'BASE_URL', "\"$global_serverScheme://$global_serverAddress:$global_serverPort/api/v1/\""
         buildConfigField 'String', 'Authorization', "\"$global_jwtHeader\""
         buildConfigField 'int', 'MAX_FILE_SIZE', "$maxFileSizeInByte"
     }
@@ -39,13 +38,26 @@ android {
             signingConfig signingConfigs.config
         }
         release {
-            multiDexEnabled true
+            multiDexEnabled false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }
     }
+
     productFlavors {
+        product {
+            applicationId "$defaultPackageName"
+
+            buildConfigField 'String', 'BASE_URL', "\"$global_productServerRealScheme://$global_productServerRealAddress/api/v1/\""
+        }
+
+        develop {
+            applicationId "${defaultPackageName}.dev"
+
+            buildConfigField 'String', 'BASE_URL', "\"$global_serverScheme://$global_serverAddress:$global_serverPort/api/v1/\""
+        }
+
     }
 }
 
