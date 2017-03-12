@@ -49,13 +49,19 @@ android {
         product {
             applicationId "$defaultPackageName"
 
+            buildConfigField 'boolean', 'PRODUCT', "true"
+            buildConfigField 'boolean', 'DEVELOP', "false"
             buildConfigField 'String', 'BASE_URL', "\"$global_productServerRealScheme://$global_productServerRealAddress/api/v1/\""
+            buildConfigField 'String', 'HOSTNAME', "\"$global_productServerRealAddress\""
         }
 
         develop {
             applicationId "${defaultPackageName}.dev"
 
+            buildConfigField 'boolean', 'PRODUCT', "true"
+            buildConfigField 'boolean', 'DEVELOP', "true"
             buildConfigField 'String', 'BASE_URL', "\"$global_serverScheme://$global_serverAddress:$global_serverPort/api/v1/\""
+            buildConfigField 'String', 'HOSTNAME', "\"$global_serverAddress\""
         }
 
     }
