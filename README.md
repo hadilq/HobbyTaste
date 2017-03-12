@@ -1,34 +1,33 @@
 # HobbyTaste
 
-Just a hobby android project. It contains server side and client side. For running the server side, you have to have
-a mysql database server. Then by defining global_serverAddress, global_serverPort and global_serverScheme in
-build.gradle file of the root project, you can specify the address of the server. For start you can do this, just
-like me, by determining an address in a LAN as the server address. You can find other options in the same place.
-For running the server side and client side you have to generate a keystore.properties file like this
+Just a hobby android project. It contains server side and client side together. For running the server side or client
+side for development, first you have to generate a keystore.properties file in the root directory of the project like
+this
 
 ```
-keyAlias=...
-keyPassword=...
-storeFile=...
-storePassword=...
-jwtSecret=...
+            keyAlias=...
+            keyPassword=...
+            storeFile=...
+            storePassword=...
+            jwtSecret=...
 ```
-
-Then you can run the server simply by this command
-
+Then by running this command
 ```
-./gradlew ':server:bootRun'
+            ./gradlew ':server:runDevelop'
 ```
-
-and simply build the client side by
-
+the server side for development is gonna run. To create an apk file of client side you just need to run
 ```
-./gradlew assembleDebug
+            ./gradlew ':client:assembleDevelopDebug'
 ```
+or if you like to work with my product server you can run
+```
+            ./gradlew ':client:assembleProductDebug'
+```
+Then install the apk file on your Android device.
 
 This project is meant to give you the ability to pick a place on map. I named those places in the project as "store"
-but basically they can be any place. Then it let you to upload pictures of that place, so others can comment, like,
-etc. on that post.
+but basically they can be any places. Then it let you to upload pictures of that place, so others can comment, like,
+etc. on your post.
 
 It's not finished yet, I feel the UI needs more to do, but the basic functionalities are ready to work and I'm
 working on it to make it better.
