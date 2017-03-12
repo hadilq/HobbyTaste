@@ -5,24 +5,31 @@ side for development, first you have to generate a keystore.properties file in t
 this
 
 ```
-            keyAlias=...
-            keyPassword=...
-            storeFile=...
-            storePassword=...
-            jwtSecret=...
+keyAlias=...
+keyPassword=...
+storeFile=...
+storePassword=...
+jwtSecret=...
 ```
+
 Then by running this command
+
 ```
-            ./gradlew ':server:runDevelop'
+./gradlew ':server:runDevelop'
 ```
+
 the server side for development is gonna run. To create an apk file of client side you just need to run
+
 ```
-            ./gradlew ':client:assembleDevelopDebug'
+./gradlew ':client:assembleDevelopDebug'
 ```
+
 or if you like to work with my product server you can run
+
 ```
-            ./gradlew ':client:assembleProductDebug'
+./gradlew ':client:assembleProductDebug'
 ```
+
 Then install the apk file on your Android device.
 
 This project is meant to give you the ability to pick a place on map. I named those places in the project as "store"
