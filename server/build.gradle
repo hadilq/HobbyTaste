@@ -38,6 +38,11 @@ def generateDefaultConfiguration = { properties ->
     properties.setProperty("image.maxLongHeight", "1750")
     properties.setProperty("spring.http.multipart.max-file-size", "$global_maxFileSize")
     properties.setProperty("spring.http.multipart.max-request-size", "5MB")
+
+    exec {
+        executable "sh"
+        args "-c", "native2ascii -encoding UTF-8 ${project.rootDir}/server/src/main/resources/messages_fa.properties ${project.rootDir}/server/src/main/resources/locale/messages_fa.properties"
+    }
 }
 
 def developConfiguration = {

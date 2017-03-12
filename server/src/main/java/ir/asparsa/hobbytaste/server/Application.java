@@ -33,7 +33,7 @@ public class Application {
     @Bean
     public ReloadableResourceBundleMessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:lang/messages");
+        messageSource.setBasename("classpath:locale/messages");
         messageSource.setCacheSeconds(100); //reload messages every 100 seconds
         return messageSource;
     }
