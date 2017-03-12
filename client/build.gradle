@@ -6,8 +6,6 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 def maxFileSizeInByte = "$global_maxFileSize".replace("MB", " * ${(int) Math.pow(2, 20)}")
 
-def defaultPackageName = "ir.asparsa.hobbytaste"
-
 android {
     signingConfigs {
         config {
@@ -28,6 +26,8 @@ android {
     }
 
     defaultConfig {
+        applicationId "ir.asparsa.hobbytaste"
+
         buildConfigField 'String', 'Authorization', "\"$global_jwtHeader\""
         buildConfigField 'int', 'MAX_FILE_SIZE', "$maxFileSizeInByte"
     }
@@ -47,8 +47,6 @@ android {
 
     productFlavors {
         product {
-            applicationId "$defaultPackageName"
-
             buildConfigField 'boolean', 'PRODUCT', "true"
             buildConfigField 'boolean', 'DEVELOP', "false"
             buildConfigField 'String', 'BASE_URL', "\"$global_productServerRealScheme://$global_productServerRealAddress/api/v1/\""
@@ -56,12 +54,11 @@ android {
         }
 
         develop {
-            applicationId "${defaultPackageName}.dev"
-
             buildConfigField 'boolean', 'PRODUCT', "true"
             buildConfigField 'boolean', 'DEVELOP', "true"
             buildConfigField 'String', 'BASE_URL', "\"$global_serverScheme://$global_serverAddress:$global_serverPort/api/v1/\""
             buildConfigField 'String', 'HOSTNAME', "\"$global_serverAddress\""
+            versionNameSuffix '-DEVELOP'
         }
 
     }
