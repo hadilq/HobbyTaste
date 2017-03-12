@@ -27,6 +27,9 @@ public class RequestLogModel {
     @JoinColumn(name = RequestLog.Columns.ACCOUNT)
     private AccountModel account;
 
+    RequestLogModel() { // jpa only
+    }
+
     public RequestLogModel(
             long datetime,
             String address,

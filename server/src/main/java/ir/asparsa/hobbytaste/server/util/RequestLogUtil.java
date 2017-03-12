@@ -8,6 +8,7 @@ import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.model.JwtAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import rx.Observable;
 import rx.Observer;
 import rx.schedulers.Schedulers;
@@ -19,6 +20,7 @@ import java.util.List;
  * @author hadi
  * @since 3/12/2017 AD.
  */
+@Component
 public class RequestLogUtil {
 
     @Value("${security.request.minInterval}")
