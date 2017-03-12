@@ -90,12 +90,36 @@ def productConfiguration = {
     properties.store(propertiesFile.newWriter(), null)
 }
 
-task deployProduct(dependsOn: 'bootRepackage')
+task deployProduct(dependsOn: 'bootRepackage') {
+    doLast {
+        File outputJar = null
+        for (File libs : project.buildDir.listFiles()) {
+            if (libs.getName().contains('libs') && libs.isDirectory()) {
+                for (File jar : libs.listFiles()) {
+                    if (jar.getName().contains('.jar')) {
+                        outputJar = jar
+                        break
+                    }
+                }
+            }
+            if (outputJar != null) {
+                break
+            }
+        }
+        println "app name  " + outputJar.getAbsolutePath()
+
+        exec {
+            executable "sh"
+            args "-c", "scp ${outputJar.getAbsolutePath()} 2.asparsa.ir:/root/hobbytaste"
+        }
+    }
+}
 
 task runDevelop(dependsOn: 'bootRun')
 
 gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.hasTask(deployProduct)) {
+        tasks.clean.execute()
         productConfiguration()
     } else if (taskGraph.hasTask(runDevelop)) {
         developConfiguration()
