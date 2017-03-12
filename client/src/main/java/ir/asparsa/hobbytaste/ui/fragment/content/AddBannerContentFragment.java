@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,7 @@ import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.android.core.logger.L;
-import ir.asparsa.android.ui.fragment.BaseFragment;
+import ir.asparsa.android.core.util.UiUtil;
 import ir.asparsa.android.ui.fragment.dialog.ProgressDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.common.net.dto.BannerDto;
@@ -45,7 +44,6 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Created by hadi
@@ -227,19 +225,8 @@ public class AddBannerContentFragment extends BaseContentFragment {
                 .getParcelable(AddStoreContentFragment.BUNDLE_KEY_DIALOG_RESULT_EVENT);
         event.setStoreModel(storeModel);
 
-        List<Fragment> fragments = getFragmentManager().getFragments();
-        for (int i = fragments.size() - 1; i >= 0; i--) {
-            Fragment fragment = fragments.get(i);
-            if (event.getSourceTag().equals(fragment.getTag()) && fragment instanceof BaseFragment) {
-                L.i(this.getClass(), "Find base fragment to send event: " + fragment.getClass().getName());
-                ((BaseFragment) fragment).onEvent(event);
-                break;
-            } else {
-                NavigationUtil.popBackStack(getFragmentManager());
-            }
-        }
+        UiUtil.invokeEventReceiver(event, getFragmentManager(), true);
     }
-
 
     private ProgressRequestBody.UploadCallbacks getProgressCallback() {
         return new ProgressRequestBody.UploadCallbacks() {
