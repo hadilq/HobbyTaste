@@ -31,8 +31,8 @@ def generateDefaultConfiguration = { properties ->
     properties.setProperty("security.request.minInterval", '1000')
 
     //###################      Storage Service     ##########################
-    properties.setProperty("storage.location", "${project.rootDir}/server/upload-banners-dir")
-    properties.setProperty("storage.location.tmp", "${project.rootDir}/server/upload-banners-dir-tmp")
+    properties.setProperty("storage.location", "upload-banners-dir")
+    properties.setProperty("storage.location.tmp", "upload-banners-dir-tmp")
 
     //###################       Image Service      ##########################
     properties.setProperty("image.maxLongHeight", "1750")

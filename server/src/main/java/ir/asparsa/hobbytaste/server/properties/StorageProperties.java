@@ -14,12 +14,14 @@ public class StorageProperties {
     @Value("${storage.location.tmp}")
     private String tmpLocation;
 
+    private String userDir = System.getProperty("user.dir") + "/";
+
     public String getLocation() {
-        return location;
+        return userDir + location;
     }
 
     public String getTmpLocation() {
-        return tmpLocation;
+        return userDir + tmpLocation;
     }
 
     public void setLocation(String location) {
