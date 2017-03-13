@@ -27,6 +27,9 @@ public class AccountModel implements Serializable {
     @Column(name = Account.Columns.USERNAME)
     private String username;
 
+    @Column(name = Account.Columns.HASH_CODE)
+    private Long hashCode;
+
     @Column(name = Account.Columns.ROLE)
     private String role;
 
@@ -39,9 +42,11 @@ public class AccountModel implements Serializable {
 
     public AccountModel(
             String username,
+            long hashCode,
             String role
     ) {
         this.username = username;
+        this.hashCode = hashCode;
         this.role = role;
     }
 

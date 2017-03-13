@@ -1,7 +1,8 @@
 package ir.asparsa.common.net.path;
 
 /**
- * Created by hadi on 12/31/2016 AD.
+ * @author hadi
+ * @since 12/31/2016 AD.
  */
 public interface StoreServicePath {
     String SERVICE = "store";

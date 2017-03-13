@@ -25,6 +25,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 import javax.inject.Inject;
+import java.security.SecureRandom;
 
 /**
  * Created by hadi on 12/15/2016 AD.
@@ -93,7 +94,9 @@ public class SetUsernameDialogFragment extends BaseBottomDialogFragment {
             mUsernameLayout.setError(getString(R.string.username_is_empty));
             return;
         }
-        mUserService.changeUsername(username)
+        mUserService.changeUsername(
+                username,
+                (System.currentTimeMillis() ^ (((long) username.hashCode()) << 31)) ^ (new SecureRandom().nextLong()))
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<AuthenticateDto>() {

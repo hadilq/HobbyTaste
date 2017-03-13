@@ -32,7 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String ENTRY_POINT_API = "/api/v1";
     private static final String ENTRY_POINT_AUTHENTICATE = ENTRY_POINT_API + "/" + UserServicePath.SERVICE +
-                                                           UserServicePath.AUTHENTICATE;
+                                                           UserServicePath.AUTHENTICATE.replace("{hashCode}", "*");
     private static final String ENTRY_POINT_BANNER = ENTRY_POINT_API + "/" + BannerServicePath.SERVICE +
                                                      BannerServicePath.IMAGE.replace("{filename:.+}", "*");
     private static final String ENTRY_POINT_TOKEN_BASED_AUTH = ENTRY_POINT_API + "/**";

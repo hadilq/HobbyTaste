@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
@@ -120,11 +121,12 @@ public class NetServiceModule {
             final AuthorizationManager authorizationManager,
             Context context
     ) {
+
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
         setupClientEssentials(httpClient, context);
         Retrofit retrofit = getRetrofitBuilder().client(httpClient.build()).build();
         retrofit.create(UserService.class)
-                .authenticate()
+                .authenticate(System.currentTimeMillis() ^ (new SecureRandom().nextLong()))
                 .retry(5)
                 .toBlocking()
                 .subscribe(new Observer<AuthenticateDto>() {

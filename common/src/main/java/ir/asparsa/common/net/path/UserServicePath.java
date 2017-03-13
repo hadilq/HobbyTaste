@@ -5,6 +5,6 @@ package ir.asparsa.common.net.path;
  */
 public interface UserServicePath {
     String SERVICE = "user";
-    String AUTHENTICATE = "/authenticate";
-    String USERNAME = "/username";
+    String AUTHENTICATE = "/authenticate/{hashCode}";
+    String USERNAME = "/username/{hashCode}";
 }

@@ -24,6 +24,7 @@ import ir.asparsa.hobbytaste.ui.list.holder.LanguageViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.UserNameViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
 import rx.Observer;
+import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
 
@@ -37,6 +38,8 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
     @Inject
     PreferencesManager mPreferencesManager;
 
+    private CompositeSubscription mSubscription = new CompositeSubscription();
+
     public static SettingsRecyclerFragment instantiate() {
         Bundle bundle = new Bundle();
         SettingsRecyclerFragment fragment = new SettingsRecyclerFragment();
@@ -47,6 +50,20 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
+    }
+
+    @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mSubscription.add(mAuthorizationManager.register(new AuthorizationManager.OnUsernameChangeObserver() {
+            @Override public void onNext(String s) {
+                changeUsername(s);
+            }
+        }));
+    }
+
+    @Override public void onDestroyView() {
+        mSubscription.clear();
+        super.onDestroyView();
     }
 
     @Nullable @Override protected View getEmptyView() {
@@ -110,18 +127,10 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
         if (event instanceof SetUsernameDialogFragment.OnSetUsernameDialogResultEvent) {
             SetUsernameDialogFragment.OnSetUsernameDialogResultEvent usernameEvent
                     = (SetUsernameDialogFragment.OnSetUsernameDialogResultEvent) event;
-            L.i(this.getClass(), "username event received: " + usernameEvent.getUsername());
-            L.i(this.getClass(), "token changed: " + usernameEvent.getToken());
-            mAuthorizationManager.setUsername(usernameEvent.getUsername());
+            L.i(getClass(), "username event received: " + usernameEvent.getUsername());
+            L.i(getClass(), "token changed: " + usernameEvent.getToken());
             mAuthorizationManager.setToken(usernameEvent.getToken());
-
-            for (BaseRecyclerData data : mAdapter.findData(UsernameData.class)) {
-                ((UsernameData) data).setUsername(usernameEvent.getUsername());
-                int index = mAdapter.getList().indexOf(data);
-                if (index != -1) {
-                    mAdapter.notifyItemChanged(index);
-                }
-            }
+            mAuthorizationManager.setUsername(usernameEvent.getUsername());
         } else if (event instanceof LanguageDialogFragment.OnChangeLanguageDialogResultEvent) {
             if (LanguageUtil.setDefaultLanguage(
                     mPreferencesManager,
@@ -130,6 +139,16 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
                 L.i(getClass(), "Language about to change");
                 getActivity().finish();
                 LaunchUtil.launch(getContext(), LaunchActivity.class);
+            }
+        }
+    }
+
+    private void changeUsername(String username) {
+        for (BaseRecyclerData data : mAdapter.findData(UsernameData.class)) {
+            ((UsernameData) data).setUsername(username);
+            int index = mAdapter.getList().indexOf(data);
+            if (index != -1) {
+                mAdapter.notifyItemChanged(index);
             }
         }
     }

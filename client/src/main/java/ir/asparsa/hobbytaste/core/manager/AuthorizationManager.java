@@ -2,6 +2,12 @@ package ir.asparsa.hobbytaste.core.manager;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import rx.Observer;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.subjects.PublishSubject;
+import rx.subjects.SerializedSubject;
+import rx.subjects.Subject;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -18,6 +24,8 @@ public class AuthorizationManager {
 
     private String token;
     private String username;
+
+    private Subject<String, String> mOnUsernameChangeSubject = new SerializedSubject<>(PublishSubject.<String>create());
 
     @Inject
     PreferencesManager mPreferencesManager;
@@ -52,6 +60,7 @@ public class AuthorizationManager {
         synchronized (usernameSync) {
             this.username = username;
             mPreferencesManager.put(PreferencesManager.KEY_USERNAME, username);
+            mOnUsernameChangeSubject.onNext(username);
         }
     }
 
@@ -72,6 +81,20 @@ public class AuthorizationManager {
                     username = mPreferencesManager.getString(PreferencesManager.KEY_USERNAME, "");
                 }
             }
+        }
+    }
+
+    public Subscription register(OnUsernameChangeObserver onUsernameChangeObserver) {
+        return mOnUsernameChangeSubject
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(onUsernameChangeObserver);
+    }
+
+    public static abstract class OnUsernameChangeObserver implements Observer<String> {
+        @Override public void onCompleted() {
+        }
+
+        @Override public void onError(Throwable e) {
         }
     }
 
