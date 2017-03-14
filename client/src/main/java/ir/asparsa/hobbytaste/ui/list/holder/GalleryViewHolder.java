@@ -129,7 +129,7 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
                 mShot.setOnClickListener(new View.OnClickListener() {
                     @Override public void onClick(View view) {
                         if (mObserver != null) {
-                            mObserver.onNext(new OnScreenshotClick(banner, mShot.getDrawable()));
+                            mObserver.onNext(new OnScreenshotClick(banner));
                         }
                     }
                 });
@@ -139,22 +139,15 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
 
     public static class OnScreenshotClick implements BaseRecyclerFragment.Event {
         private BannerModel data;
-        private Drawable drawable;
 
         OnScreenshotClick(
-                BannerModel data,
-                Drawable drawable
+                BannerModel data
         ) {
             this.data = data;
-            this.drawable = drawable;
         }
 
         public BannerModel getData() {
             return data;
-        }
-
-        public Drawable getDrawable() {
-            return drawable;
         }
     }
 

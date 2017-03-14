@@ -19,7 +19,6 @@ import ir.asparsa.hobbytaste.R;
  */
 public class ScreenshotActivity extends BaseActivity {
 
-    public static final String BUNDLE_KEY_IMAGE = "BUNDLE_KEY_IMAGE";
     public static final String BUNDLE_KEY_MAIN_URL = "BUNDLE_KEY_MAIN_URL";
     public static final String BUNDLE_KEY_THUMBNAIL_URL = "BUNDLE_KEY_THUMBNAIL_URL";
 
@@ -41,7 +40,6 @@ public class ScreenshotActivity extends BaseActivity {
         });
 
         Bundle extras = getIntent().getExtras();
-        Bitmap bitmap = extras.getParcelable(BUNDLE_KEY_IMAGE);
         String mainUrl = extras.getString(BUNDLE_KEY_MAIN_URL);
         String thumbnailUrl = extras.getString(BUNDLE_KEY_THUMBNAIL_URL);
 
@@ -52,10 +50,6 @@ public class ScreenshotActivity extends BaseActivity {
         } else if (!TextUtils.isEmpty(thumbnailUrl)) {
             requestCreator = Picasso.with(this)
                                     .load(thumbnailUrl);
-        }
-
-        if (bitmap != null && requestCreator != null) {
-            requestCreator.placeholder(new BitmapDrawable(getResources(), bitmap));
         }
 
         if (requestCreator != null) {

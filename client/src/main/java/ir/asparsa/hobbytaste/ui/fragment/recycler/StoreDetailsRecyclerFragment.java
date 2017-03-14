@@ -1,8 +1,6 @@
 package ir.asparsa.hobbytaste.ui.fragment.recycler;
 
 import android.content.Intent;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.util.SparseArrayCompat;
@@ -104,7 +102,7 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
                     onCommentHeartClick(((CommentViewHolder.OnHeartClick) t).getComment());
                 } else if (t instanceof GalleryViewHolder.OnScreenshotClick) {
                     GalleryViewHolder.OnScreenshotClick onScreenshotClick = (GalleryViewHolder.OnScreenshotClick) t;
-                    onScreenshotClick(onScreenshotClick.getData(), onScreenshotClick.getDrawable());
+                    onScreenshotClick(onScreenshotClick.getData());
                 }
             }
         };
@@ -156,16 +154,12 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
     }
 
     private void onScreenshotClick(
-            BannerModel data,
-            Drawable drawable
+            BannerModel data
     ) {
         Intent intent = new Intent(getContext(), ScreenshotActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(ScreenshotActivity.BUNDLE_KEY_MAIN_URL, data.getMainUrl());
         intent.putExtra(ScreenshotActivity.BUNDLE_KEY_THUMBNAIL_URL, data.getThumbnailUrl());
-        if (drawable instanceof BitmapDrawable) {
-            intent.putExtra(ScreenshotActivity.BUNDLE_KEY_IMAGE, ((BitmapDrawable) drawable).getBitmap());
-        }
         getContext().startActivity(intent);
     }
 
