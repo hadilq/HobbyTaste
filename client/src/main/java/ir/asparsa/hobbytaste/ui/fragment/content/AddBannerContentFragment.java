@@ -141,9 +141,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
 
     @Override public void onDestroy() {
         super.onDestroy();
-        if (mFilePath != null) {
-            new File(mFilePath).delete();
-        }
+        tryToDeleteFile();
     }
 
     @Override public BackState onBackPressed() {
@@ -160,6 +158,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
     private DialogControlLayout.OnControlListener getControllerListener(final StoreModel store) {
         return new DialogControlLayout.OnControlListener() {
             @Override public void onCommit() {
+                // Finish adding new store
                 if (mBanner == null) {
                     mHintTextView.setText(R.string.new_store_banner_is_not_sent);
                     return;
@@ -171,6 +170,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
             }
 
             @Override public void onNeutral() {
+                // Adding more banner
                 if (mBanner == null) {
                     mHintTextView.setText(R.string.new_store_banner_is_not_sent);
                     return;
@@ -184,6 +184,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
             }
 
             @Override public void onCancel() {
+                // Send selected banner to the server
                 if (mFilePath == null) {
                     mHintTextView.setText(R.string.new_store_banner_is_empty);
                     return;
@@ -250,6 +251,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
                 mBanner = new BannerModel(bannerDto.getMainUrl(), bannerDto.getThumbnailUrl());
                 L.i(AddBannerContentFragment.class, "Banner is uploaded " + mBanner);
                 mHintTextView.setText(getString(R.string.new_store_banner_successfully_sent));
+                tryToDeleteFile();
                 dismissProgressDialog();
             }
         };
@@ -276,9 +278,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
                 Observable.create(new Observable.OnSubscribe<Void>() {
                     @Override public void call(Subscriber<? super Void> subscriber) {
                         try {
-                            if (mFilePath != null) {
-                                new File(mFilePath).delete();
-                            }
+                            tryToDeleteFile();
                             String filePath = getContext().getCacheDir().getAbsolutePath() + "file_" +
                                               System.currentTimeMillis();
                             FileOutputStream out = new FileOutputStream(filePath);
@@ -310,6 +310,13 @@ public class AddBannerContentFragment extends BaseContentFragment {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void tryToDeleteFile() {
+        if (mFilePath != null) {
+            new File(mFilePath).delete();
+            mFilePath = null;
         }
     }
 
