@@ -1,17 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:clickable="true"
-             android:focusable="true"
-             android:foreground="?attr/selectableItemBackground">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/shot_height"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
 
     <ImageView
             android:id="@+id/shot"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/shot_height"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
             android:scaleType="fitStart"
             android:adjustViewBounds="true"/>
 
-</FrameLayout>
+    <ImageView
+            android:id="@+id/try_again"
+            android:layout_width="@dimen/try_again_width"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:paddingStart="@dimen/horizontal_margin_double"
+            android:paddingEnd="@dimen/horizontal_margin_double"
+            android:scaleType="fitStart"
+            android:adjustViewBounds="true"
+            android:src="@drawable/refresh"
+            android:visibility="gone"/>
+
+    <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:paddingStart="@dimen/horizontal_margin_double"
+            android:paddingEnd="@dimen/horizontal_margin_double"/>
+
+</RelativeLayout>

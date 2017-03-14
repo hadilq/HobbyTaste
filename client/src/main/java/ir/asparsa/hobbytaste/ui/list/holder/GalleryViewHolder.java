@@ -1,6 +1,5 @@
 package ir.asparsa.hobbytaste.ui.list.holder;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,12 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
+import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.ui.list.HorizontalSpaceItemDecoration;
@@ -96,10 +98,16 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
         }
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements Callback {
 
         @BindView(R.id.shot)
-        ImageView mShot;
+        ImageView mScreenshot;
+        @BindView(R.id.try_again)
+        ImageView mTryAgain;
+        @BindView(R.id.progress_bar)
+        ProgressBar mProgressBar;
+
+        private String urlString;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -113,20 +121,16 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
                 if (TextUtils.isEmpty(banner.getMainUrl())) {
                     itemView.setVisibility(View.GONE);
                 } else {
-                    Picasso.with(itemView.getContext())
-                           .load(banner.getMainUrl())
-                           .into(mShot);
+                    setupScreenshot(banner.getMainUrl());
                     imageSet = true;
                 }
             } else {
-                Picasso.with(itemView.getContext())
-                       .load(banner.getThumbnailUrl())
-                       .into(mShot);
+                setupScreenshot(banner.getThumbnailUrl());
                 imageSet = true;
             }
 
             if (imageSet) {
-                mShot.setOnClickListener(new View.OnClickListener() {
+                mScreenshot.setOnClickListener(new View.OnClickListener() {
                     @Override public void onClick(View view) {
                         if (mObserver != null) {
                             mObserver.onNext(new OnScreenshotClick(banner));
@@ -134,6 +138,32 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
                     }
                 });
             }
+        }
+
+        private void setupScreenshot(final String urlString) {
+            this.urlString = urlString;
+            final Picasso builder = Picasso.with(itemView.getContext());
+            if (BuildConfig.DEBUG) {
+                builder.setLoggingEnabled(true);
+            }
+            builder.load(urlString)
+                   .into(mScreenshot, this);
+        }
+
+        @Override public void onSuccess() {
+            mProgressBar.setVisibility(View.GONE);
+        }
+
+        @Override public void onError() {
+            mProgressBar.setVisibility(View.GONE);
+            mTryAgain.setVisibility(View.VISIBLE);
+            mTryAgain.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    mTryAgain.setVisibility(View.GONE);
+                    setupScreenshot(urlString);
+                }
+            });
         }
     }
 
