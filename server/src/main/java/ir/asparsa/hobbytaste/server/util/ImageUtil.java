@@ -30,9 +30,10 @@ public class ImageUtil {
         try {
             BufferedImage imgIn = ImageIO.read(source.getInputStream());
             if (imgIn.getHeight() <= maxLongHeight) {
+                logger.info("No need to scale: image height is " + imgIn.getHeight() + " and max is " + maxLongHeight);
                 return null;
             }
-            return scale(imgIn, imgIn.getHeight() / (double) imgIn.getHeight());
+            return scale(imgIn, (double) maxLongHeight / imgIn.getHeight());
         } catch (IOException e) {
             logger.error("Cannot scale to thumbnail: ", e);
         }
@@ -40,30 +41,18 @@ public class ImageUtil {
     }
 
     public BufferedImage scale(
-            BufferedImage source,
+            BufferedImage imgIn,
             double ratio
     ) {
-        int w = (int) (source.getWidth() * ratio);
-        int h = (int) (source.getHeight() * ratio);
-        BufferedImage bi = getCompatibleImage(w, h);
-        Graphics2D g2d = bi.createGraphics();
-        double xScale = (double) w / source.getWidth();
-        double yScale = (double) h / source.getHeight();
-        AffineTransform at = AffineTransform.getScaleInstance(xScale, yScale);
-        g2d.drawRenderedImage(source, at);
-        g2d.dispose();
-        return bi;
-    }
+        int w = (int) (imgIn.getWidth() * ratio);
+        int h = (int) (imgIn.getHeight() * ratio);
 
-    private BufferedImage getCompatibleImage(
-            int w,
-            int h
-    ) {
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice gd = ge.getDefaultScreenDevice();
-        GraphicsConfiguration gc = gd.getDefaultConfiguration();
-        BufferedImage image = gc.createCompatibleImage(w, h);
-        return image;
+        BufferedImage thumbnailOut = new BufferedImage(w, h, imgIn.getType());
+        Graphics2D g = thumbnailOut.createGraphics();
+        AffineTransform transform = AffineTransform.getScaleInstance(ratio, ratio);
+        g.drawImage(imgIn, transform, (img, infoFlags, x, y, width, height) -> true);
+
+        return thumbnailOut;
     }
 
     public boolean saveImage(

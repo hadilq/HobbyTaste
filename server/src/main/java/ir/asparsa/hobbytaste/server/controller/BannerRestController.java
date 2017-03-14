@@ -2,7 +2,6 @@ package ir.asparsa.hobbytaste.server.controller;
 
 import ir.asparsa.common.net.dto.BannerDto;
 import ir.asparsa.common.net.path.BannerServicePath;
-import ir.asparsa.hobbytaste.server.exception.StorageFileNotFoundException;
 import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
 import ir.asparsa.hobbytaste.server.storage.StorageService;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 /**
  * @author hadi
@@ -73,7 +73,7 @@ import java.awt.image.BufferedImage;
 
         String fileName;
         do {
-            fileName = "" + System.currentTimeMillis() + "-" + file.getName().hashCode() + ".jpeg";
+            fileName = "" + System.currentTimeMillis() + "-" + new Random().nextLong() + ".jpeg";
         } while (storageService.exists(fileName));
         storageService.store(file, fileName, locale);
         String mainUrl = storageService.getTmpServerFileUrl(fileName);
