@@ -1,15 +1,15 @@
 package ir.asparsa.hobbytaste.ui.activity;
 
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import ir.asparsa.hobbytaste.R;
@@ -24,6 +24,8 @@ public class ScreenshotActivity extends BaseActivity {
 
     @BindView(R.id.image)
     ImageView mScreenshotImageView;
+    @BindView(R.id.progress_bar)
+    ProgressBar mProgressBar;
     @BindView(R.id.close_button)
     Button mCloseButton;
 
@@ -53,7 +55,15 @@ public class ScreenshotActivity extends BaseActivity {
         }
 
         if (requestCreator != null) {
-            requestCreator.into(mScreenshotImageView);
+            requestCreator.into(mScreenshotImageView, new Callback() {
+                @Override public void onSuccess() {
+                    mProgressBar.setVisibility(View.GONE);
+                }
+
+                @Override public void onError() {
+                    mProgressBar.setVisibility(View.GONE);
+                }
+            });
         }
 
     }

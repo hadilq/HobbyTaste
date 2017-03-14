@@ -3,23 +3,36 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <ImageView
+    <ir.asparsa.android.ui.view.ZoomableImageView
             android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/dark_background"
             android:scaleType="fitCenter"/>
 
-    <Button
-            android:id="@+id/close_button"
+    <ProgressBar
+            android:id="@+id/progress_bar"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/button_height"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+
+    <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:layout_marginEnd="@dimen/vertical_margin_half"
-            android:layout_marginTop="@dimen/vertical_margin_half"
-            android:background="@color/dark_background"
-            android:textColor="@color/toolbar_title"
-            android:text="@string/close"/>
+            android:clickable="true"
+            android:foreground="?attr/selectableItemBackground">
+
+        <Button
+                android:id="@+id/close_button"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginEnd="@dimen/vertical_margin_half"
+                android:layout_marginTop="@dimen/vertical_margin_half"
+                android:background="@android:color/transparent"
+                android:textColor="@color/toolbar_title"
+                android:text="@string/close"/>
+    </FrameLayout>
 
 </RelativeLayout>
