@@ -99,7 +99,7 @@ dependencies {
     compile "com.squareup.okhttp3:logging-interceptor:$global_okHttpVersion"
     // Picasso
     compile "com.squareup.picasso:picasso:$global_picassoVersion"
-
+    compile "com.jakewharton.picasso:picasso2-okhttp3-downloader:$global_picassoDownloaderVersion"
     // Test
     testCompile "junit:junit:$global_junitVersion"
 }

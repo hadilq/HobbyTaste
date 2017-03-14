@@ -2,6 +2,8 @@ package ir.asparsa.hobbytaste.core.dagger;
 
 import android.content.Context;
 import android.text.TextUtils;
+import com.jakewharton.picasso.OkHttp3Downloader;
+import com.squareup.picasso.Picasso;
 import dagger.Module;
 import dagger.Provides;
 import ir.asparsa.android.core.logger.L;
@@ -63,12 +65,35 @@ public class NetServiceModule {
     }
 
     @Provides
+    OkHttpClient.Builder provideOkHttpClientBuilder(Context context) {
+        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        setupClientEssentials(httpClient, context);
+        return httpClient;
+    }
+
+    @Provides
+    @Singleton
+    Picasso providePicasso(
+            Context context,
+            OkHttpClient.Builder httpClient
+    ) {
+        return new Picasso.Builder(context)
+                .downloader(new OkHttp3Downloader(httpClient.build()))
+                .build();
+    }
+
+    @Provides
     @Singleton
     Retrofit providesRetrofit(
             final AuthorizationManager authorizationManager,
-            final Context context
+            final OkHttpClient.Builder httpClient,
+            final Context context,
+            Picasso picasso
     ) {
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        // First install Picasso
+        Picasso.setSingletonInstance(picasso);
+
+        // Then create retrofit
         httpClient
                 .connectTimeout(CONNECT_TIMEOUT_SECOND, TimeUnit.SECONDS)
                 .readTimeout(READ_TIMEOUT_SECOND, TimeUnit.SECONDS)
@@ -89,9 +114,6 @@ public class NetServiceModule {
                         return null;
                     }
                 });
-
-        setupClientEssentials(httpClient, context);
-
 
         return getRetrofitBuilder()
                 .client(httpClient.build())
