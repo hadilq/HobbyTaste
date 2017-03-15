@@ -44,6 +44,10 @@ public abstract class BaseContentFragment extends BaseFragment {
         return null;
     }
 
+    public boolean hasHomeAsUp() {
+        return false;
+    }
+
     public boolean scrollToolbar() {
         return false;
     }

@@ -16,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
+import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import ir.asparsa.hobbytaste.core.util.LaunchUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.ui.adapter.NavigationAdapter;
@@ -95,6 +96,12 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         super.onDestroy();
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
     @Override public void onBackPressed() {
         FragmentManager activeFragmentManager = getActiveFragmentManager();
         BaseContentFragment fragment = NavigationUtil.findTopFragment(activeFragmentManager);
@@ -151,6 +158,19 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                 );
             } else {
                 params.setScrollFlags(0);
+            }
+
+            if (fragment.hasHomeAsUp()) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                getSupportActionBar().setDisplayShowHomeEnabled(true);
+                if (LanguageUtil.isRTL()) {
+                    mToolbar.setNavigationIcon(R.drawable.home_as_up_rtl);
+                } else {
+                    mToolbar.setNavigationIcon(R.drawable.home_as_up_ltr);
+                }
+            } else {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                getSupportActionBar().setDisplayShowHomeEnabled(false);
             }
         }
     }

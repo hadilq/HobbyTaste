@@ -153,6 +153,10 @@ public class AddBannerContentFragment extends BaseContentFragment {
         getArguments().putParcelable(BUNDLE_KEY_BANNER, mBanner);
     }
 
+    @Override public boolean hasHomeAsUp() {
+        return true;
+    }
+
     @Override public BackState onBackPressed() {
         final StoreModel store = getArguments().getParcelable(BUNDLE_KEY_STORE);
         if (store == null) {

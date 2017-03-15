@@ -84,6 +84,10 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
         };
     }
 
+    @Override public boolean hasHomeAsUp() {
+        return true;
+    }
+
     @Override public boolean scrollToolbar() {
         return true;
     }

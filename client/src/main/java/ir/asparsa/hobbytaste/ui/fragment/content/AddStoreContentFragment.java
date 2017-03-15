@@ -197,6 +197,10 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
                 event, store));
     }
 
+    @Override public boolean hasHomeAsUp() {
+        return true;
+    }
+
     public static class StoreSaveResultEvent extends BaseDialogFragment.BaseOnDialogResultEvent {
         private StoreModel mStoreModel;
 
