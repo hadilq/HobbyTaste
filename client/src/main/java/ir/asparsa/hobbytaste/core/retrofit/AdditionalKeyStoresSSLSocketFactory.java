@@ -5,10 +5,16 @@ package ir.asparsa.hobbytaste.core.retrofit;
  * @since 3/12/2017 AD.
  */
 
+import android.content.Context;
 import ir.asparsa.android.core.logger.L;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
+import ir.asparsa.hobbytaste.BuildConfig;
+import ir.asparsa.hobbytaste.R;
 
+import javax.inject.Inject;
 import javax.net.ssl.*;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -17,6 +23,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 
 /**
  * Allows you to trust certificates from additional KeyStores in addition to
@@ -26,10 +33,34 @@ public class AdditionalKeyStoresSSLSocketFactory extends SSLSocketFactory {
     private final AdditionalKeyStoresTrustManager mTrustManager;
     private final SSLContext mSslContext = SSLContext.getInstance("TLS");
 
-    public AdditionalKeyStoresSSLSocketFactory(KeyStore keyStore)
-            throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException {
+    @Inject
+    Context mContext;
+
+    public AdditionalKeyStoresSSLSocketFactory()
+            throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, UnrecoverableKeyException,
+                   IOException, CertificateException {
         super();
-        mTrustManager = new AdditionalKeyStoresTrustManager(keyStore);
+        ApplicationLauncher.mainComponent().inject(this);
+
+        KeyStore ksTrust = KeyStore.getInstance("BKS");
+        InputStream inputStream = mContext.getResources().openRawResource(R.raw.mystore);
+        try {
+            ksTrust.load(inputStream, "secret".toCharArray());
+        } finally {
+            inputStream.close();
+        }
+
+        if (BuildConfig.DEBUG) {
+            Enumeration enumeration = ksTrust.aliases();
+            while (enumeration.hasMoreElements()) {
+                String alias = (String) enumeration.nextElement();
+                L.i(getClass(), "alias name: " + alias);
+                java.security.cert.Certificate certificate = ksTrust.getCertificate(alias);
+                L.i(getClass(), certificate.toString());
+            }
+        }
+
+        mTrustManager = new AdditionalKeyStoresTrustManager(ksTrust);
         mSslContext.init(null, new TrustManager[]{mTrustManager}, new SecureRandom());
     }
 

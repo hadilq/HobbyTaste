@@ -2,6 +2,8 @@ package ir.asparsa.hobbytaste.core.dagger;
 
 import dagger.Component;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
+import ir.asparsa.hobbytaste.core.retrofit.AdditionalKeyStoresSSLSocketFactory;
+import ir.asparsa.hobbytaste.core.retrofit.AuthorizationFactory;
 import ir.asparsa.hobbytaste.core.retrofit.RetrofitException;
 import ir.asparsa.hobbytaste.ui.activity.BaseActivity;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
@@ -50,4 +52,8 @@ public interface MainComponent {
     void inject(AddBannerContentFragment addBannerContentFragment);
 
     void inject(RetrofitException retrofitException);
+
+    void inject(AdditionalKeyStoresSSLSocketFactory additionalKeyStoresSSLSocketFactory);
+
+    void inject(AuthorizationFactory.Authorization authorization);
 }
