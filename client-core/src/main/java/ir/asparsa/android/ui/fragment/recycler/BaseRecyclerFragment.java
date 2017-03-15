@@ -42,6 +42,7 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
     private static final String BUNDLE_KEY_SCROLL_POSITION = "BUNDLE_KEY_SCROLL_POSITION";
     private static final String BUNDLE_KEY_NEXT_OFFSET = "BUNDLE_KEY_NEXT_OFFSET";
     private static final String BUNDLE_KEY_LIMIT = "BUNDLE_KEY_LIMIT";
+    private static final String BUNDLE_KEY_LOADING = "BUNDLE_KEY_LOADING";
     private static final int LIMIT_DEFAULT = 20;
 
     protected RecyclerListAdapter mAdapter;
@@ -96,15 +97,12 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         return rootView;
     }
 
-    @Override
-    public void onViewCreated(
-            View view,
-            @Nullable Bundle savedInstanceState
-    ) {
-        super.onViewCreated(view, savedInstanceState);
+    @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         mNextOffset = getArguments().getLong(BUNDLE_KEY_NEXT_OFFSET, 0);
         mScrollPosition = getArguments().getInt(BUNDLE_KEY_SCROLL_POSITION, 0);
         mLimit = getArguments().getInt(BUNDLE_KEY_LIMIT, LIMIT_DEFAULT);
+        mLoading = getArguments().getBoolean(BUNDLE_KEY_LOADING);
         provideDataAndStart();
     }
 
@@ -113,6 +111,7 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         getArguments().putInt(BUNDLE_KEY_SCROLL_POSITION, mLayoutManager.findFirstVisibleItemPosition());
         getArguments().putInt(BUNDLE_KEY_LIMIT, mLimit);
         getArguments().putLong(BUNDLE_KEY_NEXT_OFFSET, mNextOffset);
+        getArguments().putBoolean(BUNDLE_KEY_LOADING, mLoading);
         super.onDestroyView();
     }
 
