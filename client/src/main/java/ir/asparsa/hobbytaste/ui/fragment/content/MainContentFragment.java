@@ -80,7 +80,9 @@ public class MainContentFragment extends BaseContentFragment
     }
 
     @Override public void onDestroyView() {
-        getArguments().putParcelable(BUNDLE_KEY_CAMERA, mMap.getCameraPosition());
+        if (mMap != null) {
+            getArguments().putParcelable(BUNDLE_KEY_CAMERA, mMap.getCameraPosition());
+        }
         for (Marker marker : mMarkers) {
             marker.remove();
         }
