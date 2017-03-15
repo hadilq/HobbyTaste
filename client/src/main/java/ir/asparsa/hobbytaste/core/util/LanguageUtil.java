@@ -10,7 +10,7 @@ import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * @author hadi
@@ -21,8 +21,13 @@ public class LanguageUtil {
     public static final String LANGUAGE_FA = "fa";
     public static final String LANGUAGE_EN = "en";
 
-    public static final String COUNTRY_IR = "IR";
-    public static final String COUNTRY_US = "US";
+    private static final String COUNTRY_IR = "IR";
+    private static final String COUNTRY_US = "US";
+
+    private static final Map<String, String> COUNTRY_MAP = new HashMap<String, String>() {{
+        put(LANGUAGE_FA, COUNTRY_IR);
+        put(LANGUAGE_EN, COUNTRY_US);
+    }};
 
 
     @StringDef({LANGUAGE_FA, LANGUAGE_EN})
@@ -37,10 +42,7 @@ public class LanguageUtil {
     public static Locale getLocale(@NonNull PreferencesManager preferencesManager) {
         loadDefaultLanguage(preferencesManager);
         if (sLocale == null) {
-            String country = COUNTRY_IR;
-            if (LANGUAGE_EN.equals(sDefaultLanguage)) {
-                country = COUNTRY_US;
-            }
+            String country = COUNTRY_MAP.get(sDefaultLanguage);
 
             for (Locale locale : Locale.getAvailableLocales()) {
                 if (locale.getLanguage().equals(sDefaultLanguage) && locale.getCountry().equals(country)) {
