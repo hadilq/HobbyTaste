@@ -2,6 +2,7 @@ package ir.asparsa.hobbytaste.ui.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.R;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -16,8 +17,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class SplashActivity extends BaseActivity {
 
-    // TODO: increase it in release
-    private static final long SPLASH_FINISH_DELAY_TIME = 1;
+    private static final long SPLASH_FINISH_DELAY_TIME = BuildConfig.DEBUG ? 1 : 5;
 
     @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
