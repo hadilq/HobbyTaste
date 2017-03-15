@@ -54,6 +54,8 @@ public class AddBannerContentFragment extends BaseContentFragment {
     private static final String BUNDLE_KEY_STORE = "BUNDLE_KEY_STORE";
     private static final String BUNDLE_KEY_BITMAP_FILE_PATH = "BUNDLE_KEY_BITMAP_FILE_PATH";
     public static final String BUNDLE_KEY_DIALOG_RESULT_EVENT = "BUNDLE_KEY_DIALOG_RESULT_EVENT";
+    private static final String BUNDLE_KEY_BANNER = "BUNDLE_KEY_BANNER";
+    private static final String BUNDLE_KEY_FILE = "BUNDLE_KEY_FILE";
     private static final int PICK_IMAGE_REQUEST = 23445;
 
     @Inject
@@ -134,6 +136,12 @@ public class AddBannerContentFragment extends BaseContentFragment {
         return view;
     }
 
+    @Override public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        mBanner = getArguments().getParcelable(BUNDLE_KEY_BANNER);
+        mFilePath = getArguments().getString(BUNDLE_KEY_FILE);
+    }
+
     @Override public void onDestroyView() {
         mSubscription.clear();
         super.onDestroyView();
@@ -141,7 +149,8 @@ public class AddBannerContentFragment extends BaseContentFragment {
 
     @Override public void onDestroy() {
         super.onDestroy();
-        tryToDeleteFile();
+        getArguments().putString(BUNDLE_KEY_FILE, mFilePath);
+        getArguments().putParcelable(BUNDLE_KEY_BANNER, mBanner);
     }
 
     @Override public BackState onBackPressed() {
