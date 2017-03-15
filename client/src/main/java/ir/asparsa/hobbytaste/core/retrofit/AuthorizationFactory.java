@@ -50,7 +50,7 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
         if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
 
             if (!TextUtils.isEmpty(response.request().header(BuildConfig.Authorization))) {
-                return null; // If we already failed with these credentials, don't retry.
+                mAuthorizationManager.setToken(""); // If we already failed with these credentials.
             }
 
             return buildRequest(response.request());
