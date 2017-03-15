@@ -4,7 +4,6 @@ import ir.asparsa.common.net.dto.AuthenticateDto;
 import ir.asparsa.common.net.path.UserServicePath;
 import ir.asparsa.hobbytaste.server.database.model.AccountModel;
 import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
-import ir.asparsa.hobbytaste.server.exception.AccountExistsTryAgainException;
 import ir.asparsa.hobbytaste.server.exception.EmptyUsernameException;
 import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
@@ -44,17 +43,21 @@ import java.util.Random;
     @RequestMapping(value = UserServicePath.AUTHENTICATE, method = RequestMethod.POST)
     AuthenticateDto authorization(
             @PathVariable("hashCode") Long hashCode,
-            @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
             HttpServletRequest request
     ) {
         String username = generateUsername();
         logger.info("New username: " + username);
-        checkAccount(hashCode, locale);
+        AccountModel accountModel;
+        Optional<AccountModel> account = accountRepository.findByHashCode(hashCode);
+        if (!account.isPresent()) {
+            accountModel = new AccountModel(username, hashCode, "USER");
+            accountModel = accountRepository.save(accountModel);
+        } else {
+            accountModel = account.get();
+        }
 
-        AccountModel account = new AccountModel(username, hashCode, "USER");
-        account = accountRepository.save(account);
-        requestLogUtil.asyncLog(request, account);
-        return new AuthenticateDto(jwtTokenUtil.generateToken(account), username);
+        requestLogUtil.asyncLog(request, accountModel);
+        return new AuthenticateDto(jwtTokenUtil.generateToken(accountModel), username);
     }
 
     @RequestMapping(value = UserServicePath.USERNAME, method = RequestMethod.POST)
@@ -68,23 +71,13 @@ import java.util.Random;
             throw new EmptyUsernameException("Username is empty", Strings.USERNAME_IS_EMPTY, locale);
         }
         logger.info("username: " + username);
-        checkAccount(hashCode, locale);
-
         AccountModel account = user.getAccount();
+
         account.setUsername(username);
+        account.setHashCode(hashCode);
         accountRepository.save(account);
 
         return new AuthenticateDto(jwtTokenUtil.generateToken(account), username);
-    }
-
-    private void checkAccount(
-            @PathVariable("hashCode") Long hashCode,
-            @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale
-    ) {
-        Optional<AccountModel> account = accountRepository.findByHashCode(hashCode);
-        if (account.isPresent()) {
-            throw new AccountExistsTryAgainException("The hash code exists", Strings.ACCOUNT_EXISTS, locale);
-        }
     }
 
     private String generateUsername() {

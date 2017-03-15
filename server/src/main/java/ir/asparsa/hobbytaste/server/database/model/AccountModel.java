@@ -70,6 +70,10 @@ public class AccountModel implements Serializable {
         this.username = username;
     }
 
+    public void setHashCode(Long hashCode) {
+        this.hashCode = hashCode;
+    }
+
     @Override
     public boolean equals(final Object otherObj) {
         if (!(otherObj instanceof AccountModel)) {

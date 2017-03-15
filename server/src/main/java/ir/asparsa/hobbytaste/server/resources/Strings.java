@@ -21,5 +21,4 @@ public interface Strings {
     String CANNOT_INIT_STORAGE = "exception.cannot_init_storage";
     String FILENAME_NOT_FOUND = "exception.filename_not_found";
     String SECURITY_DDOS = "exception.security_ddos";
-    String ACCOUNT_EXISTS = "exception.account_exists";
 }
