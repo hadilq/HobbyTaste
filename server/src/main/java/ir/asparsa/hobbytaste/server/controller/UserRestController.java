@@ -45,19 +45,18 @@ import java.util.Random;
             @PathVariable("hashCode") Long hashCode,
             HttpServletRequest request
     ) {
-        String username = generateUsername();
-        logger.info("New username: " + username);
         AccountModel accountModel;
         Optional<AccountModel> account = accountRepository.findByHashCode(hashCode);
         if (!account.isPresent()) {
-            accountModel = new AccountModel(username, hashCode, "USER");
+            accountModel = new AccountModel(generateUsername(), hashCode, "USER");
             accountModel = accountRepository.save(accountModel);
+            logger.info("New username: " + accountModel.getUsername());
         } else {
             accountModel = account.get();
         }
 
         requestLogUtil.asyncLog(request, accountModel);
-        return new AuthenticateDto(jwtTokenUtil.generateToken(accountModel), username);
+        return new AuthenticateDto(jwtTokenUtil.generateToken(accountModel), accountModel.getUsername());
     }
 
     @RequestMapping(value = UserServicePath.USERNAME, method = RequestMethod.POST)
