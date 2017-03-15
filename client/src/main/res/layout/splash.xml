@@ -23,4 +23,15 @@
             android:textColor="@color/colorAccent"
             android:textSize="@dimen/font_size_big"/>
 
+    <TextView
+            android:id="@+id/version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/icon"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/vertical_margin"
+            android:gravity="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/font_size_small"/>
 </RelativeLayout>

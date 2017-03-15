@@ -2,6 +2,9 @@ package ir.asparsa.hobbytaste.ui.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.widget.TextView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.R;
 import rx.Observable;
@@ -19,9 +22,14 @@ public class SplashActivity extends BaseActivity {
 
     private static final long SPLASH_FINISH_DELAY_TIME = BuildConfig.DEBUG ? 1 : 5;
 
+    @BindView(R.id.version)
+    TextView mVersion;
+
     @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash);
+        ButterKnife.bind(this);
+        mVersion.setText(BuildConfig.VERSION_NAME);
     }
 
     @Override protected void onResume() {
