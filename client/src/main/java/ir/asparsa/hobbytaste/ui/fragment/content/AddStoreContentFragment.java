@@ -142,9 +142,9 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
                 setMarker(latLng);
             }
         });
-        LatLng latLng = new LatLng(INITIAL_LAT, INITIAL_LON);
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        MapUtil.zoom(mMap, latLng);
+//        LatLng latLng = new LatLng(INITIAL_LAT, INITIAL_LON);
+//        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+//        MapUtil.zoom(mMap, latLng);
     }
 
     private void setMarker(@NonNull LatLng latLng) {
