@@ -91,7 +91,10 @@ dependencies {
     compile "io.reactivex:rxandroid:$global_rxandroidVersion"
     compile "io.reactivex:rxjava:$global_rxjavaVersion"
     // Google map
-    compile 'com.google.android.gms:play-services:9.8.0'
+    compile "com.google.android.gms:play-services:$global_playServicesVersion"
+    // Fire base
+    compile "com.google.firebase:firebase-core:$global_playServicesVersion"
+    compile "com.google.firebase:firebase-crash:$global_playServicesVersion"
     // Retrofit
     compile "com.squareup.retrofit2:retrofit:$global_retrofitVersion"
     compile "com.squareup.retrofit2:converter-gson:$global_retrofitVersion"
@@ -103,3 +106,5 @@ dependencies {
     // Test
     testCompile "junit:junit:$global_junitVersion"
 }
+
+apply plugin: 'com.google.gms.google-services'
