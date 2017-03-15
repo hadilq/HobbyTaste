@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -27,7 +26,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.hobbytaste.R;
-import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 
@@ -39,6 +37,7 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
 
     public static final String BUNDLE_KEY_DIALOG_RESULT_EVENT = "BUNDLE_KEY_DIALOG_RESULT_EVENT";
     private static final String BUNDLE_KEY_STORE = "BUNDLE_KEY_STORE";
+    private static final String BUNDLE_KEY_LAT_LNG = "BUNDLE_KEY_LAT_LNG";
     // Tehran
     private final double INITIAL_LAT = 35.7952119d;
     private final double INITIAL_LON = 51.4062329d;
@@ -129,6 +128,19 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
                                      .commit();
         }
         mapFragment.getMapAsync(this);
+    }
+
+    @Override public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        LatLng latLng = getArguments().getParcelable(BUNDLE_KEY_LAT_LNG);
+        if (latLng != null) {
+            setMarker(latLng);
+        }
+    }
+
+    @Override public void onDestroyView() {
+        getArguments().putParcelable(BUNDLE_KEY_LAT_LNG, mLatlng);
+        super.onDestroyView();
     }
 
     @Override protected String setHeaderTitle() {
