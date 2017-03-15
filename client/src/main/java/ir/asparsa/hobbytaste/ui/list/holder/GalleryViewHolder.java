@@ -152,6 +152,7 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
 
         @Override public void onSuccess() {
             mProgressBar.setVisibility(View.GONE);
+            mTryAgain.setVisibility(View.GONE);
         }
 
         @Override public void onError() {
