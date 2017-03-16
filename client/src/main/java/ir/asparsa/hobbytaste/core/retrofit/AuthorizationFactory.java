@@ -3,6 +3,7 @@ package ir.asparsa.hobbytaste.core.retrofit;
 import android.text.TextUtils;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.common.net.dto.AuthenticateDto;
+import ir.asparsa.common.net.dto.OldTokenDto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
@@ -49,29 +50,28 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
     ) throws IOException {
         if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
 
+            String oldToken = null;
             if (!TextUtils.isEmpty(response.request().header(BuildConfig.Authorization))) {
+                oldToken = mAuthorizationManager.getToken();
                 mAuthorizationManager.setToken(""); // If we already failed with these credentials.
             }
 
-            return buildRequest(response.request());
+            return buildRequest(response.request(), oldToken);
         }
         return null;
     }
 
     @Override public Response intercept(Chain chain) throws IOException {
-        L.i(getClass(), "Adding header");
-        return chain.proceed(buildRequest(chain.request()));
+        return chain.proceed(buildRequest(chain.request(), null));
     }
 
     private Request buildRequest(
-            Request original
+            Request original,
+            String oldToken
     ) {
         if (!mAuthorizationManager.isAuthenticated()) {
-            L.i(getClass(), "it's unauthorized");
-            authorize();
-            L.i(getClass(), "it's authorized");
+            authorize(oldToken);
         }
-        L.i(getClass(), "Original request: " + original);
 
         return original.newBuilder()
                        .header(BuildConfig.Authorization, mAuthorizationManager.getToken())
@@ -80,13 +80,13 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
                        .build();
     }
 
-    private void authorize() {
+    private void authorize(String oldToken) {
         long current = System.currentTimeMillis();
         if (current - lastTimeRefreshed > MAX_REFRESH_STATE) {
             lastTimeRefreshed = current;
             hashCode = generateHashCode();
         }
-        new Authorization(hashCode, mAuthorizationManager);
+        new Authorization(hashCode, mAuthorizationManager, oldToken);
     }
 
     public static class Authorization {
@@ -98,19 +98,21 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
 
         private Authorization(
                 long hashCode,
-                AuthorizationManager authorizationManager
+                AuthorizationManager authorizationManager,
+                String oldToken
         ) {
             ApplicationLauncher.mainComponent().inject(this);
-            authorize(hashCode, authorizationManager);
+            authorize(hashCode, authorizationManager, oldToken);
         }
 
         private void authorize(
                 long hashCode,
-                final AuthorizationManager authorizationManager
+                final AuthorizationManager authorizationManager,
+                String oldToken
         ) {
             Retrofit retrofit = mRetrofitBuilder.client(mHttpClientBuilder.build()).build();
             retrofit.create(UserService.class)
-                    .authenticate(hashCode)
+                    .authenticate(hashCode, new OldTokenDto(oldToken))
                     .retry(5)
                     .toBlocking()
                     .subscribe(new Observer<AuthenticateDto>() {
