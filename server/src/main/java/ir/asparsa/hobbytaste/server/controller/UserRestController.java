@@ -18,6 +18,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -80,31 +82,33 @@ import java.util.Random;
     }
 
     private String generateUsername() {
-        StringBuilder tmp = new StringBuilder();
+        List<Integer> list = new ArrayList<>();
         for (char ch = '0'; ch <= '9'; ++ch)
-            tmp.append(ch);
+            list.add((int) ch);
         for (char ch = 'a'; ch <= 'z'; ++ch)
-            tmp.append(ch);
+            list.add((int) ch);
         for (char ch = 'A'; ch <= 'Z'; ++ch)
-            tmp.append(ch);
-        tmp.appendCodePoint(0x1F600);
-        tmp.appendCodePoint(0x1F601);
-        tmp.appendCodePoint(0x1F602);
-        tmp.appendCodePoint(0x1F603);
-        tmp.appendCodePoint(0x1F604);
-        tmp.appendCodePoint(0x1F605);
-        tmp.appendCodePoint(0x1F606);
-        tmp.appendCodePoint(0x1F609);
-        tmp.appendCodePoint(0x1F923);
-        tmp.appendCodePoint(0x1F60A);
-        char[] symbols = tmp.toString().toCharArray();
+            list.add((int) ch);
+        list.add(0x1F600);
+
+        list.add(0x1F600);
+        list.add(0x1F601);
+        list.add(0x1F602);
+        list.add(0x1F603);
+        list.add(0x1F604);
+        list.add(0x1F606);
+        list.add(0x1F609);
+        list.add(0x1F60A);
+        list.add(0x1F60E);
+        list.add(0x1F913);
 
         Random random = new Random();
-        char[] buf = new char[8];
+        StringBuilder tmp = new StringBuilder();
 
-        for (int idx = 0; idx < buf.length; ++idx)
-            buf[idx] = symbols[random.nextInt(symbols.length)];
-        return new String(buf);
+        for (int idx = 0; idx < 8; ++idx)
+            tmp.appendCodePoint(list.get(random.nextInt(list.size())));
+
+        return tmp.toString();
     }
 
 
