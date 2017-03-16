@@ -39,6 +39,12 @@ def generateDefaultConfiguration = { properties ->
     properties.setProperty("spring.http.multipart.max-file-size", "$global_maxFileSize")
     properties.setProperty("spring.http.multipart.max-request-size", "5MB")
 
+    //###################           Logger         ##########################
+    // DEBUG, ERROR, INFO
+    properties.setProperty("logging.level.ir.asparsa.hobbytaste.server.controller.controllers", "INFO")
+    properties.setProperty("logging.level.org.hibernate", "ERROR")
+    properties.setProperty("logging.path", "logs")
+
     exec {
         executable "sh"
         args "-c", "native2ascii -encoding UTF-8 ${project.rootDir}/server/src/main/resources/messages_fa.properties ${project.rootDir}/server/src/main/resources/locale/messages_fa.properties"
@@ -58,6 +64,10 @@ def developConfiguration = {
     properties.setProperty("server.port", "$global_serverPort")
     properties.setProperty("server.realAddress", "$global_serverAddress:$global_serverPort")
     properties.setProperty("server.realScheme", "$global_serverScheme")
+
+    //###################           Logger         ##########################
+    // DEBUG, ERROR, INFO
+    properties.setProperty("logging.level.ir.asparsa.hobbytaste.server.controller", "DEBUG")
 
     properties.store(propertiesFile.newWriter(), null)
 }
@@ -86,6 +96,10 @@ def productConfiguration = {
     properties.setProperty("server.port", "$global_productServerPort")
     properties.setProperty("server.realAddress", "$global_productServerRealAddress")
     properties.setProperty("server.realScheme", "$global_productServerRealScheme")
+
+    //###################           Logger         ##########################
+    // DEBUG, ERROR, INFO
+    properties.setProperty("logging.level.ir.asparsa.hobbytaste.server.controller", "ERROR")
 
     properties.store(propertiesFile.newWriter(), null)
 }

@@ -1,4 +1,5 @@
 /build
+/logs
 /src/main/resources/application.properties
 /src/main/resources/locale/messages_fa.properties
 /upload-banners-dir
