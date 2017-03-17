@@ -58,7 +58,7 @@ android {
             buildConfigField 'boolean', 'DEVELOP', "true"
             buildConfigField 'String', 'BASE_URL', "\"$global_serverScheme://$global_serverAddress:$global_serverPort/api/v1/\""
             buildConfigField 'String', 'HOSTNAME', "\"$global_serverAddress\""
-            versionNameSuffix '-DEVELOP'
+            versionNameSuffix '-SNAPSHOT'
         }
 
     }
