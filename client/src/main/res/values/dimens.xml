@@ -1,8 +1,4 @@
 <resources>
-    <dimen name="font_size_small">12sp</dimen>
-    <dimen name="font_size_normal">18sp</dimen>
-    <dimen name="font_size_medium">20sp</dimen>
-    <dimen name="font_size_big">23sp</dimen>
 
     <dimen name="store_map_height">200dp</dimen>
     <dimen name="gallery_height">200dp</dimen>

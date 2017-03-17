@@ -64,7 +64,7 @@ public class MainContentFragment extends BaseContentFragment
             @Nullable Bundle savedInstanceState
     ) {
         subscription.add(mStoresManager.loadStores(getStoreObserver()));
-        return inflater.inflate(R.layout.main_content_fragment, container, false);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
