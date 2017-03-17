@@ -67,7 +67,7 @@ public class LanguageUtil {
     }
 
     @NonNull
-    public static String getLanguage(@NonNull Resources resources) {
+    public static String getLanguageTitle(@NonNull Resources resources) {
         String lang = Locale.getDefault().getLanguage();
         switch (lang) {
             case LANGUAGE_FA:
@@ -90,7 +90,7 @@ public class LanguageUtil {
     }
 
     private static void loadDefaultLanguage(@NonNull PreferencesManager preferencesManager) {
-        sDefaultLanguage = preferencesManager.getString(PreferencesManager.KEY_DEFAULT_LANGUAGE, LANGUAGE_FA);
+        sDefaultLanguage = preferencesManager.getString(PreferencesManager.KEY_DEFAULT_LANGUAGE, LANGUAGE_EN);
     }
 
     public static boolean setDefaultLanguage(
