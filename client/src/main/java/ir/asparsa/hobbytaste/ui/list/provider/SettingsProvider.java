@@ -10,6 +10,7 @@ import ir.asparsa.android.ui.list.provider.AbsListProvider;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.util.LanguageUtil;
+import ir.asparsa.hobbytaste.ui.list.data.AboutUsData;
 import ir.asparsa.hobbytaste.ui.list.data.LanguageData;
 import ir.asparsa.hobbytaste.ui.list.data.UsernameData;
 
@@ -45,8 +46,9 @@ public class SettingsProvider extends AbsListProvider {
             @Override public void onCompleted() {
                 deque.add(new UsernameData(mAuthorizationManager.getUsername()));
                 deque.add(new LanguageData(
-                        LanguageUtil.getLanguage(mContext.getResources()),
+                        LanguageUtil.getLanguageTitle(mContext.getResources()),
                         Locale.getDefault().getLanguage()));
+                deque.add(new AboutUsData());
             }
 
             @Override public void onNext(BaseRecyclerData baseRecyclerData) {

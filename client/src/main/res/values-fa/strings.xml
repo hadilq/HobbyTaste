@@ -1,9 +1,10 @@
 <resources>
     <string name="title_main">اصلی</string>
     <string name="title_settings">تنظیمات</string>
-    <string name="title_store_details">فروشگاه</string>
+    <string name="title_store_details">مکان</string>
     <string name="title_add_banner">اضافه‌کردن تصویر</string>
-    <string name="title_add_store">اضافه‌کردن فروشگاه</string>
+    <string name="title_add_store">اضافه‌کردن مکان</string>
+    <string name="title_about_us">درباره ما</string>
 
     <string name="connection_error">مشکلی در برقراری ارتباط بوجود آمده‌است</string>
 
@@ -27,10 +28,10 @@
     <string name="comment_is_empty">نظر شما خالی است</string>
     <string name="comment_store_is_empty">مشکلی پیش آمده! لطفا دوباره این دیالوگ را باز نمایید</string>
 
-    <string name="new_store_name_hint">نام فروشگاه</string>
-    <string name="new_store_description_hint">توضیحات فروشگاه</string>
-    <string name="new_store_marker_empty">لطفا مکان فروشگاه را روی نقشه مشخص نمایید</string>
-    <string name="new_store_name_empty">لطفا نام فروشگاه را مشخص نمایید</string>
+    <string name="new_store_name_hint">نام مکان</string>
+    <string name="new_store_description_hint">توضیحات مکان</string>
+    <string name="new_store_marker_empty">لطفا این مکان را روی نقشه مشخص نمایید</string>
+    <string name="new_store_name_empty">لطفا نام مکان را مشخص نمایید</string>
     <string name="new_store_description_empty">لطفا توضیحاتی را اضافه نمایید</string>
     <string name="new_store_at_least_banner">حداقل سه تصویر لازم است</string>
     <string name="new_store_banner_is_empty">تصویری انتخاب نشده‌است یا تصویر آماده‌نشده‌است.</string>
@@ -55,4 +56,7 @@
     <string name="month_9">دی</string>
     <string name="month_10">بهمن</string>
     <string name="month_11">اسفند</string>
+
+    <string name="about_us_description">این برنامه جهت نشانه‌گذاری مکان‌ها روی نقشه و انتقال اطلاعات در مورد آن‌ها طراحی شده‌است. این مکان‌ها می‌توانند مکان‌های تاریخی یا مکان‌‌های قرار عمومی و یا حتی خصوصی، فروشگاه‌ها، مغازه‌ها و … باشند. همچنین شما می‌توانید نظر خودتان در مورد آن‌ها را با دیگران به اشتراک بگذارید.\n\nبرای تماس با توسعه‌دهندگان این برنامه با این ایمیل تماس بگیرید: \n lashkari.hadi.developer@gmail.com</string>
+
 </resources>

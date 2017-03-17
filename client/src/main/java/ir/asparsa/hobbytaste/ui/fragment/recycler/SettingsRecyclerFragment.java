@@ -18,8 +18,10 @@ import ir.asparsa.hobbytaste.core.util.LaunchUtil;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.LanguageDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.SetUsernameDialogFragment;
+import ir.asparsa.hobbytaste.ui.list.data.AboutUsData;
 import ir.asparsa.hobbytaste.ui.list.data.LanguageData;
 import ir.asparsa.hobbytaste.ui.list.data.UsernameData;
+import ir.asparsa.hobbytaste.ui.list.holder.AboutUsViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.LanguageViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.UserNameViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
@@ -39,6 +41,7 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
     PreferencesManager mPreferencesManager;
 
     private CompositeSubscription mSubscription = new CompositeSubscription();
+    private Observer<Object> mContentObserver;
 
     public static SettingsRecyclerFragment instantiate() {
         Bundle bundle = new Bundle();
@@ -90,6 +93,8 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
                     onUsernameClick(((UserNameViewHolder.UsernameClick) t).getUsername());
                 } else if (t instanceof LanguageViewHolder.LanguageClick) {
                     onLanguageClick(((LanguageViewHolder.LanguageClick) t).getLangAbbreviation());
+                } else if (t instanceof AboutUsViewHolder.AboutUsClick) {
+                    runItOnContentFragment(t);
                 }
             }
         };
@@ -99,6 +104,7 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
         SparseArrayCompat<Class<? extends BaseViewHolder>> array = super.getViewHoldersList();
         array.put(UsernameData.VIEW_TYPE, UserNameViewHolder.class.asSubclass(BaseViewHolder.class));
         array.put(LanguageData.VIEW_TYPE, LanguageViewHolder.class.asSubclass(BaseViewHolder.class));
+        array.put(AboutUsData.VIEW_TYPE, AboutUsViewHolder.class.asSubclass(BaseViewHolder.class));
         return array;
     }
 
@@ -114,6 +120,12 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
                 language,
                 new LanguageDialogFragment.OnChangeLanguageDialogResultEvent(getTagName())
         ).show(getFragmentManager());
+    }
+
+    private <T> void runItOnContentFragment(T t) {
+        if (mContentObserver != null) {
+            mContentObserver.onNext(t);
+        }
     }
 
     @Override public void onEvent(BaseEvent event) {
@@ -151,5 +163,9 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
                 mAdapter.notifyItemChanged(index);
             }
         }
+    }
+
+    public void setContentObserver(Observer<Object> contentObserver) {
+        mContentObserver = contentObserver;
     }
 }
