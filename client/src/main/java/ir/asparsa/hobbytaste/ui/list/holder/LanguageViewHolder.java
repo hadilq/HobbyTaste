@@ -2,6 +2,7 @@ package ir.asparsa.hobbytaste.ui.list.holder;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -16,6 +17,8 @@ import rx.Observer;
  */
 public class LanguageViewHolder extends BaseViewHolder<LanguageData> {
 
+    @BindView(R.id.language_layout)
+    ViewGroup mLayout;
     @BindView(R.id.language)
     TextView mLanguageTextView;
 
@@ -30,7 +33,7 @@ public class LanguageViewHolder extends BaseViewHolder<LanguageData> {
 
     @Override public void onBindView(final LanguageData data) {
         mLanguageTextView.setText(data.getLanguage());
-        mLanguageTextView.setOnClickListener(new View.OnClickListener() {
+        mLayout.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
                 mObserver.onNext(new LanguageClick(data.getLangAbbreviation()));
             }

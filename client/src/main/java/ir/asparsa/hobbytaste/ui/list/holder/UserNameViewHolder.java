@@ -2,6 +2,7 @@ package ir.asparsa.hobbytaste.ui.list.holder;
 
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -16,6 +17,8 @@ import rx.Observer;
  */
 public class UserNameViewHolder extends BaseViewHolder<UsernameData> {
 
+    @BindView(R.id.username_layout)
+    ViewGroup mLayout;
     @BindView(R.id.username)
     TextView mUsernameTextView;
 
@@ -30,7 +33,7 @@ public class UserNameViewHolder extends BaseViewHolder<UsernameData> {
 
     @Override public void onBindView(final UsernameData data) {
         mUsernameTextView.setText(data.getUsername());
-        mUsernameTextView.setOnClickListener(new View.OnClickListener() {
+        mLayout.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
                 mObserver.onNext(new UsernameClick(data.getUsername()));
             }

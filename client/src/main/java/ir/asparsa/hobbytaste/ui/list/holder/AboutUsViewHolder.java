@@ -2,7 +2,7 @@ package ir.asparsa.hobbytaste.ui.list.holder;
 
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
+import android.view.ViewGroup;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
@@ -17,8 +17,8 @@ import rx.Observer;
  */
 public class AboutUsViewHolder extends BaseViewHolder<AboutUsData> {
 
-    @BindView(R.id.about_us)
-    TextView mAboutUsTextView;
+    @BindView(R.id.about_us_layout)
+    ViewGroup mLayout;
 
     public AboutUsViewHolder(
             View itemView,
@@ -30,7 +30,7 @@ public class AboutUsViewHolder extends BaseViewHolder<AboutUsData> {
     }
 
     @Override public void onBindView(final AboutUsData data) {
-        mAboutUsTextView.setOnClickListener(new View.OnClickListener() {
+        mLayout.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
                 mObserver.onNext(new AboutUsClick());
             }

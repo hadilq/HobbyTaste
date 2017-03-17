@@ -2,5 +2,6 @@
 <resources>
 
     <color name="white">#ffffff</color>
+    <color name="color_clicked">#dcdcdc</color>
 
 </resources>

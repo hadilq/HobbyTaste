@@ -10,7 +10,7 @@
             android:paddingTop="@dimen/vertical_margin_quarter"
             android:paddingBottom="@dimen/vertical_margin_quarter"
             android:clickable="true"
-            android:foreground="?attr/selectableItemBackground">
+            android:foreground="@drawable/selectable_item_background">
 
         <RelativeLayout
                 android:id="@+id/dashboard"

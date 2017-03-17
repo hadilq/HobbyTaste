@@ -16,23 +16,17 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"/>
 
-    <FrameLayout
+    <Button
+            android:id="@+id/close_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/button_height"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:clickable="true"
-            android:foreground="?attr/selectableItemBackground">
-
-        <Button
-                android:id="@+id/close_button"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_height"
-                android:layout_marginEnd="@dimen/vertical_margin_half"
-                android:layout_marginTop="@dimen/vertical_margin_half"
-                android:background="@android:color/transparent"
-                android:textColor="@color/toolbar_title"
-                android:text="@string/close"/>
-    </FrameLayout>
+            android:layout_marginEnd="@dimen/vertical_margin_half"
+            android:layout_marginTop="@dimen/vertical_margin_half"
+            android:background="@android:color/transparent"
+            android:foreground="@drawable/selectable_item_background"
+            android:textColor="@color/toolbar_title"
+            android:text="@string/close"/>
 
 </RelativeLayout>
