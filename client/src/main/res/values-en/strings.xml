@@ -59,4 +59,8 @@
 
     <string name="about_us_description">This app is designed to exchange information of places. ُThese places can be any kind of places, such as historical sites, public or private dates, stores etc. Also you can add your comments and share them to others.\n\nTo contact the developers you can email to:\nlashkari.hadi.developer@gmail.com</string>
 
+    <string name="crash_report_hint">We are so sorry for this crash. Would you explain what\'s happened? \nWe\'re so appreciate it.\nIf you feel we can contact you, would you put your email or phone number here. We promise to not disclose or use your personal information in other ways.</string>
+    <string name="crash_report_is_empty">Feedback is empty</string>
+    <string name="crash_report_successfully_sent">Feedback is sent successfully</string>
+
 </resources>

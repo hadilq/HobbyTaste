@@ -6,6 +6,7 @@ import ir.asparsa.hobbytaste.core.dagger.DaggerMainComponent;
 import ir.asparsa.hobbytaste.core.dagger.MainComponent;
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 import ir.asparsa.hobbytaste.core.util.LanguageUtil;
+import ir.asparsa.hobbytaste.core.util.UncaughtExceptionHandler;
 
 import javax.inject.Inject;
 
@@ -26,6 +27,9 @@ public class ApplicationLauncher extends Application {
         setupDagger();
         sMainComponent.inject(this);
         LanguageUtil.setupDefaultLocale(mPreferencesManager, this);
+
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler(
+                Thread.getDefaultUncaughtExceptionHandler(), this));
     }
 
     private void setupDagger() {

@@ -7,6 +7,7 @@
     <color name="toolbar_title">#ebe7f1</color>
     <color name="text">#110720</color>
     <color name="text_hint">#777778</color>
+    <color name="text_error">#FF0000</color>
 
     <color name="divider">#dcdcdc</color>
 
@@ -16,6 +17,7 @@
     <color name="background">#eff1f2f2</color>
     <color name="light_background">#fefefe</color>
     <color name="dark_background">#ef0b0b0b</color>
+    <color name="crash_background">#efead05d</color>
 
 
 </resources>

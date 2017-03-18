@@ -114,6 +114,24 @@ public class L {
         }
     }
 
+    public static void wtf(
+            Class<?> clazz,
+            Throwable tr
+    ) {
+        if (BuildConfig.DEBUG) {
+            Log.wtf(clazz.getSimpleName(), tr);
+        }
+    }
+
+    public static void wtf(
+            Class<?> clazz,
+            String msg,
+            Throwable tr
+    ) {
+        if (BuildConfig.DEBUG) {
+            Log.wtf(clazz.getSimpleName(), msg, tr);
+        }
+    }
 
     public static void e(
             String tag,
@@ -216,6 +234,25 @@ public class L {
     ) {
         if (BuildConfig.DEBUG) {
             Log.w(tag, tr);
+        }
+    }
+
+    public static void wtf(
+            String tag,
+            Throwable tr
+    ) {
+        if (BuildConfig.DEBUG) {
+            Log.wtf(tag, tr);
+        }
+    }
+
+    public static void wtf(
+            String tag,
+            String msg,
+            Throwable tr
+    ) {
+        if (BuildConfig.DEBUG) {
+            Log.wtf(tag, msg, tr);
         }
     }
 

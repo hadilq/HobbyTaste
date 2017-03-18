@@ -11,18 +11,40 @@ import android.support.annotation.NonNull;
  */
 public class LaunchUtil {
 
-    public static <T extends Activity> void launch(@NonNull Context context, Class<T> clazz, int flags) {
+    public static <T extends Activity> void launch(
+            @NonNull Context context,
+            Class<T> clazz
+    ) {
+        launch(context, clazz, -1);
+    }
+
+    public static <T extends Activity> void launch(
+            @NonNull Context context,
+            Class<T> clazz,
+            int flags
+    ) {
+        Intent intent = getIntent(context, clazz, flags);
+        context.startActivity(intent);
+    }
+
+    public static <T extends Activity> Intent getIntent(
+            @NonNull Context context,
+            Class<T> clazz
+    ) {
+        return getIntent(context, clazz, -1);
+    }
+
+    public static <T extends Activity> Intent getIntent(
+            @NonNull Context context,
+            Class<T> clazz,
+            int flags
+    ) {
         Intent intent = new Intent(context, clazz);
         if (flags != -1) {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | flags);
         } else {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
-        context.startActivity(intent);
-    }
-
-
-    public static <T extends Activity> void launch(@NonNull Context context, Class<T> clazz) {
-        launch(context, clazz, -1);
+        return intent;
     }
 }

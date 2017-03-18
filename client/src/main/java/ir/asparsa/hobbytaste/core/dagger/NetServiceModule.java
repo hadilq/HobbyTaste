@@ -11,6 +11,7 @@ import ir.asparsa.hobbytaste.core.retrofit.AdditionalKeyStoresSSLSocketFactory;
 import ir.asparsa.hobbytaste.core.retrofit.AuthorizationFactory;
 import ir.asparsa.hobbytaste.core.retrofit.RxErrorHandlingCallAdapterFactory;
 import ir.asparsa.hobbytaste.net.BannerService;
+import ir.asparsa.hobbytaste.net.FeedbackService;
 import ir.asparsa.hobbytaste.net.StoreService;
 import ir.asparsa.hobbytaste.net.UserService;
 import okhttp3.OkHttpClient;
@@ -51,6 +52,12 @@ public class NetServiceModule {
     @Singleton
     BannerService provideBannerService(Retrofit retrofit) {
         return retrofit.create(BannerService.class);
+    }
+
+    @Provides
+    @Singleton
+    FeedbackService provideFeedbackService(Retrofit retrofit) {
+        return retrofit.create(FeedbackService.class);
     }
 
     @Provides

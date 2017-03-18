@@ -58,8 +58,7 @@ public class RequestLogUtil {
             }
         }
 
-        Observable.create((Observable.OnSubscribe<Void>) subscriber -> requestLogRepository.save(model)
-        )
+        Observable.create((Observable.OnSubscribe<Void>) subscriber -> requestLogRepository.save(model))
                   .subscribeOn(Schedulers.newThread())
                   .subscribe(new Observer<Void>() {
                       @Override public void onCompleted() {

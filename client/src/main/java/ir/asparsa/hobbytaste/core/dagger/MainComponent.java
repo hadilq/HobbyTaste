@@ -6,6 +6,7 @@ import ir.asparsa.hobbytaste.core.retrofit.AdditionalKeyStoresSSLSocketFactory;
 import ir.asparsa.hobbytaste.core.retrofit.AuthorizationFactory;
 import ir.asparsa.hobbytaste.core.retrofit.RetrofitException;
 import ir.asparsa.hobbytaste.ui.activity.BaseActivity;
+import ir.asparsa.hobbytaste.ui.activity.CrashReportActivity;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
 import ir.asparsa.hobbytaste.ui.fragment.content.AddBannerContentFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
@@ -32,6 +33,8 @@ public interface MainComponent {
     void inject(BaseActivity baseActivity);
 
     void inject(LaunchActivity launchActivity);
+
+    void inject(CrashReportActivity crashReportActivity);
 
     void inject(MainContentFragment mainContentFragment);
 

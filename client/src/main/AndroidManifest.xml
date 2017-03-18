@@ -38,6 +38,9 @@
                 android:name=".ui.activity.SplashActivity"
                 android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"/>
         <activity android:name=".ui.activity.ScreenshotActivity"/>
+        <activity
+                android:name=".ui.activity.CrashReportActivity"
+                android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"/>
 
     </application>
 

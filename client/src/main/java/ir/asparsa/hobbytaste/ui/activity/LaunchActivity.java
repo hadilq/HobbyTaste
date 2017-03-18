@@ -19,6 +19,7 @@ import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import ir.asparsa.hobbytaste.core.util.LaunchUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
+import ir.asparsa.hobbytaste.core.util.UncaughtExceptionHandler;
 import ir.asparsa.hobbytaste.ui.adapter.NavigationAdapter;
 import ir.asparsa.hobbytaste.ui.fragment.container.BaseContainerFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.BaseContentFragment;
@@ -89,7 +90,12 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                     }
                 });
 
+        if (UncaughtExceptionHandler.DEBUG) {
+            throw new RuntimeException("Test");
+        }
+
         LaunchUtil.launch(this, SplashActivity.class);
+
     }
 
     @Override protected void onDestroy() {
