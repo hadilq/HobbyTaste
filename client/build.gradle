@@ -64,6 +64,12 @@ android {
     }
 }
 
+android.variantFilter { variant ->
+    if (variant.buildType.name == 'release' && variant.getFlavors().get(0).name == 'develop') {
+        variant.setIgnore(true)
+    }
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     debugCompile project(path: ':client-core', configuration: 'debug')
