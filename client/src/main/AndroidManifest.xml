@@ -40,7 +40,7 @@
         <activity android:name=".ui.activity.ScreenshotActivity"/>
         <activity
                 android:name=".ui.activity.CrashReportActivity"
-                android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"/>
+                android:theme="@style/Theme.AppCompat.Translucent"/>
 
     </application>
 

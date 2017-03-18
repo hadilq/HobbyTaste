@@ -12,7 +12,7 @@ import ir.asparsa.hobbytaste.ui.activity.CrashReportActivity;
  */
 public class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     private Thread.UncaughtExceptionHandler oldHandler;
     private Context context;
 
@@ -32,10 +32,13 @@ public class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler
             debugMode(t, e);
         } else {
             try {
-                Intent intent = LaunchUtil.getIntent(context, CrashReportActivity.class);
-                intent.putExtra(CrashReportActivity.BUNDLE_KEY_CRASH_THROWABLE_NAME, e.getClass().getName());
-                intent.putExtra(CrashReportActivity.BUNDLE_KEY_CRASH_MESSAGE, e.getMessage());
-                context.startActivity(intent);
+                // Avoid exceptions in crash report activity
+                if (!CrashReportActivity.sCrashReportIsRunning) {
+                    Intent intent = LaunchUtil.getIntent(context, CrashReportActivity.class);
+                    intent.putExtra(CrashReportActivity.BUNDLE_KEY_CRASH_THROWABLE_NAME, e.getClass().getName());
+                    intent.putExtra(CrashReportActivity.BUNDLE_KEY_CRASH_MESSAGE, e.getMessage());
+                    context.startActivity(intent);
+                }
             } catch (Throwable throwable) {
                 throwable.initCause(e);
                 e = throwable;

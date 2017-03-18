@@ -1,5 +1,7 @@
 package ir.asparsa.hobbytaste.ui.activity;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -30,6 +32,7 @@ public class CrashReportActivity extends BaseActivity {
 
     public static final String BUNDLE_KEY_CRASH_MESSAGE = "BUNDLE_KEY_CRASH_MESSAGE";
     public static final String BUNDLE_KEY_CRASH_THROWABLE_NAME = "BUNDLE_KEY_CRASH_THROWABLE_NAME";
+    public static boolean sCrashReportIsRunning = false;
 
     @BindView(R.id.feedback_text)
     EditText mFeedback;
@@ -46,7 +49,10 @@ public class CrashReportActivity extends BaseActivity {
     private CompositeSubscription mSubscription = new CompositeSubscription();
 
     @Override protected void onCreate(Bundle savedInstanceState) {
+        sCrashReportIsRunning = true;
         super.onCreate(savedInstanceState);
+        getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
         setContentView(R.layout.crash_report_activity);
         ButterKnife.bind(this);
         ApplicationLauncher.mainComponent().inject(this);
@@ -68,6 +74,11 @@ public class CrashReportActivity extends BaseActivity {
     @Override protected void onDestroy() {
         mSubscription.clear();
         super.onDestroy();
+        sCrashReportIsRunning = false;
+    }
+
+    @Override public void onBackPressed() {
+        finish();
     }
 
     private void actionFeedback(String feedback) {
