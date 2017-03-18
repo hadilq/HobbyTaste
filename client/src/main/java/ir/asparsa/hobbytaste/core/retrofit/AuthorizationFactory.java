@@ -7,6 +7,8 @@ import ir.asparsa.common.net.dto.OldTokenDto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
+import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
+import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import ir.asparsa.hobbytaste.net.UserService;
 import junit.framework.Assert;
 import okhttp3.*;
@@ -36,6 +38,8 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
 
     @Inject
     AuthorizationManager mAuthorizationManager;
+    @Inject
+    PreferencesManager mPreferencesManager;
 
     @Inject AuthorizationFactory() {
     }
@@ -73,11 +77,24 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
             authorize(oldToken);
         }
 
-        return original.newBuilder()
-                       .header(BuildConfig.Authorization, mAuthorizationManager.getToken())
-                       .header("Accept", "application/json")
-                       .method(original.method(), original.body())
-                       .build();
+        HttpUrl originalUrl = original.url();
+        String localeQueryParamKey = "locale";
+        HttpUrl url = null;
+        if (TextUtils.isEmpty(originalUrl.queryParameter(localeQueryParamKey))) {
+            url = originalUrl
+                    .newBuilder()
+                    .addQueryParameter(localeQueryParamKey, LanguageUtil.getLocale(mPreferencesManager).getLanguage())
+                    .build();
+        }
+
+        Request.Builder builder = original.newBuilder();
+        if (url != null) {
+            builder.url(url);
+        }
+        return builder.header(BuildConfig.Authorization, mAuthorizationManager.getToken())
+                      .header("Accept", "application/json")
+                      .method(original.method(), original.body())
+                      .build();
     }
 
     private void authorize(String oldToken) {
