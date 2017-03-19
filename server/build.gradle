@@ -45,6 +45,11 @@ def generateDefaultConfiguration = { properties ->
     properties.setProperty("logging.level.org.hibernate", "ERROR")
     properties.setProperty("logging.path", "logs")
 
+    //###################         Exception       ##########################
+    properties.setProperty("spring.mvc.throw-exception-if-no-handler-found", "true")
+    properties.setProperty("spring.resources.add-mappings", "false")
+
+
     exec {
         executable "sh"
         args "-c", "native2ascii -encoding UTF-8 ${project.rootDir}/server/src/main/resources/messages_fa.properties ${project.rootDir}/server/src/main/resources/locale/messages_fa.properties"

@@ -1,5 +1,7 @@
 package ir.asparsa.hobbytaste.server.exception;
 
+import org.springframework.http.HttpStatus;
+
 /**
  * @author hadi
  * @since 3/7/2017 AD.
@@ -36,4 +38,6 @@ public abstract class BaseRuntimeException extends RuntimeException {
     public String getLocale() {
         return locale;
     }
+
+    public abstract HttpStatus getHttpStatus();
 }

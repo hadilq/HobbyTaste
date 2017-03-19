@@ -4,6 +4,7 @@ import ir.asparsa.hobbytaste.server.exception.JwtTokenMissingException;
 import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.model.JwtAuthenticationToken;
 import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -40,13 +41,15 @@ public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessi
     ) {
         String authToken = request.getHeader(jwtTokenUtil.getHeaderKey());
 
+        String locale = request.getParameter("locale");
+        locale = StringUtils.isEmpty(locale) ? Strings.DEFAULT_LOCALE : locale;
         if (authToken == null) {
             throw new JwtTokenMissingException(
-                    "No JWT token found in request headers", Strings.NO_JWT_HEADER_FOUND, Strings.DEFAULT_LOCALE);
+                    "No JWT token found in request headers", Strings.NO_JWT_HEADER_FOUND, locale);
         }
 
         JwtAuthenticationToken authRequest = new JwtAuthenticationToken(
-                authToken, request.getRemoteAddr(), request.getRequestURI());
+                authToken, request.getRemoteAddr(), request.getRequestURI(), locale);
 
         return getAuthenticationManager().authenticate(authRequest);
     }

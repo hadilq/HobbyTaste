@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.server.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 
 /**
@@ -38,4 +39,6 @@ public abstract class BaseAuthenticationException extends AuthenticationExceptio
     public String getLocale() {
         return locale;
     }
+
+    public abstract HttpStatus getHttpStatus();
 }

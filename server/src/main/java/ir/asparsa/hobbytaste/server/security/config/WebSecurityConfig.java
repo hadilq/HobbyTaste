@@ -39,14 +39,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtAuthenticationEntryPoint unauthorizedHandler;
-
     @Autowired
     private JwtAuthenticationProvider authenticationProvider;
+    @Autowired
+    private JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler;
 
     @Bean
     @Override
     public AuthenticationManager authenticationManager() throws Exception {
-
         return new ProviderManager(Arrays.asList(authenticationProvider));
     }
 
@@ -59,6 +59,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 new JwtAuthenticationTokenFilter(new SkipPathRequestMatcher(pathsToSkip, ENTRY_POINT_TOKEN_BASED_AUTH));
         authenticationTokenFilter.setAuthenticationManager(authenticationManager());
         authenticationTokenFilter.setAuthenticationSuccessHandler(new JwtAuthenticationSuccessHandler());
+        authenticationTokenFilter.setAuthenticationFailureHandler(jwtAuthenticationFailureHandler);
         return authenticationTokenFilter;
     }
 

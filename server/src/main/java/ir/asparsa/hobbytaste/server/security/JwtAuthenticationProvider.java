@@ -58,7 +58,7 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
 
         if (parsedUser == null) {
             throw new JwtTokenMalformedException(
-                    "JWT token is not valid", Strings.JWT_TOKEN_NOT_VALID, Strings.DEFAULT_LOCALE);
+                    "JWT token is not valid", Strings.JWT_TOKEN_NOT_VALID, jwtAuthenticationToken.getLocale());
         }
 
         requestLogUtil.asyncLog(jwtAuthenticationToken, parsedUser);

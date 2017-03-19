@@ -1,9 +1,7 @@
 package ir.asparsa.hobbytaste.server.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Storage error")  // 500
 public class StorageException extends BaseRuntimeException {
 
     public StorageException(
@@ -21,5 +19,9 @@ public class StorageException extends BaseRuntimeException {
             String local
     ) {
         super(message, cause, localizedMessageKey, local);
+    }
+
+    @Override public HttpStatus getHttpStatus() {
+        return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 }
