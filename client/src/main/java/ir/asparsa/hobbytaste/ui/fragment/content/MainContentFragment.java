@@ -17,7 +17,6 @@ import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
-import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import rx.Observer;
@@ -119,15 +118,15 @@ public class MainContentFragment extends BaseContentFragment
             return;
         }
         mStores = new ArrayList<>(stores);
-        if (mMarkers.size() != 0) {
-            removeMarkers(mMarkers);
-        }
         fillMap();
     }
 
     private void removeMarkers(Collection<Marker> mMarkers) {
-        for (Marker marker : mMarkers) {
-            marker.remove();
+        if (mMarkers.size() != 0) {
+            for (Marker marker : mMarkers) {
+                marker.remove();
+            }
+            mMarkers.clear();
         }
     }
 
@@ -137,10 +136,7 @@ public class MainContentFragment extends BaseContentFragment
             double accumulatedLon = 0d;
             BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.placeholder);
 
-            for (Marker marker : mMarkers) {
-                marker.remove();
-            }
-            mMarkers.clear();
+            removeMarkers(mMarkers);
             for (StoreModel store : mStores) {
                 accumulatedLat += store.getLat();
                 accumulatedLon += store.getLon();
@@ -157,7 +153,6 @@ public class MainContentFragment extends BaseContentFragment
             if (camera == null) {
                 LatLng latLng = new LatLng(accumulatedLat / mStores.size(), accumulatedLon / mStores.size());
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                MapUtil.zoom(mMap, latLng);
             } else {
                 mMap.moveCamera(CameraUpdateFactory.newCameraPosition(camera));
             }

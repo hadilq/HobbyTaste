@@ -9,8 +9,18 @@ import com.google.android.gms.maps.model.LatLng;
  * @since 11/29/2016 AD
  */
 public class MapUtil {
-    public static void zoom(GoogleMap googleMap, LatLng currentLocation) {
-        int zoomLevel = 12;
+    public static void zoom(
+            GoogleMap googleMap,
+            LatLng currentLocation
+    ) {
+        zoom(googleMap, currentLocation, 12);
+    }
+
+    public static void zoom(
+            GoogleMap googleMap,
+            LatLng currentLocation,
+            int zoomLevel
+    ) {
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, zoomLevel));
         // Zoom in, animating the camera.
         googleMap.animateCamera(CameraUpdateFactory.zoomIn());
