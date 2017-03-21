@@ -81,6 +81,7 @@ dependencies {
         exclude group: 'io.reactivex'
     }
     compile(project(':common'))
+    compile 'com.android.support:multidex:1.0.1'
     compile "com.android.support:appcompat-v7:$global_appcompatVersion"
     compile "com.android.support:design:$global_designVersion"
     compile "com.android.support:support-v4:$global_supportVersion"

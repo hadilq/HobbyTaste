@@ -1,6 +1,9 @@
 package ir.asparsa.hobbytaste;
 
 import android.app.Application;
+import android.content.Context;
+import android.support.multidex.MultiDex;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.core.dagger.AppModule;
 import ir.asparsa.hobbytaste.core.dagger.DaggerMainComponent;
 import ir.asparsa.hobbytaste.core.dagger.MainComponent;
@@ -24,6 +27,7 @@ public class ApplicationLauncher extends Application {
     @Override public void onCreate() {
         super.onCreate();
 
+        L.i(getClass(), "Application created");
         setupDagger();
         sMainComponent.inject(this);
         LanguageUtil.setupDefaultLocale(mPreferencesManager, this);
@@ -40,5 +44,10 @@ public class ApplicationLauncher extends Application {
 
     public static MainComponent mainComponent() {
         return sMainComponent;
+    }
+
+    @Override protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }

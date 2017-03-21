@@ -55,7 +55,8 @@ subprojects {
     ext.global_butterknifeVersion = "8.4.0"
     ext.global_rxandroidVersion = "1.2.1"
     ext.global_rxjavaVersion = "1.1.6"
-    ext.global_playServicesVersion = "10.2.0"
+    // In case of updating play services, find TODOs in StoreMapViewHolder
+    ext.global_playServicesVersion = "9.2.0"
     ext.global_ormliteVersion = "4.48"
     ext.global_retrofitVersion = "2.1.0"
     ext.global_okHttpVersion = "3.6.0"

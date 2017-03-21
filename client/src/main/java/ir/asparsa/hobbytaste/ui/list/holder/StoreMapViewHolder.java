@@ -89,7 +89,8 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
 
     @Override
     public void onStart() {
-        mMapView.onStart();
+        // TODO uncomment it after updating google services
+//        mMapView.onStart();
     }
 
     @Override
@@ -99,7 +100,8 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
 
     @Override
     public void onStop() {
-        mMapView.onStop();
+        // TODO uncomment it after updating google services
+//        mMapView.onStop();
     }
 
     @Override
