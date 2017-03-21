@@ -73,12 +73,13 @@ import java.util.Random;
 
         String fileName;
         do {
-            fileName = "" + System.currentTimeMillis() + "-" + new Random().nextLong() + ".jpeg";
+            fileName = System.currentTimeMillis() + StorageService.FILE_NAME_SPLITTER + new Random().nextLong() +
+                       ".jpeg";
         } while (storageService.exists(fileName));
         storageService.store(file, fileName, locale);
         String mainUrl = storageService.getTmpServerFileUrl(fileName);
         String thumbnailUrl = mainUrl;
-        String thumbnailFileName = "thumbnail-" + fileName;
+        String thumbnailFileName = StorageService.THUMBNAIL_PREFIX + StorageService.FILE_NAME_SPLITTER + fileName;
 
         BufferedImage thumbnail = imageUtil.scale(file);
         if (thumbnail != null) {

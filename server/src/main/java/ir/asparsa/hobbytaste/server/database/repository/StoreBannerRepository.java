@@ -15,4 +15,8 @@ import java.util.Optional;
 public interface StoreBannerRepository extends JpaRepository<BannerModel, Long> {
 
     Optional<List<BannerModel>> findByStore(StoreModel model);
+
+    Optional<BannerModel> findByMainUrl(String mainUrl);
+
+    Optional<BannerModel> findByThumbnailUrl(String thumbnailUrl);
 }
