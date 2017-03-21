@@ -201,8 +201,9 @@ public class MainContentFragment extends BaseContentFragment
         return new FloatingActionButtonObserver() {
             @Override public void onNext(View view) {
                 NavigationUtil.startContentFragment(
-                        getFragmentManager(), AddStoreContentFragment
-                                .instantiate(new AddStoreContentFragment.StoreSaveResultEvent(getTagName())));
+                        getFragmentManager(), AddStoreContentFragment.instantiate(
+                                mMap.getCameraPosition(),
+                                new AddStoreContentFragment.StoreSaveResultEvent(getTagName())));
             }
         };
     }

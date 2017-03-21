@@ -16,13 +16,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.*;
 import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.hobbytaste.R;
@@ -38,9 +36,7 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
     public static final String BUNDLE_KEY_DIALOG_RESULT_EVENT = "BUNDLE_KEY_DIALOG_RESULT_EVENT";
     private static final String BUNDLE_KEY_STORE = "BUNDLE_KEY_STORE";
     private static final String BUNDLE_KEY_LAT_LNG = "BUNDLE_KEY_LAT_LNG";
-    // Tehran
-    private final double INITIAL_LAT = 35.7952119d;
-    private final double INITIAL_LON = 51.4062329d;
+    private static final String BUNDLE_KEY_CAMERA_POSITION = "BUNDLE_KEY_CAMERA_POSITION";
 
     @BindView(R.id.input_layout_store_name)
     TextInputLayout mStoreNameInputLayout;
@@ -56,8 +52,12 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
     private GoogleMap mMap;
     private LatLng mLatlng;
 
-    public static AddStoreContentFragment instantiate(StoreSaveResultEvent event) {
+    public static AddStoreContentFragment instantiate(
+            @NonNull CameraPosition cameraPosition,
+            @NonNull StoreSaveResultEvent event
+    ) {
         Bundle bundle = new Bundle();
+        bundle.putParcelable(BUNDLE_KEY_CAMERA_POSITION, cameraPosition);
         bundle.putParcelable(BUNDLE_KEY_DIALOG_RESULT_EVENT, event);
         AddStoreContentFragment fragment = new AddStoreContentFragment();
         fragment.setArguments(bundle);
@@ -140,6 +140,7 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
 
     @Override public void onDestroyView() {
         getArguments().putParcelable(BUNDLE_KEY_LAT_LNG, mLatlng);
+        getArguments().putParcelable(BUNDLE_KEY_CAMERA_POSITION, mMap.getCameraPosition());
         super.onDestroyView();
     }
 
@@ -154,9 +155,8 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
                 setMarker(latLng);
             }
         });
-//        LatLng latLng = new LatLng(INITIAL_LAT, INITIAL_LON);
-//        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-//        MapUtil.zoom(mMap, latLng);
+        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(
+                getArguments().<CameraPosition>getParcelable(BUNDLE_KEY_CAMERA_POSITION)));
     }
 
     private void setMarker(@NonNull LatLng latLng) {
