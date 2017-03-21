@@ -95,8 +95,8 @@ public class SetUsernameDialogFragment extends BaseBottomDialogFragment {
             return;
         }
         mUserService.changeUsername(
-                username,
-                (System.currentTimeMillis() ^ (((long) username.hashCode()) << 31)) ^ (new SecureRandom().nextLong()))
+                (System.currentTimeMillis() ^ (((long) username.hashCode()) << 31)) ^ (new SecureRandom().nextLong()),
+                username)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<AuthenticateDto>() {

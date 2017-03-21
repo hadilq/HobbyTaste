@@ -21,7 +21,7 @@ public interface UserService {
 
     @POST(UserServicePath.SERVICE + UserServicePath.USERNAME)
     Observable<AuthenticateDto> changeUsername(
-            @Query("new") String username,
-            @Path("hashCode") long hashCode
+            @Path("hashCode") long hashCode,
+            @Query("new") String username
     );
 }
