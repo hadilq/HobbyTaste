@@ -58,6 +58,6 @@ public class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler
             Throwable e
     ) {
         L.wtf(getClass(), "In thread: " + t.getName(), e);
-        System.exit(10);
+//        System.exit(10);
     }
 }
