@@ -74,6 +74,8 @@ public class AddBannerContentFragment extends BaseContentFragment {
     private BannerModel mBanner;
     private ProgressDialogFragment mProgressDialog;
     private final CompositeSubscription mSubscription = new CompositeSubscription();
+    private Handler mHandler;
+    private Runnable mShowProgressDialogRunnable;
 
     public static AddBannerContentFragment instantiate(
             AddStoreContentFragment.StoreSaveResultEvent event,
@@ -91,6 +93,15 @@ public class AddBannerContentFragment extends BaseContentFragment {
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
+        mHandler = new Handler();
+
+        mShowProgressDialogRunnable = new Runnable() {
+            @Override public void run() {
+                if (mProgressDialog != null) {
+                    mProgressDialog.show(getFragmentManager());
+                }
+            }
+        };
     }
 
     @Nullable @Override public View onCreateView(
@@ -276,8 +287,10 @@ public class AddBannerContentFragment extends BaseContentFragment {
             Intent data
     ) {
         super.onActivityResult(requestCode, resultCode, data);
+        L.i(getClass(), "onActivityResult gets called");
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null &&
             data.getData() != null) {
+            L.i(getClass(), "Starting to prepare banner");
 
             Uri uri = data.getData();
             try {
@@ -291,6 +304,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
                 Observable.create(new Observable.OnSubscribe<Void>() {
                     @Override public void call(Subscriber<? super Void> subscriber) {
                         try {
+                            L.i(getClass(), "Starting to prepare banner asynchronously");
                             tryToDeleteFile();
                             String filePath = getContext().getCacheDir().getAbsolutePath() + "file_" +
                                               System.currentTimeMillis();
@@ -300,8 +314,10 @@ public class AddBannerContentFragment extends BaseContentFragment {
 
                             mFilePath = filePath;
                             getArguments().putString(BUNDLE_KEY_BITMAP_FILE_PATH, mFilePath);
+                            L.i(getClass(), "Preparing banner is finished");
                             subscriber.onNext(null);
                         } catch (IOException e) {
+                            L.i(getClass(), "Preparing banner is finished with error", e);
                             subscriber.onError(e);
                         }
                     }
@@ -309,15 +325,18 @@ public class AddBannerContentFragment extends BaseContentFragment {
                           .observeOn(AndroidSchedulers.mainThread())
                           .subscribe(new Action1<Void>() {
                               @Override public void call(Void aVoid) {
+                                  L.i(getClass(), "Successfully preparing is finished");
                                   mHintTextView.setText(getString(R.string.new_store_banner_successfully_prepared));
                                   dismissProgressDialog();
                               }
                           }, new Action1<Throwable>() {
                               @Override public void call(Throwable throwable) {
+                                  L.i(getClass(), "Preparing is finished with error", throwable);
                                   mHintTextView.setText(getString(R.string.new_store_banner_error_prepared));
                                   dismissProgressDialog();
                               }
                           });
+                mHintTextView.setText("");
                 showProgressDialog(R.string.new_store_preparing);
 
             } catch (IOException e) {
@@ -337,22 +356,20 @@ public class AddBannerContentFragment extends BaseContentFragment {
         return getString(R.string.title_add_banner);
     }
 
-    private void showProgressDialog(@StringRes int message) {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
-        }
-        mProgressDialog = ProgressDialogFragment.newInstance(getString(message));
+    private void showProgressDialog(@StringRes final int message) {
+        dismissProgressDialog();
 
-        new Handler().post(new Runnable() {
-            @Override public void run() {
-                mProgressDialog.show(getFragmentManager());
-            }
-        });
+        mProgressDialog = ProgressDialogFragment.newInstance(getString(message));
+        mHandler.post(mShowProgressDialogRunnable);
     }
 
     private void dismissProgressDialog() {
         if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
+            mHandler.removeCallbacks(mShowProgressDialogRunnable);
+            if (mProgressDialog.isAdded()) {
+                mProgressDialog.dismiss();
+            }
+            mProgressDialog = null;
         }
     }
 }
