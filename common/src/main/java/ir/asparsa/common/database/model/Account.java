@@ -10,6 +10,7 @@ public interface Account {
         String PASSWORD = "password";
         String USERNAME = "username";
         String HASH_CODE = "hash_code";
+        String CREATED = "created";
         String ROLE = "role";
     }
 }

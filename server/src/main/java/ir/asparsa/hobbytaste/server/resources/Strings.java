@@ -22,4 +22,5 @@ public interface Strings {
     String FILENAME_NOT_FOUND = "exception.filename_not_found";
     String SECURITY_DDOS = "exception.security_ddos";
     String UNKNOWN = "exception.unknown";
+    String HASH_CODE_EXPIRED = "exception.hash_code_expired";
 }

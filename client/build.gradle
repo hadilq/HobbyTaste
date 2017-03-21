@@ -30,6 +30,7 @@ android {
 
         buildConfigField 'String', 'Authorization', "\"$global_jwtHeader\""
         buildConfigField 'int', 'MAX_FILE_SIZE', "$maxFileSizeInByte"
+        buildConfigField 'int', 'HASH_CODE_EXPIRATION_TIME', "$global_hashCodeExpirationTime"
     }
 
     buildTypes {

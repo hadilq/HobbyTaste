@@ -8,6 +8,8 @@ import ir.asparsa.hobbytaste.server.security.model.AuthenticatedUser;
 import ir.asparsa.hobbytaste.server.security.model.JwtAuthenticationToken;
 import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
 import ir.asparsa.hobbytaste.server.util.RequestLogUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -26,6 +28,8 @@ import java.util.List;
  */
 @Component
 public class JwtAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+
+    private final static Logger logger = LoggerFactory.getLogger(JwtAuthenticationProvider.class);
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
@@ -51,6 +55,8 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
             String username,
             UsernamePasswordAuthenticationToken authentication
     ) throws AuthenticationException {
+        logger.debug("retrieveUser gets called");
+
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
         String token = jwtAuthenticationToken.getToken();
 

@@ -30,6 +30,9 @@ public class AccountModel implements Serializable {
     @Column(name = Account.Columns.HASH_CODE)
     private Long hashCode;
 
+    @Column(name = Account.Columns.CREATED)
+    private Long created;
+
     @Column(name = Account.Columns.ROLE)
     private String role;
 
@@ -47,6 +50,7 @@ public class AccountModel implements Serializable {
     ) {
         this.username = username;
         this.hashCode = hashCode;
+        this.created = System.currentTimeMillis();
         this.role = role;
     }
 
@@ -72,6 +76,10 @@ public class AccountModel implements Serializable {
 
     public void setHashCode(Long hashCode) {
         this.hashCode = hashCode;
+    }
+
+    public long getCreated() {
+        return created;
     }
 
     @Override

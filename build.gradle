@@ -75,6 +75,7 @@ subprojects {
 
     ext.global_jwtHeader= "Authorization"
     ext.global_maxFileSize= "10MB"
+    ext.global_hashCodeExpirationTime= "30000"
 
     afterEvaluate { project ->
         if (project.hasProperty("android")) {

@@ -5,6 +5,8 @@ import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.model.JwtAuthenticationToken;
 import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -24,6 +26,8 @@ import java.io.IOException;
  */
 public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessingFilter {
 
+    private final static Logger logger = LoggerFactory.getLogger(JwtAuthenticationProvider.class);
+
     @Autowired
     JwtTokenUtil jwtTokenUtil;
 
@@ -39,6 +43,8 @@ public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessi
             HttpServletRequest request,
             HttpServletResponse response
     ) {
+        logger.debug("attemptAuthentication gets called");
+
         String authToken = request.getHeader(jwtTokenUtil.getHeaderKey());
 
         String locale = request.getParameter("locale");
@@ -74,6 +80,7 @@ public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessi
             throws IOException, ServletException {
         super.successfulAuthentication(request, response, chain, authResult);
 
+        logger.debug("successfulAuthentication gets called");
         // As this authentication is in HTTP header, after success we need to continue the request normally
         // and return the response as if the resource was not secured at all
         chain.doFilter(request, response);

@@ -1,10 +1,12 @@
 package ir.asparsa.hobbytaste.server.controller;
 
 import ir.asparsa.common.net.dto.AuthenticateDto;
+import ir.asparsa.common.net.dto.AuthenticateRequestDto;
 import ir.asparsa.common.net.path.UserServicePath;
 import ir.asparsa.hobbytaste.server.database.model.AccountModel;
 import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
 import ir.asparsa.hobbytaste.server.exception.EmptyUsernameException;
+import ir.asparsa.hobbytaste.server.exception.HashCodeExpiredException;
 import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
 import ir.asparsa.hobbytaste.server.security.model.AuthenticatedUser;
@@ -14,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +35,9 @@ import java.util.Random;
 
     private final static Logger logger = LoggerFactory.getLogger(UserRestController.class);
 
+    @Value("${authorization.hashCodeExpirationTime}")
+    int hashCodeExpirationTime;
+
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
@@ -44,16 +50,23 @@ import java.util.Random;
 
     @RequestMapping(value = UserServicePath.AUTHENTICATE, method = RequestMethod.POST)
     AuthenticateDto authorization(
-            @PathVariable("hashCode") Long hashCode,
+            @RequestBody AuthenticateRequestDto authenticateRequestDto,
             HttpServletRequest request
     ) {
+        logger.debug("Authentication gets called");
         AccountModel accountModel;
-        Optional<AccountModel> account = accountRepository.findByHashCode(hashCode);
+        Optional<AccountModel> account = accountRepository.findByHashCode(authenticateRequestDto.getHashCode());
         if (!account.isPresent()) {
-            accountModel = new AccountModel(generateUsername(), hashCode, "USER");
+            accountModel = new AccountModel(generateUsername(), authenticateRequestDto.getHashCode(), "USER");
             accountModel = accountRepository.save(accountModel);
-            logger.info("New username: " + accountModel.getUsername());
+            logger.debug("New username: " + accountModel.getUsername());
+        } else if (System.currentTimeMillis() - account.get().getCreated() > hashCodeExpirationTime) {
+            logger.debug("Authentication is expired");
+            String locale = request.getParameter("locale");
+            throw new HashCodeExpiredException("hash code is expired", Strings.HASH_CODE_EXPIRED,
+                                      StringUtils.isEmpty(locale) ? Strings.DEFAULT_LOCALE : locale);
         } else {
+            logger.debug("Authenticated before");
             accountModel = account.get();
         }
 
@@ -71,7 +84,7 @@ import java.util.Random;
         if (StringUtils.isEmpty(username)) {
             throw new EmptyUsernameException("Username is empty", Strings.USERNAME_IS_EMPTY, locale);
         }
-        logger.info("username: " + username);
+        logger.debug("username: " + username);
         AccountModel account = user.getAccount();
 
         account.setUsername(username);

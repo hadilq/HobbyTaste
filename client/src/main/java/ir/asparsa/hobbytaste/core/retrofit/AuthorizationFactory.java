@@ -3,7 +3,7 @@ package ir.asparsa.hobbytaste.core.retrofit;
 import android.text.TextUtils;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.common.net.dto.AuthenticateDto;
-import ir.asparsa.common.net.dto.OldTokenDto;
+import ir.asparsa.common.net.dto.AuthenticateRequestDto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
@@ -27,9 +27,6 @@ import java.security.SecureRandom;
  */
 @Singleton
 public class AuthorizationFactory implements Authenticator, Interceptor {
-
-
-    private static final long MAX_REFRESH_STATE = 10000;
 
     private SecureRandom secureRandom = new SecureRandom();
 
@@ -99,7 +96,7 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
 
     private void authorize(String oldToken) {
         long current = System.currentTimeMillis();
-        if (current - lastTimeRefreshed > MAX_REFRESH_STATE) {
+        if (current - lastTimeRefreshed > BuildConfig.HASH_CODE_EXPIRATION_TIME) {
             lastTimeRefreshed = current;
             hashCode = generateHashCode();
         }
@@ -129,7 +126,7 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
         ) {
             Retrofit retrofit = mRetrofitBuilder.client(mHttpClientBuilder.build()).build();
             retrofit.create(UserService.class)
-                    .authenticate(hashCode, new OldTokenDto(oldToken))
+                    .authenticate(new AuthenticateRequestDto(hashCode, oldToken))
                     .retry(5)
                     .toBlocking()
                     .subscribe(new Observer<AuthenticateDto>() {
