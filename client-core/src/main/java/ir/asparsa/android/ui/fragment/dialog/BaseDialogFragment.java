@@ -5,10 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.view.*;
 import ir.asparsa.android.core.util.UiUtil;
 
 /**
@@ -24,6 +21,7 @@ public abstract class BaseDialogFragment extends DialogFragment implements IDial
         WindowManager.LayoutParams params = getDialog().getWindow().getAttributes();
         params.height = WindowManager.LayoutParams.MATCH_PARENT;
         getDialog().getWindow().setAttributes(params);
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         return null;
     }
 
