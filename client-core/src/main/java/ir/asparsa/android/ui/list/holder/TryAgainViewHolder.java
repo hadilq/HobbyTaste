@@ -9,7 +9,7 @@ import ir.asparsa.android.R2;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.data.TryAgainData;
 import ir.asparsa.android.ui.view.TryAgainView;
-import rx.Observer;
+import rx.functions.Action1;
 
 /**
  * @author hadi
@@ -22,7 +22,7 @@ public class TryAgainViewHolder extends BaseViewHolder<TryAgainData> {
 
     public TryAgainViewHolder(
             View itemView,
-            Observer<BaseRecyclerFragment.Event> observer,
+            Action1<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);
@@ -31,12 +31,20 @@ public class TryAgainViewHolder extends BaseViewHolder<TryAgainData> {
 
     @Override
     public void onBindView(TryAgainData data) {
-        mTryAgainView.setTryAgainListener(data.getOnTryAgainListener());
+        mTryAgainView.setTryAgainListener(new TryAgainView.OnTryAgainListener() {
+            @Override public void tryAgain() {
+                if (mObserver != null) {
+                    mObserver.call(new OnTryAgainEvent());
+                }
+            }
+        });
         if (data.start()) {
             mTryAgainView.start();
         } else if (!TextUtils.isEmpty(data.getErrorMessage())) {
             mTryAgainView.onError(data.getErrorMessage());
         }
+    }
 
+    public static class OnTryAgainEvent implements BaseRecyclerFragment.Event {
     }
 }

@@ -10,7 +10,7 @@ import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.list.data.LanguageData;
-import rx.Observer;
+import rx.functions.Action1;
 
 /**
  * Created by hadi on 1/13/2017 AD.
@@ -24,7 +24,7 @@ public class LanguageViewHolder extends BaseViewHolder<LanguageData> {
 
     public LanguageViewHolder(
             View itemView,
-            Observer<BaseRecyclerFragment.Event> observer,
+            Action1<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);
@@ -35,7 +35,7 @@ public class LanguageViewHolder extends BaseViewHolder<LanguageData> {
         mLanguageTextView.setText(data.getLanguage());
         mLayout.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
-                mObserver.onNext(new LanguageClick(data.getLangAbbreviation()));
+                mObserver.call(new LanguageClick(data.getLangAbbreviation()));
             }
         });
     }

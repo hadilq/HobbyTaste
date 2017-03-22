@@ -14,7 +14,7 @@ import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import ir.asparsa.hobbytaste.ui.list.data.CommentData;
-import rx.Observer;
+import rx.functions.Action1;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -41,7 +41,7 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
 
     public CommentViewHolder(
             View itemView,
-            Observer<BaseRecyclerFragment.Event> observer,
+            Action1<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);
@@ -67,7 +67,7 @@ public class CommentViewHolder extends BaseViewHolder<CommentData> {
         mHeartImageView.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
                 if (mObserver != null) {
-                    mObserver.onNext(new OnHeartClick(data));
+                    mObserver.call(new OnHeartClick(data));
                 }
             }
         });

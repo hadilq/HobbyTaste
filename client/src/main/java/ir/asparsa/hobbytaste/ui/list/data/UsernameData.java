@@ -1,10 +1,12 @@
 package ir.asparsa.hobbytaste.ui.list.data;
 
+import android.os.Parcel;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.hobbytaste.R;
 
 /**
- * Created by hadi on 12/14/2016 AD.
+ * @author hadi
+ * @since 12/14/2016 AD.
  */
 public class UsernameData extends BaseRecyclerData {
 
@@ -36,4 +38,30 @@ public class UsernameData extends BaseRecyclerData {
         return (getUsername() == null && other.getUsername() == null) ||
                (getUsername() != null && getUsername().equals(other.getUsername()));
     }
+
+
+    @Override public int describeContents() {
+        return 0;
+    }
+
+    @Override public void writeToParcel(
+            Parcel dest,
+            int flags
+    ) {
+        dest.writeString(this.mUsername);
+    }
+
+    protected UsernameData(Parcel in) {
+        this.mUsername = in.readString();
+    }
+
+    public static final Creator<UsernameData> CREATOR = new Creator<UsernameData>() {
+        @Override public UsernameData createFromParcel(Parcel source) {
+            return new UsernameData(source);
+        }
+
+        @Override public UsernameData[] newArray(int size) {
+            return new UsernameData[size];
+        }
+    };
 }

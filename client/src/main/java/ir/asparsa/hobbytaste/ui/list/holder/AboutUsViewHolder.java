@@ -9,7 +9,7 @@ import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.list.data.AboutUsData;
-import rx.Observer;
+import rx.functions.Action1;
 
 /**
  * @author hadi
@@ -22,7 +22,7 @@ public class AboutUsViewHolder extends BaseViewHolder<AboutUsData> {
 
     public AboutUsViewHolder(
             View itemView,
-            Observer<BaseRecyclerFragment.Event> observer,
+            Action1<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);
@@ -32,7 +32,7 @@ public class AboutUsViewHolder extends BaseViewHolder<AboutUsData> {
     @Override public void onBindView(final AboutUsData data) {
         mLayout.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
-                mObserver.onNext(new AboutUsClick());
+                mObserver.call(new AboutUsClick());
             }
         });
     }

@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.ui.list.data;
 
+import android.os.Parcel;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
@@ -34,4 +35,30 @@ public class StoreMapData extends BaseRecyclerData {
         return (getStore() == null && other.getStore() == null) ||
                (getStore() != null && getStore().equals(other.getStore()));
     }
+
+
+    @Override public int describeContents() {
+        return 0;
+    }
+
+    @Override public void writeToParcel(
+            Parcel dest,
+            int flags
+    ) {
+        dest.writeParcelable(this.store, flags);
+    }
+
+    protected StoreMapData(Parcel in) {
+        this.store = in.readParcelable(StoreModel.class.getClassLoader());
+    }
+
+    public static final Creator<StoreMapData> CREATOR = new Creator<StoreMapData>() {
+        @Override public StoreMapData createFromParcel(Parcel source) {
+            return new StoreMapData(source);
+        }
+
+        @Override public StoreMapData[] newArray(int size) {
+            return new StoreMapData[size];
+        }
+    };
 }

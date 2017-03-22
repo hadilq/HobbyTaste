@@ -1,8 +1,8 @@
 package ir.asparsa.android.ui.list.data;
 
 
+import android.os.Parcel;
 import ir.asparsa.android.R;
-import ir.asparsa.android.ui.view.TryAgainView;
 
 /**
  * @author hadi
@@ -13,12 +13,12 @@ public class TryAgainData extends BaseRecyclerData {
     public static final int VIEW_TYPE = R.layout.try_again;
 
     private boolean mStart;
-    private TryAgainView.OnTryAgainListener mOnTryAgainListener;
     private String mErrorMessage;
 
-    public TryAgainData(boolean s, TryAgainView.OnTryAgainListener t) {
+    public TryAgainData(
+            boolean s
+    ) {
         this.mStart = s;
-        this.mOnTryAgainListener = t;
     }
 
     public void setErrorMessage(String mErrorMessage) {
@@ -29,10 +29,6 @@ public class TryAgainData extends BaseRecyclerData {
         return mStart;
     }
 
-    public TryAgainView.OnTryAgainListener getOnTryAgainListener() {
-        return mOnTryAgainListener;
-    }
-
     public String getErrorMessage() {
         return mErrorMessage;
     }
@@ -40,4 +36,36 @@ public class TryAgainData extends BaseRecyclerData {
     @Override public int getViewType() {
         return VIEW_TYPE;
     }
+
+    @Override public boolean equals(Object otherObj) {
+        return !((otherObj == null) || !(otherObj instanceof TryAgainData));
+    }
+
+
+    @Override public int describeContents() {
+        return 0;
+    }
+
+    @Override public void writeToParcel(
+            Parcel dest,
+            int flags
+    ) {
+        dest.writeByte(this.mStart ? (byte) 1 : (byte) 0);
+        dest.writeString(this.mErrorMessage);
+    }
+
+    protected TryAgainData(Parcel in) {
+        this.mStart = in.readByte() != 0;
+        this.mErrorMessage = in.readString();
+    }
+
+    public static final Creator<TryAgainData> CREATOR = new Creator<TryAgainData>() {
+        @Override public TryAgainData createFromParcel(Parcel source) {
+            return new TryAgainData(source);
+        }
+
+        @Override public TryAgainData[] newArray(int size) {
+            return new TryAgainData[size];
+        }
+    };
 }

@@ -13,7 +13,7 @@ import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.list.data.RatingData;
-import rx.Observer;
+import rx.functions.Action1;
 
 import java.util.Locale;
 
@@ -45,7 +45,7 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
 
     public RatingViewHolder(
             View itemView,
-            Observer<BaseRecyclerFragment.Event> observer,
+            Action1<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);
@@ -75,7 +75,7 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
         mHeartImageView.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
                 if (mObserver != null) {
-                    mObserver.onNext(new OnHeartClick(data));
+                    mObserver.call(new OnHeartClick(data));
                 }
             }
         });
@@ -91,7 +91,7 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
         mDashboardView.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 if (mObserver != null) {
-                    mObserver.onNext(new OnArrowClick(data));
+                    mObserver.call(new OnArrowClick(data));
                 }
             }
         });

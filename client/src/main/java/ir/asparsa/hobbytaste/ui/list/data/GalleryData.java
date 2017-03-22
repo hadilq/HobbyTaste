@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.ui.list.data;
 
+import android.os.Parcel;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.database.model.BannerModel;
@@ -36,4 +37,29 @@ public class GalleryData extends BaseRecyclerData {
         return (getBanners() == null && other.getBanners() == null) ||
                (getBanners() != null && getBanners().equals(other.getBanners()));
     }
+
+    @Override public int describeContents() {
+        return 0;
+    }
+
+    @Override public void writeToParcel(
+            Parcel dest,
+            int flags
+    ) {
+        dest.writeTypedList(this.banners);
+    }
+
+    protected GalleryData(Parcel in) {
+        this.banners = in.createTypedArrayList(BannerModel.CREATOR);
+    }
+
+    public static final Creator<GalleryData> CREATOR = new Creator<GalleryData>() {
+        @Override public GalleryData createFromParcel(Parcel source) {
+            return new GalleryData(source);
+        }
+
+        @Override public GalleryData[] newArray(int size) {
+            return new GalleryData[size];
+        }
+    };
 }

@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.ui.list.data;
 
+import android.os.Parcel;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.hobbytaste.R;
 
@@ -76,4 +77,38 @@ public class RatingData extends BaseRecyclerData {
         final RatingData other = (RatingData) otherObj;
         return getRate() == other.getRate();
     }
+
+
+    @Override public int describeContents() {
+        return 0;
+    }
+
+    @Override public void writeToParcel(
+            Parcel dest,
+            int flags
+    ) {
+        dest.writeLong(this.mRate);
+        dest.writeLong(this.mViewed);
+        dest.writeString(this.description);
+        dest.writeByte(this.mLike ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.showDescription ? (byte) 1 : (byte) 0);
+    }
+
+    protected RatingData(Parcel in) {
+        this.mRate = in.readLong();
+        this.mViewed = in.readLong();
+        this.description = in.readString();
+        this.mLike = in.readByte() != 0;
+        this.showDescription = in.readByte() != 0;
+    }
+
+    public static final Creator<RatingData> CREATOR = new Creator<RatingData>() {
+        @Override public RatingData createFromParcel(Parcel source) {
+            return new RatingData(source);
+        }
+
+        @Override public RatingData[] newArray(int size) {
+            return new RatingData[size];
+        }
+    };
 }

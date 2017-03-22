@@ -26,6 +26,7 @@ import ir.asparsa.hobbytaste.ui.list.holder.LanguageViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.UserNameViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
 import rx.Observer;
+import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
@@ -80,15 +81,9 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
         return new SettingsProvider(adapter, insertData);
     }
 
-    @Override protected <T extends Event> Observer<T> getObserver() {
-        return new Observer<T>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-            }
-
-            @Override public void onNext(T t) {
+    @Override protected <T extends Event> Action1<T> getObserver() {
+        return new Action1<T>() {
+            @Override public void call(T t) {
                 if (t instanceof UserNameViewHolder.UsernameClick) {
                     onUsernameClick(((UserNameViewHolder.UsernameClick) t).getUsername());
                 } else if (t instanceof LanguageViewHolder.LanguageClick) {

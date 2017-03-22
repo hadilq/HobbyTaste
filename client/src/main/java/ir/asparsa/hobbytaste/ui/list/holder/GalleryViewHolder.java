@@ -22,7 +22,7 @@ import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.ui.list.HorizontalSpaceItemDecoration;
 import ir.asparsa.hobbytaste.ui.list.data.GalleryData;
-import rx.Observer;
+import rx.functions.Action1;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
 
     public GalleryViewHolder(
             View itemView,
-            Observer<BaseRecyclerFragment.Event> observer,
+            Action1<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);
@@ -133,7 +133,7 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
                 mScreenshot.setOnClickListener(new View.OnClickListener() {
                     @Override public void onClick(View view) {
                         if (mObserver != null) {
-                            mObserver.onNext(new OnScreenshotClick(banner));
+                            mObserver.call(new OnScreenshotClick(banner));
                         }
                     }
                 });

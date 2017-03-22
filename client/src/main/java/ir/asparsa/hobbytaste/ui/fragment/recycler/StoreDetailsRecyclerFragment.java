@@ -29,6 +29,7 @@ import ir.asparsa.hobbytaste.ui.list.holder.StoreMapViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
 import junit.framework.Assert;
 import rx.Observer;
+import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
@@ -85,15 +86,9 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
         return new StoreDetailsProvider(adapter, insertData, getStoreModel());
     }
 
-    @Override protected <T extends Event> Observer<T> getObserver() {
-        return new Observer<T>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-            }
-
-            @Override public void onNext(T t) {
+    @Override protected <T extends Event> Action1<T> getObserver() {
+        return new Action1<T>() {
+            @Override public void call(T t) {
                 if (t instanceof RatingViewHolder.OnArrowClick) {
                     onArrowClick(((RatingViewHolder.OnArrowClick) t).getData());
                 } else if (t instanceof RatingViewHolder.OnHeartClick) {

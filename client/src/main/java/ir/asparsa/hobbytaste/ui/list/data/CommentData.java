@@ -1,8 +1,8 @@
 package ir.asparsa.hobbytaste.ui.list.data;
 
+import android.os.Parcel;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.hobbytaste.R;
-import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
 
 /**
@@ -43,4 +43,30 @@ public class CommentData extends BaseRecyclerData {
     public void heartBeat() {
         getCommentModel().heartBeat();
     }
+
+
+    @Override public int describeContents() {
+        return 0;
+    }
+
+    @Override public void writeToParcel(
+            Parcel dest,
+            int flags
+    ) {
+        dest.writeParcelable(this.mCommentModel, flags);
+    }
+
+    protected CommentData(Parcel in) {
+        this.mCommentModel = in.readParcelable(CommentModel.class.getClassLoader());
+    }
+
+    public static final Creator<CommentData> CREATOR = new Creator<CommentData>() {
+        @Override public CommentData createFromParcel(Parcel source) {
+            return new CommentData(source);
+        }
+
+        @Override public CommentData[] newArray(int size) {
+            return new CommentData[size];
+        }
+    };
 }

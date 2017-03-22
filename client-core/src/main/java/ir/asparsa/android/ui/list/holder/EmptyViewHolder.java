@@ -5,6 +5,7 @@ import android.view.View;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import rx.Observer;
+import rx.functions.Action1;
 
 /**
  * @author hadi
@@ -14,7 +15,7 @@ public class EmptyViewHolder extends BaseViewHolder {
 
     public EmptyViewHolder(
             View itemView,
-            Observer<BaseRecyclerFragment.Event> observer,
+            Action1<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);

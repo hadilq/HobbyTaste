@@ -25,8 +25,8 @@ import ir.asparsa.android.ui.list.holder.TryAgainViewHolder;
 import ir.asparsa.android.ui.list.provider.AbsListProvider;
 import ir.asparsa.android.ui.view.TryAgainView;
 import rx.Observable;
-import rx.Observer;
 import rx.Subscriber;
+import rx.functions.Action1;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
     private static final String BUNDLE_KEY_SCROLL_POSITION = "BUNDLE_KEY_SCROLL_POSITION";
     private static final String BUNDLE_KEY_NEXT_OFFSET = "BUNDLE_KEY_NEXT_OFFSET";
     private static final String BUNDLE_KEY_LIMIT = "BUNDLE_KEY_LIMIT";
-    private static final String BUNDLE_KEY_LOADING = "BUNDLE_KEY_LOADING";
+    private static final String BUNDLE_KEY_LIST = "BUNDLE_KEY_LIST";
     private static final int LIMIT_DEFAULT = 20;
 
     protected RecyclerListAdapter mAdapter;
@@ -87,8 +87,17 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setOnScrollListener(new LoadingListener());
 
+        final Action1<Event> observer = getObserver();
         mAdapter = new RecyclerListAdapter(
-                mRecyclerView, mLayoutManager, savedInstanceState, getViewHoldersList(), getObserver());
+                mRecyclerView, mLayoutManager, savedInstanceState, getViewHoldersList(), new Action1<Event>() {
+            @Override public void call(Event event) {
+                if (event instanceof TryAgainViewHolder.OnTryAgainEvent) {
+                    mOnTryAgainListener.tryAgain();
+                } else {
+                    observer.call(event);
+                }
+            }
+        });
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -102,7 +111,10 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         mNextOffset = getArguments().getLong(BUNDLE_KEY_NEXT_OFFSET, 0);
         mScrollPosition = getArguments().getInt(BUNDLE_KEY_SCROLL_POSITION, 0);
         mLimit = getArguments().getInt(BUNDLE_KEY_LIMIT, LIMIT_DEFAULT);
-        mLoading = getArguments().getBoolean(BUNDLE_KEY_LOADING);
+        ArrayList<BaseRecyclerData> parcelableArrayList = getArguments().getParcelableArrayList(BUNDLE_KEY_LIST);
+        if (parcelableArrayList != null) {
+            mAdapter.getList().addAll(parcelableArrayList);
+        }
         provideDataAndStart();
     }
 
@@ -111,7 +123,7 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         getArguments().putInt(BUNDLE_KEY_SCROLL_POSITION, mLayoutManager.findFirstVisibleItemPosition());
         getArguments().putInt(BUNDLE_KEY_LIMIT, mLimit);
         getArguments().putLong(BUNDLE_KEY_NEXT_OFFSET, mNextOffset);
-        getArguments().putBoolean(BUNDLE_KEY_LOADING, mLoading);
+        getArguments().putParcelableArrayList(BUNDLE_KEY_LIST, mAdapter.getList());
         super.onDestroyView();
     }
 
@@ -141,7 +153,7 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
             OnInsertData insertData
     );
 
-    protected abstract <T extends Event> Observer<T> getObserver();
+    protected abstract <T extends Event> Action1<T> getObserver();
 
     private class LoadingListener extends RecyclerView.OnScrollListener {
         @Override
@@ -218,7 +230,7 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
             }
 
             if (mLoading) {
-                list.add(new TryAgainData(true, mOnTryAgainListener));
+                list.add(new TryAgainData(true));
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -229,12 +241,10 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
                 mAdapter.notifyItemRemoved(list.size());
             }
 
-            if (mAdapter.isEmpty() && !mLoading) {
-                mTryAgainView.showExtraView();
-            }
-
             if (!mAdapter.isEmpty()) {
                 mTryAgainView.finish();
+            } else if (!mLoading) {
+                mTryAgainView.showExtraView();
             }
 
             if (mScrollPosition > 0) {

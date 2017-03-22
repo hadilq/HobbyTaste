@@ -16,7 +16,7 @@ import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.list.data.StoreMapData;
-import rx.Observer;
+import rx.functions.Action1;
 
 /**
  * @author hadi
@@ -36,7 +36,7 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
 
     public StoreMapViewHolder(
             View itemView,
-            Observer<BaseRecyclerFragment.Event> observer,
+            Action1<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);

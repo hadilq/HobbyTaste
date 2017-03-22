@@ -10,7 +10,7 @@ import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.list.data.UsernameData;
-import rx.Observer;
+import rx.functions.Action1;
 
 /**
  * Created by hadi on 12/14/2016 AD.
@@ -24,7 +24,7 @@ public class UserNameViewHolder extends BaseViewHolder<UsernameData> {
 
     public UserNameViewHolder(
             View itemView,
-            Observer<BaseRecyclerFragment.Event> observer,
+            Action1<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);
@@ -35,7 +35,7 @@ public class UserNameViewHolder extends BaseViewHolder<UsernameData> {
         mUsernameTextView.setText(data.getUsername());
         mLayout.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
-                mObserver.onNext(new UsernameClick(data.getUsername()));
+                mObserver.call(new UsernameClick(data.getUsername()));
             }
         });
     }

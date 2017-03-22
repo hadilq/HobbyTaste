@@ -5,7 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
-import rx.Observer;
+import rx.functions.Action1;
 
 /**
  * @author hadi
@@ -13,11 +13,11 @@ import rx.Observer;
  */
 public abstract class BaseViewHolder<DATA extends BaseRecyclerData> extends RecyclerView.ViewHolder {
 
-    protected final Observer<BaseRecyclerFragment.Event> mObserver;
+    protected final Action1<BaseRecyclerFragment.Event> mObserver;
 
     public BaseViewHolder(
             View itemView,
-            Observer<BaseRecyclerFragment.Event> observer,
+            Action1<BaseRecyclerFragment.Event> observer,
             Bundle savedInstanceState
     ) {
         super(itemView);
