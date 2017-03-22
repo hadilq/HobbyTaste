@@ -19,6 +19,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.core.util.UiUtil;
+import ir.asparsa.android.ui.fragment.dialog.LoadingProgressDialogFragment;
 import ir.asparsa.android.ui.fragment.dialog.ProgressDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.common.net.dto.BannerDto;
@@ -73,6 +74,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
     private String mFilePath;
     private BannerModel mBanner;
     private ProgressDialogFragment mProgressDialog;
+    private LoadingProgressDialogFragment mLoadingProgressDialog;
     private final CompositeSubscription mSubscription = new CompositeSubscription();
     private Handler mHandler;
     private Runnable mShowProgressDialogRunnable;
@@ -215,13 +217,14 @@ public class AddBannerContentFragment extends BaseContentFragment {
                 }
                 mHintTextView.setText("");
                 File file = new File(mFilePath);
-                ProgressRequestBody requestFile = new ProgressRequestBody(file, getProgressCallback());
+                ProgressRequestBody requestFile = new ProgressRequestBody(file)
+                        .registerObserver(getProgressObserver());
                 MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
                 mSubscription.add(mBannerService.handleFileUpload(body)
                                                 .subscribeOn(Schedulers.newThread())
                                                 .observeOn(AndroidSchedulers.mainThread())
                                                 .subscribe(getFileUploadObserver()));
-                showProgressDialog(R.string.new_store_uploading);
+                showLoadingProgressDialog(R.string.new_store_uploading);
             }
         };
     }
@@ -253,9 +256,12 @@ public class AddBannerContentFragment extends BaseContentFragment {
         UiUtil.invokeEventReceiver(event, getFragmentManager(), true);
     }
 
-    private ProgressRequestBody.UploadCallbacks getProgressCallback() {
-        return new ProgressRequestBody.UploadCallbacks() {
-            @Override public void onProgressUpdate(int percentage) {
+    private Action1<Integer> getProgressObserver() {
+        return new Action1<Integer>() {
+            @Override public void call(Integer percentage) {
+                if (mLoadingProgressDialog != null) {
+                    mLoadingProgressDialog.setProgress(percentage);
+                }
             }
         };
     }
@@ -268,7 +274,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
             @Override public void onError(Throwable e) {
                 L.e(AddBannerContentFragment.class, "Banner is not uploaded", e);
                 mHintTextView.setText(e.getLocalizedMessage());
-                dismissProgressDialog();
+                dismissLoadingProgressDialog();
             }
 
             @Override public void onNext(BannerDto bannerDto) {
@@ -276,7 +282,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
                 L.i(AddBannerContentFragment.class, "Banner is uploaded " + mBanner);
                 mHintTextView.setText(getString(R.string.new_store_banner_successfully_sent));
                 tryToDeleteFile();
-                dismissProgressDialog();
+                dismissLoadingProgressDialog();
             }
         };
     }
@@ -370,6 +376,22 @@ public class AddBannerContentFragment extends BaseContentFragment {
                 mProgressDialog.dismiss();
             }
             mProgressDialog = null;
+        }
+    }
+
+    private void showLoadingProgressDialog(@StringRes final int message) {
+        dismissLoadingProgressDialog();
+
+        mLoadingProgressDialog = LoadingProgressDialogFragment.newInstance(getString(message));
+        mLoadingProgressDialog.show(getFragmentManager());
+    }
+
+    private void dismissLoadingProgressDialog() {
+        if (mLoadingProgressDialog != null) {
+            if (mLoadingProgressDialog.isAdded()) {
+                mLoadingProgressDialog.dismiss();
+            }
+            mLoadingProgressDialog = null;
         }
     }
 }
