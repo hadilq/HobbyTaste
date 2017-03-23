@@ -14,9 +14,9 @@ def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
-def generateDefaultConfiguration = { properties ->
+def attachGenerateDefaultConfiguration = { properties ->
     //################### DataSource Configuration ##########################
-    properties.setProperty("spring.datasource.testWhileIdle", "rue")
+    properties.setProperty("spring.datasource.testWhileIdle", "true")
     properties.setProperty("spring.datasource.validationQuery", "SELECT 1")
     properties.setProperty("spring.jpa.hibernate.naming-strategy", "org.hibernate.cfg.ImprovedNamingStrategy")
 
@@ -59,13 +59,7 @@ def generateDefaultConfiguration = { properties ->
     }
 }
 
-def developConfiguration = {
-    println "developConfig " + project.name
-    def properties = new Properties()
-    def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
-    propertiesFile.createNewFile()
-    generateDefaultConfiguration(properties)
-
+def attachDevelopConfiguration = { properties ->
     //###################          Server          ##########################
     properties.setProperty("server.address", "$global_serverAddress")
     properties.setProperty("server.scheme", "$global_serverScheme")
@@ -76,18 +70,16 @@ def developConfiguration = {
     //###################           Logger         ##########################
     // DEBUG, ERROR, INFO
     properties.setProperty("logging.level.ir.asparsa.hobbytaste.server.controller", "DEBUG")
-
-    properties.store(propertiesFile.newWriter(), null)
 }
 
+def attachTestConfiguration = { properties ->
 
-def productConfiguration = {
-    println "productConfig  " + project.name
-    def properties = new Properties()
-    def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
-    propertiesFile.createNewFile()
-    generateDefaultConfiguration(properties)
+    //###################          Security          ##########################
+//    properties.setProperty("security.basic.enabled", 'false')
+//    properties.setProperty("management.security.enabled", 'false')
+}
 
+def attachProductConfiguration = { properties ->
     //################### DataSource Configuration ##########################
     properties.setProperty("spring.datasource.platform", "postgres")
     properties.setProperty("spring.datasource.url", "jdbc:postgresql://localhost:5432/hobbytastedb")
@@ -108,6 +100,42 @@ def productConfiguration = {
     //###################           Logger         ##########################
     // DEBUG, ERROR, INFO
     properties.setProperty("logging.level.ir.asparsa.hobbytaste.server.controller", "ERROR")
+}
+
+def developConfiguration = {
+    println "developConfig " + project.name
+    def properties = new Properties()
+    def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
+    propertiesFile.createNewFile()
+
+    attachGenerateDefaultConfiguration(properties)
+    attachDevelopConfiguration(properties)
+
+    properties.store(propertiesFile.newWriter(), null)
+}
+
+def testConfiguration = {
+    println "testConfig " + project.name
+    def properties = new Properties()
+    def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
+    propertiesFile.createNewFile()
+
+    attachGenerateDefaultConfiguration(properties)
+    attachDevelopConfiguration(properties)
+    attachTestConfiguration(properties)
+
+    properties.store(propertiesFile.newWriter(), null)
+}
+
+
+def productConfiguration = {
+    println "productConfig  " + project.name
+    def properties = new Properties()
+    def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
+    propertiesFile.createNewFile()
+
+    attachGenerateDefaultConfiguration(properties)
+    attachProductConfiguration(properties)
 
     properties.store(propertiesFile.newWriter(), null)
 }
@@ -146,20 +174,27 @@ gradle.taskGraph.whenReady { taskGraph ->
     } else if (taskGraph.hasTask(runDevelop)) {
         developConfiguration()
     }
+    for (Task task : taskGraph.allTasks) {
+        if (task.name.contains('Test')) {
+            testConfiguration()
+        }
+    }
 }
 
 dependencies {
     compile(project(':common'))
-    compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    compile('org.springframework.boot:spring-boot-starter-hateoas')
-    compile('org.springframework.boot:spring-boot-starter-security')
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile("org.springframework.boot:spring-boot-configuration-processor")
-    compile('org.apache.commons:commons-lang3:3.5')
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.springframework.boot:spring-boot-starter-hateoas'
+    compile 'org.springframework.boot:spring-boot-starter-security'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-configuration-processor'
+    compile 'org.apache.commons:commons-lang3:3.5'
     compile 'io.jsonwebtoken:jjwt:0.7.0'
     compile "io.reactivex:rxjava:$global_rxjavaVersion"
-    runtime('org.postgresql:postgresql:9.4.1212')
-    runtime('com.h2database:h2:1.4.193')
+    runtime 'org.postgresql:postgresql:9.4.1212'
+    runtime 'com.h2database:h2:1.4.193'
 
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile 'org.mockito:mockito-core:2.7.19'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'org.springframework.security:spring-security-test:4.2.2.RELEASE'
 }

@@ -64,7 +64,7 @@ import java.util.Random;
             logger.debug("Authentication is expired");
             String locale = request.getParameter("locale");
             throw new HashCodeExpiredException("hash code is expired", Strings.HASH_CODE_EXPIRED,
-                                      StringUtils.isEmpty(locale) ? Strings.DEFAULT_LOCALE : locale);
+                                               StringUtils.isEmpty(locale) ? Strings.DEFAULT_LOCALE : locale);
         } else {
             logger.debug("Authenticated before");
             accountModel = account.get();

@@ -38,6 +38,7 @@ public class JwtAuthenticationFailureHandler implements AuthenticationFailureHan
     ) throws IOException, ServletException {
 
         logger.info("onAuthenticationFailure gets called");
+        logger.warn("request: " + request, authException);
 
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

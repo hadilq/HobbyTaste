@@ -8,6 +8,9 @@ public class AuthenticateDto {
     private String token;
     private String username;
 
+    public AuthenticateDto() {
+    }
+
     public AuthenticateDto(
             String token,
             String username

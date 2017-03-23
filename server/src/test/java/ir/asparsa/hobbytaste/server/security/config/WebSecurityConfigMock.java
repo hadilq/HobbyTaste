@@ -1,7 +1,5 @@
 package ir.asparsa.hobbytaste.server.security.config;
 
-import ir.asparsa.common.net.path.BannerServicePath;
-import ir.asparsa.common.net.path.UserServicePath;
 import ir.asparsa.hobbytaste.server.security.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -28,19 +26,12 @@ import java.util.List;
 @EnableWebSecurity
 @EnableAutoConfiguration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    public static final String ENTRY_POINT_API = "/api/v1";
-    public static final String ENTRY_POINT_AUTHENTICATE = ENTRY_POINT_API + "/" + UserServicePath.SERVICE +
-                                                           UserServicePath.AUTHENTICATE;
-    public static final String ENTRY_POINT_BANNER = ENTRY_POINT_API + "/" + BannerServicePath.SERVICE +
-                                                     BannerServicePath.IMAGE.replace("{filename:.+}", "*");
-    public static final String ENTRY_POINT_TOKEN_BASED_AUTH = ENTRY_POINT_API + "/**";
+public class WebSecurityConfigMock extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private JwtAuthenticationEntryPoint unauthorizedHandler;
     @Autowired
-    private JwtAuthenticationProvider authenticationProvider;
+    private JwtAuthenticationProviderMock authenticationProvider;
     @Autowired
     private JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler;
 
@@ -51,12 +42,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public JwtAuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
+    public JwtAuthenticationTokenFilterMock authenticationTokenFilterBean() throws Exception {
         List<String> pathsToSkip = new ArrayList<>();
-        pathsToSkip.add(ENTRY_POINT_AUTHENTICATE);
-        pathsToSkip.add(ENTRY_POINT_BANNER);
-        JwtAuthenticationTokenFilter authenticationTokenFilter =
-                new JwtAuthenticationTokenFilter(new SkipPathRequestMatcher(pathsToSkip, ENTRY_POINT_TOKEN_BASED_AUTH));
+        pathsToSkip.add(WebSecurityConfig.ENTRY_POINT_AUTHENTICATE);
+        pathsToSkip.add(WebSecurityConfig.ENTRY_POINT_BANNER);
+        JwtAuthenticationTokenFilterMock authenticationTokenFilter =
+                new JwtAuthenticationTokenFilterMock(
+                        new SkipPathRequestMatcher(pathsToSkip, WebSecurityConfig.ENTRY_POINT_TOKEN_BASED_AUTH));
         authenticationTokenFilter.setAuthenticationManager(authenticationManager());
         authenticationTokenFilter.setAuthenticationSuccessHandler(new JwtAuthenticationSuccessHandler());
         authenticationTokenFilter.setAuthenticationFailureHandler(jwtAuthenticationFailureHandler);
@@ -70,8 +62,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 // All urls must be authenticated (filter for token always fires (/**)
                 .authorizeRequests()
-                .antMatchers(ENTRY_POINT_AUTHENTICATE).permitAll() // Authentication
-                .antMatchers(ENTRY_POINT_BANNER).permitAll() // Banner
+                .antMatchers(WebSecurityConfig.ENTRY_POINT_AUTHENTICATE).permitAll() // Authentication
+                .antMatchers(WebSecurityConfig.ENTRY_POINT_BANNER).permitAll() // Banner
                 .anyRequest().authenticated()
                 .and()
                 // Call our errorHandler if authentication/authorisation fails

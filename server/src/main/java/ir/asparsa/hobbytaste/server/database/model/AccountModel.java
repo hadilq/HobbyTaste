@@ -39,10 +39,6 @@ public class AccountModel implements Serializable {
     AccountModel() { // jpa only
     }
 
-    public AccountModel(String token) {
-        this.username = token;
-    }
-
     public AccountModel(
             String username,
             long hashCode,
