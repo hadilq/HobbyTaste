@@ -5,12 +5,15 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
+import android.text.TextUtils;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * @author hadi
@@ -23,6 +26,8 @@ public class LanguageUtil {
 
     private static final String COUNTRY_IR = "IR";
     private static final String COUNTRY_US = "US";
+
+    private static final Object sSync = new Object();
 
     private static final Map<String, String> COUNTRY_MAP = new HashMap<String, String>() {{
         put(LANGUAGE_FA, COUNTRY_IR);
@@ -40,30 +45,30 @@ public class LanguageUtil {
 
     @NonNull
     public static Locale getLocale(@NonNull PreferencesManager preferencesManager) {
-        loadDefaultLanguage(preferencesManager);
-        if (sLocale == null) {
+        synchronized (sSync) {
+            loadDefaultLanguage(preferencesManager);
             String country = COUNTRY_MAP.get(sDefaultLanguage);
-
-            for (Locale locale : Locale.getAvailableLocales()) {
-                if (locale.getLanguage().equals(sDefaultLanguage) && locale.getCountry().equals(country)) {
-                    sLocale = locale;
-                    break;
+            if (sLocale == null) {
+                for (Locale locale : Locale.getAvailableLocales()) {
+                    if (locale.getLanguage().equals(sDefaultLanguage) && locale.getCountry().equals(country)) {
+                        sLocale = locale;
+                        break;
+                    }
                 }
             }
-        }
-        if (sLocale == null) {
-            for (Locale locale : Locale.getAvailableLocales()) {
-                if (locale.getLanguage().equals(sDefaultLanguage)) {
-                    sLocale = locale;
-                    break;
+            if (sLocale == null) {
+                for (Locale locale : Locale.getAvailableLocales()) {
+                    if (locale.getLanguage().equals(sDefaultLanguage)) {
+                        sLocale = locale;
+                        break;
+                    }
                 }
             }
+            if (sLocale == null) {
+                sLocale = new Locale(sDefaultLanguage, country);
+            }
+            return sLocale;
         }
-        if (sLocale == null) {
-            setDefaultLanguage(preferencesManager, LANGUAGE_EN);
-            sLocale = Locale.US;
-        }
-        return sLocale;
     }
 
     @NonNull
@@ -90,30 +95,34 @@ public class LanguageUtil {
     }
 
     private static void loadDefaultLanguage(@NonNull PreferencesManager preferencesManager) {
-        sDefaultLanguage = preferencesManager.getString(PreferencesManager.KEY_DEFAULT_LANGUAGE, LANGUAGE_EN);
+        if (TextUtils.isEmpty(sDefaultLanguage) || sLocale == null) {
+            sDefaultLanguage = preferencesManager.getString(PreferencesManager.KEY_DEFAULT_LANGUAGE, LANGUAGE_EN);
+        }
     }
 
     public static boolean setDefaultLanguage(
             @NonNull PreferencesManager preferencesManager,
             @Language String language
     ) {
-        if (!sDefaultLanguage.equals(language)) {
-            sDefaultLanguage = language;
-            preferencesManager.put(PreferencesManager.KEY_DEFAULT_LANGUAGE, language);
-            sLocale = null;
-            return true;
+        synchronized (sSync) {
+            if (!sDefaultLanguage.equals(language)) {
+                sDefaultLanguage = language;
+                preferencesManager.put(PreferencesManager.KEY_DEFAULT_LANGUAGE, language);
+                sLocale = null;
+                return true;
+            }
+            return false;
         }
-        return false;
+    }
+
+    public static void reset() {
+        sDefaultLanguage = "";
+        sLocale = null;
     }
 
     public static boolean isRTL() {
-        return isRTL(Locale.getDefault());
-    }
-
-
-    public static boolean isRTL(Locale locale) {
-        final int directionality = Character.getDirectionality(locale.getDisplayName().charAt(0));
-        return directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT ||
-               directionality == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC;
+        synchronized (sSync) {
+            return LANGUAGE_FA.equals(sDefaultLanguage);
+        }
     }
 }

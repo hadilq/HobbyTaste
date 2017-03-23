@@ -32,8 +32,9 @@ public class ApplicationLauncher extends Application {
         sMainComponent.inject(this);
         LanguageUtil.setupDefaultLocale(mPreferencesManager, this);
 
-        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler(
-                Thread.getDefaultUncaughtExceptionHandler(), this));
+        Thread.setDefaultUncaughtExceptionHandler(
+                new UncaughtExceptionHandler(new UncaughtExceptionHandler.UncaughtExceptionController(
+                        Thread.getDefaultUncaughtExceptionHandler()), this));
     }
 
     private void setupDagger() {

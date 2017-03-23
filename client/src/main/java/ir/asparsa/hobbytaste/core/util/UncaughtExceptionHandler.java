@@ -13,14 +13,14 @@ import ir.asparsa.hobbytaste.ui.activity.CrashReportActivity;
 public class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     public static final boolean DEBUG = false;
-    private Thread.UncaughtExceptionHandler oldHandler;
     private Context context;
+    private UncaughtExceptionController controller;
 
     public UncaughtExceptionHandler(
-            Thread.UncaughtExceptionHandler oldHandler,
+            UncaughtExceptionController controller,
             Context context
     ) {
-        this.oldHandler = oldHandler;
+        this.controller = controller;
         this.context = context;
     }
 
@@ -28,36 +28,71 @@ public class UncaughtExceptionHandler implements Thread.UncaughtExceptionHandler
             Thread t,
             Throwable e
     ) {
-        if (BuildConfig.DEBUG && !DEBUG) {
-            debugMode(t, e);
+        if (controller.isAppDebug() && !controller.isDebug()) {
+            controller.debugMode(t, e);
         } else {
             try {
                 // Avoid exceptions in crash report activity
-                if (!CrashReportActivity.sCrashReportIsRunning) {
-                    Intent intent = LaunchUtil.getIntent(context, CrashReportActivity.class);
-                    intent.putExtra(CrashReportActivity.BUNDLE_KEY_CRASH_THROWABLE_NAME, e.getClass().getName());
-                    intent.putExtra(CrashReportActivity.BUNDLE_KEY_CRASH_MESSAGE, e.getMessage());
-                    context.startActivity(intent);
+                if (!controller.isCrashReportActivityIsRunning()) {
+                    controller.launchCrashReportActivity(context, e);
                 }
             } catch (Throwable throwable) {
                 throwable.initCause(e);
                 e = throwable;
             } finally {
-                if (oldHandler != null && !DEBUG) {
-                    oldHandler.uncaughtException(t, e);
-                }
-                if (DEBUG) {
-                    debugMode(t, e);
+                controller.uncaughtException(t, e);
+                if (controller.isDebug()) {
+                    controller.debugMode(t, e);
                 }
             }
         }
     }
 
-    private void debugMode(
-            Thread t,
-            Throwable e
-    ) {
-        L.wtf(getClass(), "In thread: " + t.getName(), e);
+    public static class UncaughtExceptionController {
+
+        Thread.UncaughtExceptionHandler oldHandler;
+
+        public UncaughtExceptionController(Thread.UncaughtExceptionHandler oldHandler) {
+            this.oldHandler = oldHandler;
+        }
+
+        boolean isDebug() {
+            return false;
+        }
+
+        boolean isAppDebug() {
+            return BuildConfig.DEBUG;
+        }
+
+        boolean isCrashReportActivityIsRunning() {
+            return CrashReportActivity.sCrashReportIsRunning;
+        }
+
+        void launchCrashReportActivity(
+                Context context,
+                Throwable e
+        ) {
+            Intent intent = LaunchUtil.getIntent(context, CrashReportActivity.class);
+            intent.putExtra(CrashReportActivity.BUNDLE_KEY_CRASH_THROWABLE_NAME, e.getClass().getName());
+            intent.putExtra(CrashReportActivity.BUNDLE_KEY_CRASH_MESSAGE, e.getMessage());
+            context.startActivity(intent);
+        }
+
+        void debugMode(
+                Thread t,
+                Throwable e
+        ) {
+            L.wtf(getClass(), "In thread: " + t.getName(), e);
 //        System.exit(10);
+        }
+
+        void uncaughtException(
+                Thread t,
+                Throwable e
+        ) {
+            if (oldHandler != null && !isDebug()) {
+                oldHandler.uncaughtException(t, e);
+            }
+        }
     }
 }

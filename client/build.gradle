@@ -63,6 +63,10 @@ android {
         }
 
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 android.variantFilter { variant ->
@@ -111,8 +115,14 @@ dependencies {
     // Picasso
     compile "com.squareup.picasso:picasso:$global_picassoVersion"
     compile "com.jakewharton.picasso:picasso2-okhttp3-downloader:$global_picassoDownloaderVersion"
+
     // Test
     testCompile "junit:junit:$global_junitVersion"
+    testCompile "org.mockito:mockito-core:$global_mockitoCoreVersion"
+    // required if you want to use Mockito for Android instrumentation tests
+    androidTestCompile "org.mockito:mockito-core:$global_mockitoCoreVersion"
+    androidTestCompile "com.google.dexmaker:dexmaker:$global_dexmakerVersion"
+    androidTestCompile "com.google.dexmaker:dexmaker-mockito:$global_dexmakerVersion"
 }
 
 apply plugin: 'com.google.gms.google-services'
