@@ -54,7 +54,7 @@ public class RequestLogUtil {
             averageTime /= 10;
             if (model.getDatetime() - averageTime < minInterval) {
                 throw new DdosSecurityException(
-                        "JWT token is not valid", Strings.SECURITY_DDOS, Strings.DEFAULT_LOCALE);
+                        "Probably a DDOS attack", Strings.SECURITY_DDOS, Strings.DEFAULT_LOCALE);
             }
         }
 
