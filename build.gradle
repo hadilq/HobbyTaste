@@ -58,7 +58,7 @@ subprojects {
     // In case of updating play services, find TODOs in StoreMapViewHolder
     ext.global_playServicesVersion = "9.2.0"
     ext.global_ormliteVersion = "4.48"
-    ext.global_retrofitVersion = "2.1.0"
+    ext.global_retrofitVersion = "2.2.0"
     ext.global_okHttpVersion = "3.6.0"
     ext.global_picassoVersion = "2.5.2"
     ext.global_picassoDownloaderVersion = "1.1.0"

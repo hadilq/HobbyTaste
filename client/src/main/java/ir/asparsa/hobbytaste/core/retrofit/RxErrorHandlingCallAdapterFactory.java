@@ -1,10 +1,6 @@
 package ir.asparsa.hobbytaste.core.retrofit;
 
-import retrofit2.Call;
-import retrofit2.CallAdapter;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.HttpException;
+import retrofit2.*;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import rx.Observable;
 import rx.functions.Func1;
@@ -29,7 +25,7 @@ public class RxErrorHandlingCallAdapterFactory extends CallAdapter.Factory {
     }
 
     @Override
-    public CallAdapter<?> get(
+    public CallAdapter<?, ?> get(
             Type returnType,
             Annotation[] annotations,
             Retrofit retrofit
@@ -37,13 +33,13 @@ public class RxErrorHandlingCallAdapterFactory extends CallAdapter.Factory {
         return new RxCallAdapterWrapper(retrofit, original.get(returnType, annotations, retrofit));
     }
 
-    private static class RxCallAdapterWrapper implements CallAdapter<Observable<?>> {
+    private static class RxCallAdapterWrapper<R> implements CallAdapter<R, Observable<?>> {
         private final Retrofit retrofit;
-        private final CallAdapter<?> wrapped;
+        private final CallAdapter<R, ?> wrapped;
 
-        public RxCallAdapterWrapper(
+        RxCallAdapterWrapper(
                 Retrofit retrofit,
-                CallAdapter<?> wrapped
+                CallAdapter<R, ?> wrapped
         ) {
             this.retrofit = retrofit;
             this.wrapped = wrapped;
@@ -56,7 +52,7 @@ public class RxErrorHandlingCallAdapterFactory extends CallAdapter.Factory {
 
         @SuppressWarnings("unchecked")
         @Override
-        public <R> Observable<?> adapt(Call<R> call) {
+        public Observable<?> adapt(Call<R> call) {
             return ((Observable) wrapped.adapt(call)).onErrorResumeNext(new Func1<Throwable, Observable>() {
                 @Override
                 public Observable call(Throwable throwable) {
