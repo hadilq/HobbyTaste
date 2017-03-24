@@ -258,6 +258,8 @@ public class L {
 
     public static void fullStackTrace(Throwable e) {
         do {
+            System.out.println("Exception: " + e.getClass().getName());
+            System.out.println("Message: " + e.getMessage());
             StackTraceElement[] elements = e.getStackTrace();
 
             for (StackTraceElement element : elements) {
@@ -265,7 +267,7 @@ public class L {
             }
             e = e.getCause();
             if (e != null) {
-                System.out.println("Caused by: " + e.getMessage());
+                System.out.println("Caused by: ");
             }
         } while (e != null);
     }
