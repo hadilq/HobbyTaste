@@ -1,6 +1,6 @@
 package ir.asparsa.hobbytaste.server.controller;
 
-import ir.asparsa.common.net.dto.BannerDto;
+import ir.asparsa.common.net.dto.StoreProto;
 import ir.asparsa.common.net.path.BannerServicePath;
 import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
@@ -64,7 +64,7 @@ import java.util.Random;
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public BannerDto handleFileUpload(
+    public StoreProto.Banner handleFileUpload(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale
     ) {
@@ -88,6 +88,10 @@ import java.util.Random;
         }
 
         logger.info("File saved to " + mainUrl + ", thumbnail is " + thumbnailUrl);
-        return new BannerDto(mainUrl, thumbnailUrl);
+        return StoreProto.Banner
+                .newBuilder()
+                .setMainUrl(mainUrl)
+                .setThumbnailUrl(thumbnailUrl)
+                .build();
     }
 }

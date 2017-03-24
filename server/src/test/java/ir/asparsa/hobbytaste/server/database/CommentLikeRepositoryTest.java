@@ -1,6 +1,6 @@
 package ir.asparsa.hobbytaste.server.database;
 
-import ir.asparsa.common.net.dto.StoreDto;
+import ir.asparsa.common.net.dto.StoreProto;
 import ir.asparsa.hobbytaste.server.ApplicationContextTest;
 import ir.asparsa.hobbytaste.server.database.model.*;
 import ir.asparsa.hobbytaste.server.database.repository.CommentLikeRepository;
@@ -37,7 +37,14 @@ public class CommentLikeRepositoryTest {
     public void findByAccountAndStoreTest() {
         entityManager.persist(new AccountModel("Foo", 29847L, "USER"));
         StoreModel storeModel = StoreModel
-                .newInstance(new StoreDto(23.23d, 42.34d, "sdfv", "sdfvzxcv", 2934756L, null));
+                .newInstance(StoreProto.Store
+                                     .newBuilder()
+                                     .setLat(23.23d)
+                                     .setLon(42.34d)
+                                     .setTitle("sdfv")
+                                     .setDescription("sdfvzxcv")
+                                     .setHashCode(2934756L)
+                                     .build());
         entityManager.persist(storeModel);
         entityManager.persist(new BannerModel("test", "thumbnailTest", storeModel));
 

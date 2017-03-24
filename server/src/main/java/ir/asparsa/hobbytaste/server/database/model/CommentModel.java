@@ -1,7 +1,7 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
 import ir.asparsa.common.database.model.Comment;
-import ir.asparsa.common.net.dto.StoreCommentDto;
+import ir.asparsa.common.net.dto.CommentProto;
 
 import javax.persistence.*;
 
@@ -51,17 +51,24 @@ public class CommentModel {
         this.creator = creator;
     }
 
-    public StoreCommentDto convertToDto(
+    public CommentProto.Comment convertToDto(
             boolean like
     ) {
-        return new StoreCommentDto(
-                getDescription(), getCreator().getUsername(), getCreated(), getStore().getHashCode(), getHashCode(),
-                getRate(), like);
+        return CommentProto.Comment
+                .newBuilder()
+                .setDescription(getDescription())
+                .setCreator(getCreator().getUsername())
+                .setCreated(getCreated())
+                .setStoreHashCode(getStore().getHashCode())
+                .setHashCode(getHashCode())
+                .setRate(getRate())
+                .setLike(like)
+                .build();
     }
 
     public static CommentModel newInstance(
             StoreModel store,
-            StoreCommentDto comment,
+            CommentProto.Comment comment,
             AccountModel creator
     ) {
         return new CommentModel(comment.getDescription(), comment.getHashCode(), store, creator);

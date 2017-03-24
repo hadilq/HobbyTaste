@@ -1,7 +1,6 @@
 package ir.asparsa.hobbytaste.server.controller;
 
-import ir.asparsa.common.net.dto.ErrorDto;
-import ir.asparsa.common.net.dto.ResponseDto;
+import ir.asparsa.common.net.dto.ResponseProto;
 import ir.asparsa.hobbytaste.server.exception.BaseRuntimeException;
 import ir.asparsa.hobbytaste.server.resources.Strings;
 import org.slf4j.Logger;
@@ -41,7 +40,7 @@ public class ServiceExceptionHandler extends ResponseEntityExceptionHandler {
     ) {
         logger.error("handleControllerException gets called", ex);
 
-        ErrorDto errorResponse;
+        ResponseProto.Response errorResponse;
         HttpStatus httpStatus;
         if (ex instanceof BaseRuntimeException) {
             BaseRuntimeException exception = (BaseRuntimeException) ex;
@@ -56,11 +55,16 @@ public class ServiceExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse, httpStatus);
     }
 
-    public static ErrorDto generateError(
+    public static ResponseProto.Response generateError(
             Throwable ex,
             String localizedMessage
     ) {
-        return new ErrorDto(ResponseDto.STATUS.ERROR, ex.getMessage(), localizedMessage);
+        return ResponseProto.Response
+                .newBuilder()
+                .setStatus(ResponseProto.Response.StatusType.ERROR)
+                .setDetailMessage(ex.getMessage())
+                .setLocalizedMessage(localizedMessage)
+                .build();
     }
 
     @Override
@@ -71,7 +75,8 @@ public class ServiceExceptionHandler extends ResponseEntityExceptionHandler {
             WebRequest request
     ) {
         logger.error("handleNoHandlerFoundException gets called", ex);
-        return new ResponseEntity<>(generateError(ex, resourceBundle.getMessage(
-                Strings.UNKNOWN, null, new Locale(Strings.DEFAULT_LOCALE))), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(
+                generateError(ex, resourceBundle.getMessage(Strings.UNKNOWN, null, new Locale(Strings.DEFAULT_LOCALE))),
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

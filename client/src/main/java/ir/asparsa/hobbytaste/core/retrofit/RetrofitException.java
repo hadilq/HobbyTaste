@@ -3,17 +3,14 @@ package ir.asparsa.hobbytaste.core.retrofit;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import ir.asparsa.android.core.logger.L;
-import ir.asparsa.common.net.dto.ErrorDto;
+import ir.asparsa.common.net.dto.ResponseProto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
-import okhttp3.ResponseBody;
-import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 
 /**
  * @author hadi
@@ -112,13 +109,16 @@ public class RetrofitException extends RuntimeException {
     @Override public String getLocalizedMessage() {
         switch (kind) {
             case HTTP:
-                ErrorDto errorDto = getErrorBody();
+                ResponseProto.Response errorDto = getErrorBody();
                 if (errorDto != null) {
                     return errorDto.getLocalizedMessage();
                 }
                 break;
             case UNEXPECTED:
-                throw this;
+                if (getCause() != null) {
+                    L.e(RetrofitException.class, "Unexpected error", getCause());
+                }
+//                throw this;
         }
         return mContext.getString(R.string.connection_error);
     }
@@ -127,13 +127,12 @@ public class RetrofitException extends RuntimeException {
      * HTTP response body converted to specified {@code type}. {@code null} if there is no
      * response.
      */
-    @Nullable private ErrorDto getErrorBody() {
+    @Nullable private ResponseProto.Response getErrorBody() {
         if (response == null || response.errorBody() == null) {
             return null;
         }
-        Converter<ResponseBody, ErrorDto> converter = retrofit.responseBodyConverter(ErrorDto.class, new Annotation[0]);
         try {
-            return converter.convert(response.errorBody());
+            return ResponseProto.Response.parseFrom(response.errorBody().bytes());
         } catch (IOException e) {
             L.w(getClass(), "Cannot convert to error dto", e);
         }

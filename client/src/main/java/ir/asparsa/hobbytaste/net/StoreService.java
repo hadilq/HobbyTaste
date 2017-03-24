@@ -1,13 +1,10 @@
 package ir.asparsa.hobbytaste.net;
 
-import ir.asparsa.common.net.dto.PageDto;
-import ir.asparsa.common.net.dto.StoreCommentDto;
-import ir.asparsa.common.net.dto.StoreDto;
+import ir.asparsa.common.net.dto.CommentProto;
+import ir.asparsa.common.net.dto.StoreProto;
 import ir.asparsa.common.net.path.StoreServicePath;
 import retrofit2.http.*;
 import rx.Observable;
-
-import java.util.Collection;
 
 /**
  * @author hadi
@@ -15,35 +12,35 @@ import java.util.Collection;
  */
 public interface StoreService {
     @GET(StoreServicePath.SERVICE)
-    Observable<Collection<StoreDto>> loadStoreModels();
+    Observable<StoreProto.Stores> loadStoreModels();
 
     @PUT(StoreServicePath.SERVICE)
-    Observable<StoreDto> saveStore(@Body StoreDto store);
+    Observable<StoreProto.Store> saveStore(@Body StoreProto.Store store);
 
     @PUT(StoreServicePath.SERVICE + StoreServicePath.VIEWED)
-    Observable<StoreDto> storeViewed(@Path("storeHashCode") Long storeHashCode);
+    Observable<StoreProto.Store> storeViewed(@Path("storeHashCode") Long storeHashCode);
 
     @POST(StoreServicePath.SERVICE + StoreServicePath.COMMENTS)
-    Observable<PageDto<StoreCommentDto>> loadComments(
+    Observable<CommentProto.Comments> loadComments(
             @Path("storeHashCode") Long storeHashCode,
             @Query("page") int page,
             @Query("size") int size
     );
 
     @PUT(StoreServicePath.SERVICE + StoreServicePath.COMMENTS)
-    Observable<StoreCommentDto> saveComment(
+    Observable<CommentProto.Comment> saveComment(
             @Path("storeHashCode") Long storeHashCode,
-            @Body StoreCommentDto comment
+            @Body CommentProto.Comment comment
     );
 
     @PUT(StoreServicePath.SERVICE + StoreServicePath.LIKE)
-    Observable<StoreDto> like(
+    Observable<StoreProto.Store> like(
             @Path("storeHashCode") Long storeHashCode,
             @Path("like") Boolean like
     );
 
     @PUT(StoreServicePath.SERVICE + StoreServicePath.LIKE_COMMENT)
-    Observable<StoreCommentDto> likeComment(
+    Observable<CommentProto.Comment> likeComment(
             @Path("storeHashCode") Long storeHashCode,
             @Path("commentHashCode") Long commentHashCode,
             @Path("like") Boolean like

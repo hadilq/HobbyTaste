@@ -1,7 +1,6 @@
 package ir.asparsa.hobbytaste.server.controller;
 
-import ir.asparsa.common.net.dto.AuthenticateDto;
-import ir.asparsa.common.net.dto.AuthenticateRequestDto;
+import ir.asparsa.common.net.dto.AuthenticateProto;
 import ir.asparsa.common.net.path.UserServicePath;
 import ir.asparsa.hobbytaste.server.database.model.AccountModel;
 import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
@@ -49,8 +48,8 @@ import java.util.Random;
     }
 
     @RequestMapping(value = UserServicePath.AUTHENTICATE, method = RequestMethod.POST)
-    AuthenticateDto authorization(
-            @RequestBody AuthenticateRequestDto authenticateRequestDto,
+    AuthenticateProto.Authenticate authorization(
+            @RequestBody AuthenticateProto.Request authenticateRequestDto,
             HttpServletRequest request
     ) {
         logger.debug("Authentication gets called");
@@ -71,11 +70,15 @@ import java.util.Random;
         }
 
         requestLogUtil.asyncLog(request, accountModel);
-        return new AuthenticateDto(jwtTokenUtil.generateToken(accountModel), accountModel.getUsername());
+        return AuthenticateProto.Authenticate
+                .newBuilder()
+                .setToken(jwtTokenUtil.generateToken(accountModel))
+                .setUsername(accountModel.getUsername())
+                .build();
     }
 
     @RequestMapping(value = UserServicePath.USERNAME, method = RequestMethod.POST)
-    AuthenticateDto changeUsername(
+    AuthenticateProto.Authenticate changeUsername(
             @RequestParam("new") String username,
             @PathVariable("hashCode") Long hashCode,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
@@ -91,7 +94,11 @@ import java.util.Random;
         account.setHashCode(hashCode);
         accountRepository.save(account);
 
-        return new AuthenticateDto(jwtTokenUtil.generateToken(account), username);
+        return AuthenticateProto.Authenticate
+                .newBuilder()
+                .setToken(jwtTokenUtil.generateToken(account))
+                .setUsername(username)
+                .build();
     }
 
     private String generateUsername() {

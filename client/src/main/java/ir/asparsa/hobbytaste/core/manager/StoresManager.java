@@ -2,7 +2,7 @@ package ir.asparsa.hobbytaste.core.manager;
 
 import android.support.annotation.NonNull;
 import ir.asparsa.android.core.logger.L;
-import ir.asparsa.common.net.dto.StoreDto;
+import ir.asparsa.common.net.dto.StoreProto;
 import ir.asparsa.hobbytaste.database.dao.BannerDao;
 import ir.asparsa.hobbytaste.database.dao.StoreDao;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
@@ -53,21 +53,21 @@ public class StoresManager {
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private Observable<Collection<StoreDto>> getLoadServiceObservable() {
+    private Observable<StoreProto.Stores> getLoadServiceObservable() {
         return mStoreService
                 .loadStoreModels()
                 .retry(5)
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private Observable<StoreDto> getSaveServiceObservable(StoreDto store) {
+    private Observable<StoreProto.Store> getSaveServiceObservable(StoreProto.Store store) {
         return mStoreService
                 .saveStore(store)
                 .retry(5)
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private Observable<StoreDto> getLikeServiceObservable(
+    private Observable<StoreProto.Store> getLikeServiceObservable(
             long storeHashCode,
             boolean like
     ) {
@@ -77,7 +77,7 @@ public class StoresManager {
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private Observable<StoreDto> getViewServiceObservable(
+    private Observable<StoreProto.Store> getViewServiceObservable(
             long storeHashCode
     ) {
         return mStoreService
@@ -172,11 +172,11 @@ public class StoresManager {
         };
     }
 
-    private Observer<? super StoreDto> onSavedStoreReceivedObserver(
+    private Observer<? super StoreProto.Store> onSavedStoreReceivedObserver(
             final StoreModel oldStore,
             final Observer<StoreModel> observer
     ) {
-        return new Observer<StoreDto>() {
+        return new Observer<StoreProto.Store>() {
             @Override public void onCompleted() {
             }
 
@@ -184,7 +184,7 @@ public class StoresManager {
                 mStoreDao.delete(mBannerDao, oldStore).subscribe(onDeleteOnUnSucceedRequestObserver(e, observer));
             }
 
-            @Override public void onNext(StoreDto storeDto) {
+            @Override public void onNext(StoreProto.Store storeDto) {
                 StoreModel newStore = StoreModel.instantiate(storeDto);
                 mStoreDao.create(mBannerDao, oldStore, newStore)
                          .subscribeOn(AndroidSchedulers.mainThread())
@@ -229,11 +229,11 @@ public class StoresManager {
         };
     }
 
-    private Observer<? super StoreDto> onNewStoreReceivedObserver(
+    private Observer<? super StoreProto.Store> onNewStoreReceivedObserver(
             final StoreModel oldStore,
             final Observer<StoreModel> observer
     ) {
-        return new Observer<StoreDto>() {
+        return new Observer<StoreProto.Store>() {
             @Override public void onCompleted() {
             }
 
@@ -241,7 +241,7 @@ public class StoresManager {
                 getSaveErrorObservable(e).subscribe(observer);
             }
 
-            @Override public void onNext(StoreDto storeDto) {
+            @Override public void onNext(StoreProto.Store storeDto) {
                 StoreModel newStore = StoreModel.instantiate(storeDto);
                 mStoreDao.create(mBannerDao, oldStore, newStore)
                          .subscribeOn(AndroidSchedulers.mainThread())
@@ -269,8 +269,8 @@ public class StoresManager {
     }
 
 
-    private Observer<Collection<StoreDto>> onLoadObserver(final Observer<Collection<StoreModel>> observer) {
-        return new Observer<Collection<StoreDto>>() {
+    private Observer<StoreProto.Stores> onLoadObserver(final Observer<Collection<StoreModel>> observer) {
+        return new Observer<StoreProto.Stores>() {
             @Override public void onCompleted() {
                 L.i(StoresManager.class, "Refresh request gets completed");
             }
@@ -280,13 +280,13 @@ public class StoresManager {
                 getLoadErrorObservable(e).subscribe(observer);
             }
 
-            @Override public void onNext(Collection<StoreDto> stores) {
+            @Override public void onNext(StoreProto.Stores stores) {
                 L.i(StoresManager.class, "Stores successfully received: " + stores);
-                if (stores.size() == 0) {
+                if (stores.getStoreCount() == 0) {
                     return;
                 }
                 Collection<StoreModel> collection = new ArrayDeque<>();
-                for (StoreDto store : stores) {
+                for (StoreProto.Store store : stores.getStoreList()) {
                     collection.add(StoreModel.instantiate(store));
                 }
                 mStoreDao.createAll(mBannerDao, collection)

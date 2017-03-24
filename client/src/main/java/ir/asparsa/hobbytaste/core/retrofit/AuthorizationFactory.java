@@ -1,9 +1,9 @@
 package ir.asparsa.hobbytaste.core.retrofit;
 
 import android.text.TextUtils;
+import com.google.common.net.HttpHeaders;
 import ir.asparsa.android.core.logger.L;
-import ir.asparsa.common.net.dto.AuthenticateDto;
-import ir.asparsa.common.net.dto.AuthenticateRequestDto;
+import ir.asparsa.common.net.dto.AuthenticateProto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
@@ -27,6 +27,8 @@ import java.security.SecureRandom;
  */
 @Singleton
 public class AuthorizationFactory implements Authenticator, Interceptor {
+
+    private static final MediaType PROTOBUF = MediaType.parse("application/x-protobuf; charset=utf-8");
 
     private SecureRandom secureRandom = new SecureRandom();
 
@@ -89,7 +91,8 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
             builder.url(url);
         }
         return builder.header(BuildConfig.Authorization, mAuthorizationManager.getToken())
-                      .header("Accept", "application/json")
+                      .header(HttpHeaders.ACCEPT, PROTOBUF.toString())
+                      .header(HttpHeaders.CONTENT_TYPE, PROTOBUF.toString())
                       .method(original.method(), original.body())
                       .build();
     }
@@ -125,11 +128,18 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
                 String oldToken
         ) {
             Retrofit retrofit = mRetrofitBuilder.client(mHttpClientBuilder.build()).build();
+            AuthenticateProto.Request.Builder builder = AuthenticateProto.Request
+                    .newBuilder()
+                    .setHashCode(hashCode);
+
+            if (!TextUtils.isEmpty(oldToken)) {
+                builder.setToken(oldToken);
+            }
             retrofit.create(UserService.class)
-                    .authenticate(new AuthenticateRequestDto(hashCode, oldToken))
+                    .authenticate(builder.build())
                     .retry(5)
                     .toBlocking()
-                    .subscribe(new Observer<AuthenticateDto>() {
+                    .subscribe(new Observer<AuthenticateProto.Authenticate>() {
                         @Override public void onCompleted() {
                         }
 
@@ -137,7 +147,7 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
                             L.i(Authorization.class, "Error on authentication!", e);
                         }
 
-                        @Override public void onNext(AuthenticateDto authenticateDto) {
+                        @Override public void onNext(AuthenticateProto.Authenticate authenticateDto) {
                             String token = authenticateDto.getToken();
                             L.i(Authorization.class, "Token: " + token);
                             Assert.assertFalse(TextUtils.isEmpty(token));

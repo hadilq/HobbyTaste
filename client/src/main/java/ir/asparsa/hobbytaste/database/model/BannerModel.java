@@ -6,7 +6,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.common.database.model.Banner;
-import ir.asparsa.common.net.dto.BannerDto;
+import ir.asparsa.common.net.dto.StoreProto;
 
 /**
  * @author hadi
@@ -36,8 +36,12 @@ public class BannerModel extends BaseModel implements Parcelable {
         this.thumbnailUrl = thumbnailUrl;
     }
 
-    public BannerDto convertToDto() {
-        return new BannerDto(mainUrl, thumbnailUrl);
+    public StoreProto.Banner convertToDto() {
+        return StoreProto.Banner
+                .newBuilder()
+                .setMainUrl(mainUrl)
+                .setThumbnailUrl(thumbnailUrl)
+                .build();
     }
 
     public long getId() {

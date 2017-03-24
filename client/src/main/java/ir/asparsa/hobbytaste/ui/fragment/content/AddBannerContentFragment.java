@@ -22,7 +22,7 @@ import ir.asparsa.android.core.util.UiUtil;
 import ir.asparsa.android.ui.fragment.dialog.LoadingProgressDialogFragment;
 import ir.asparsa.android.ui.fragment.dialog.ProgressDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
-import ir.asparsa.common.net.dto.BannerDto;
+import ir.asparsa.common.net.dto.StoreProto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.BuildConfig;
 import ir.asparsa.hobbytaste.R;
@@ -266,8 +266,8 @@ public class AddBannerContentFragment extends BaseContentFragment {
         };
     }
 
-    private Observer<BannerDto> getFileUploadObserver() {
-        return new Observer<BannerDto>() {
+    private Observer<StoreProto.Banner> getFileUploadObserver() {
+        return new Observer<StoreProto.Banner>() {
             @Override public void onCompleted() {
             }
 
@@ -277,7 +277,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
                 dismissLoadingProgressDialog();
             }
 
-            @Override public void onNext(BannerDto bannerDto) {
+            @Override public void onNext(StoreProto.Banner bannerDto) {
                 mBanner = new BannerModel(bannerDto.getMainUrl(), bannerDto.getThumbnailUrl());
                 L.i(AddBannerContentFragment.class, "Banner is uploaded " + mBanner);
                 mHintTextView.setText(getString(R.string.new_store_banner_successfully_sent));

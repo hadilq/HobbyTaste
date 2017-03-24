@@ -12,8 +12,8 @@ import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.android.ui.view.DialogControlLayout;
-import ir.asparsa.common.net.dto.FeedbackDto;
-import ir.asparsa.common.net.dto.ResponseDto;
+import ir.asparsa.common.net.dto.FeedbackProto;
+import ir.asparsa.common.net.dto.ResponseProto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.net.FeedbackService;
@@ -97,11 +97,16 @@ public class CrashReportActivity extends BaseActivity {
 
         mSubscription.add(
                 mFeedbackService
-                        .feedback(new FeedbackDto(feedback, crashThrowableName, crashMessage))
+                        .feedback(FeedbackProto.Feedback
+                                          .newBuilder()
+                                          .setBody(feedback)
+                                          .setCrashThrowableName(crashThrowableName)
+                                          .setCrashMessage(crashMessage)
+                                          .build())
                         .subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Action1<ResponseDto>() {
-                            @Override public void call(ResponseDto responseDto) {
+                        .subscribe(new Action1<ResponseProto.Response>() {
+                            @Override public void call(ResponseProto.Response responseDto) {
                                 mError.setVisibility(View.GONE);
                                 mProgressBar.setVisibility(View.GONE);
                                 Toast.makeText(

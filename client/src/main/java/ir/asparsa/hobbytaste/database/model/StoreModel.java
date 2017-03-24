@@ -7,8 +7,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.common.database.model.Store;
-import ir.asparsa.common.net.dto.BannerDto;
-import ir.asparsa.common.net.dto.StoreDto;
+import ir.asparsa.common.net.dto.StoreProto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +66,7 @@ public class StoreModel extends BaseModel implements Parcelable {
         banners = new ArrayList<>();
     }
 
-    public static StoreModel instantiate(StoreDto storeDto) {
+    public static StoreModel instantiate(StoreProto.Store storeDto) {
         StoreModel storeModel = new StoreModel();
         storeModel.lat = storeDto.getLat();
         storeModel.lon = storeDto.getLon();
@@ -79,8 +78,8 @@ public class StoreModel extends BaseModel implements Parcelable {
         storeModel.hashCode = storeDto.getHashCode();
         storeModel.created = storeDto.getCreated();
         List<BannerModel> banners = new ArrayList<>();
-        if (storeDto.getBanners() != null && storeDto.getBanners().size() != 0) {
-            for (BannerDto bannerDto : storeDto.getBanners()) {
+        if (storeDto.getBannerCount() != 0) {
+            for (StoreProto.Banner bannerDto : storeDto.getBannerList()) {
                 banners.add(
                         new BannerModel(bannerDto.getMainUrl(), bannerDto.getThumbnailUrl()));
             }
@@ -89,14 +88,20 @@ public class StoreModel extends BaseModel implements Parcelable {
         return storeModel;
     }
 
-    public StoreDto convertToDto() {
-        List<BannerDto> banners = new ArrayList<>();
+    public StoreProto.Store convertToDto() {
+        StoreProto.Store.Builder builder = StoreProto.Store
+                .newBuilder()
+                .setLat(lat)
+                .setLon(lon)
+                .setTitle(title)
+                .setDescription(description)
+                .setHashCode(hashCode);
         if (this.banners != null && this.banners.size() != 0) {
             for (BannerModel banner : this.banners) {
-                banners.add(banner.convertToDto());
+                builder.addBanner(banner.convertToDto());
             }
         }
-        return new StoreDto(lat, lon, title, description, hashCode, banners);
+        return builder.build();
     }
 
     public Long getId() {

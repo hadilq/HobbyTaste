@@ -1,7 +1,6 @@
 package ir.asparsa.hobbytaste.server.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import ir.asparsa.common.net.dto.ErrorDto;
+import ir.asparsa.common.net.dto.ResponseProto;
 import ir.asparsa.hobbytaste.server.controller.ServiceExceptionHandler;
 import ir.asparsa.hobbytaste.server.exception.BaseAuthenticationException;
 import ir.asparsa.hobbytaste.server.resources.Strings;
@@ -9,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -40,9 +40,9 @@ public class JwtAuthenticationFailureHandler implements AuthenticationFailureHan
         logger.info("onAuthenticationFailure gets called");
         logger.warn("request: " + request, authException);
 
-        response.setContentType("application/json");
+        response.setContentType(ProtobufHttpMessageConverter.PROTOBUF.toString());
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        ErrorDto errorResponse;
+        ResponseProto.Response errorResponse;
         if (authException instanceof BaseAuthenticationException) {
             BaseAuthenticationException exception = (BaseAuthenticationException) authException;
             errorResponse = ServiceExceptionHandler
@@ -52,7 +52,6 @@ public class JwtAuthenticationFailureHandler implements AuthenticationFailureHan
             errorResponse = ServiceExceptionHandler.generateError(authException, resourceBundle.getMessage(
                     Strings.UNKNOWN, null, new Locale(Strings.DEFAULT_LOCALE)));
         }
-        ObjectMapper mapper = new ObjectMapper();
-        response.getOutputStream().println(mapper.writeValueAsString(errorResponse));
+        errorResponse.writeTo(response.getOutputStream());
     }
 }

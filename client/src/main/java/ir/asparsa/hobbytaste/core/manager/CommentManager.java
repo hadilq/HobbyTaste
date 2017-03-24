@@ -2,8 +2,7 @@ package ir.asparsa.hobbytaste.core.manager;
 
 import com.j256.ormlite.dao.Dao;
 import ir.asparsa.android.core.logger.L;
-import ir.asparsa.common.net.dto.PageDto;
-import ir.asparsa.common.net.dto.StoreCommentDto;
+import ir.asparsa.common.net.dto.CommentProto;
 import ir.asparsa.hobbytaste.database.dao.CommentDao;
 import ir.asparsa.hobbytaste.database.dao.StoreDao;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
@@ -42,7 +41,7 @@ public class CommentManager {
     @Inject CommentManager() {
     }
 
-    private Observable<PageDto<StoreCommentDto>> getLoadServiceObservable(Constraint constraint) {
+    private Observable<CommentProto.Comments> getLoadServiceObservable(Constraint constraint) {
         return mStoreService
                 .loadComments(
                         constraint.getStore().getHashCode(), (int) (constraint.getOffset() / constraint.getLimit()),
@@ -52,7 +51,7 @@ public class CommentManager {
                 .observeOn(Schedulers.newThread());
     }
 
-    private Observable<StoreCommentDto> getSaveServiceObservable(
+    private Observable<CommentProto.Comment> getSaveServiceObservable(
             StoreModel store,
             CommentModel comment
     ) {
@@ -64,7 +63,7 @@ public class CommentManager {
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private Observable<StoreCommentDto> getLikeServiceObservable(
+    private Observable<CommentProto.Comment> getLikeServiceObservable(
             long storeHashCode,
             long commentHashCode,
             boolean liked
@@ -171,12 +170,12 @@ public class CommentManager {
         return subscription;
     }
 
-    private Observer<StoreCommentDto> onCommentReceivedObserver(
+    private Observer<CommentProto.Comment> onCommentReceivedObserver(
             final StoreModel store,
             final CommentModel oldComment,
             final Observer<CommentModel> observer
     ) {
-        return new Observer<StoreCommentDto>() {
+        return new Observer<CommentProto.Comment>() {
             @Override public void onCompleted() {
             }
 
@@ -184,7 +183,7 @@ public class CommentManager {
                 getLikeErrorObservable(e).subscribe(observer);
             }
 
-            @Override public void onNext(StoreCommentDto storeCommentDto) {
+            @Override public void onNext(CommentProto.Comment storeCommentDto) {
                 if (store.getHashCode() != storeCommentDto.getStoreHashCode()) {
                     getLikeErrorObservable(new RuntimeException("Returned store from server is wrong"))
                             .subscribe(observer);
@@ -205,11 +204,11 @@ public class CommentManager {
         };
     }
 
-    private Observer<PageDto<StoreCommentDto>> onLoadObserver(
+    private Observer<CommentProto.Comments> onLoadObserver(
             final Constraint constraint,
             final Observer<Collection<CommentModel>> observer
     ) {
-        return new Observer<PageDto<StoreCommentDto>>() {
+        return new Observer<CommentProto.Comments>() {
             @Override public void onCompleted() {
             }
 
@@ -217,11 +216,11 @@ public class CommentManager {
                 getLoadErrorObservable(e).subscribe(observer);
             }
 
-            @Override public void onNext(PageDto<StoreCommentDto> comments) {
-                L.i(CommentManager.class, "Loaded comments from server: " + comments.getList().size() +
+            @Override public void onNext(CommentProto.Comments comments) {
+                L.i(CommentManager.class, "Loaded comments from server: " + comments.getCommentCount() +
                                           " " + comments.getTotalElements());
                 List<CommentModel> list = new ArrayList<>();
-                for (StoreCommentDto storeCommentDto : comments.getList()) {
+                for (CommentProto.Comment storeCommentDto : comments.getCommentList()) {
                     if (constraint.getStore().getHashCode() != storeCommentDto.getStoreHashCode()) {
                         getLoadErrorObservable(new RuntimeException("Returned store from server is wrong"))
                                 .subscribe(observer);
@@ -305,12 +304,12 @@ public class CommentManager {
         };
     }
 
-    private Observer<StoreCommentDto> onSaveToServerObserver(
+    private Observer<CommentProto.Comment> onSaveToServerObserver(
             final StoreModel store,
             final CommentModel comment,
             final Observer<CommentModel> observer
     ) {
-        return new Observer<StoreCommentDto>() {
+        return new Observer<CommentProto.Comment>() {
             @Override public void onCompleted() {
             }
 
@@ -319,7 +318,7 @@ public class CommentManager {
                            .subscribe(onDeleteOnUnSucceedRequestObserver(e, observer));
             }
 
-            @Override public void onNext(StoreCommentDto storeComment) {
+            @Override public void onNext(CommentProto.Comment storeComment) {
                 L.i(CommentManager.class, "Saved on server.");
                 if (store.getHashCode() != storeComment.getStoreHashCode()) {
                     mCommentDao.delete(comment)

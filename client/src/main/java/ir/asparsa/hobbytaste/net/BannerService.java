@@ -1,6 +1,6 @@
 package ir.asparsa.hobbytaste.net;
 
-import ir.asparsa.common.net.dto.BannerDto;
+import ir.asparsa.common.net.dto.StoreProto;
 import ir.asparsa.common.net.path.BannerServicePath;
 import okhttp3.MultipartBody;
 import retrofit2.http.Multipart;
@@ -16,7 +16,7 @@ public interface BannerService {
 
     @Multipart
     @POST(BannerServicePath.SERVICE)
-    Observable<BannerDto> handleFileUpload(
+    Observable<StoreProto.Banner> handleFileUpload(
             @Part MultipartBody.Part file
     );
 }

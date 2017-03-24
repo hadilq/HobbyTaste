@@ -28,7 +28,7 @@ def attachGenerateDefaultConfiguration = { properties ->
     //###################         Security         ##########################
     properties.setProperty("jwt.secret", "${keystoreProperties['jwtSecret']}")
     properties.setProperty("jwt.header", "$global_jwtHeader")
-    properties.setProperty("security.request.minInterval", '1000')
+    properties.setProperty("security.request.minInterval", '100')
 
     //###################      Storage Service     ##########################
     properties.setProperty("storage.location", "upload-banners-dir")
@@ -191,6 +191,7 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'io.jsonwebtoken:jjwt:0.7.0'
     compile "io.reactivex:rxjava:$global_rxjavaVersion"
+    compile "com.googlecode.protobuf-java-format:protobuf-java-format:1.4"
     runtime 'org.postgresql:postgresql:9.4.1212'
     runtime 'com.h2database:h2:1.4.193'
 

@@ -109,7 +109,7 @@ dependencies {
     compile "com.google.firebase:firebase-crash:$global_playServicesVersion"
     // Retrofit
     compile "com.squareup.retrofit2:retrofit:$global_retrofitVersion"
-    compile "com.squareup.retrofit2:converter-gson:$global_retrofitVersion"
+    compile "com.squareup.retrofit2:converter-protobuf:$global_retrofitVersion"
     compile "com.squareup.retrofit2:adapter-rxjava:$global_retrofitVersion"
     compile "com.squareup.okhttp3:logging-interceptor:$global_okHttpVersion"
     // Picasso

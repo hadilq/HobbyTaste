@@ -1,7 +1,7 @@
 package ir.asparsa.hobbytaste.server.controller;
 
-import ir.asparsa.common.net.dto.FeedbackDto;
-import ir.asparsa.common.net.dto.ResponseDto;
+import ir.asparsa.common.net.dto.FeedbackProto;
+import ir.asparsa.common.net.dto.ResponseProto;
 import ir.asparsa.common.net.path.FeedbackServicePath;
 import ir.asparsa.hobbytaste.server.database.model.FeedbackModel;
 import ir.asparsa.hobbytaste.server.database.repository.FeedbackRepository;
@@ -33,8 +33,8 @@ import rx.schedulers.Schedulers;
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseBody
-    ResponseDto feedback(
-            @RequestBody FeedbackDto feedbackDto,
+    ResponseProto.Response feedback(
+            @RequestBody FeedbackProto.Feedback feedbackDto,
             @AuthenticationPrincipal AuthenticatedUser user
     ) {
         logger.info("The feedback is: " + feedbackDto.getBody());
@@ -53,6 +53,9 @@ import rx.schedulers.Schedulers;
                       @Override public void onNext(Void aVoid) {
                       }
                   });
-        return new ResponseDto(ResponseDto.STATUS.SUCCEED);
+        return ResponseProto.Response
+                .newBuilder()
+                .setStatus(ResponseProto.Response.StatusType.SUCCEED)
+                .build();
     }
 }

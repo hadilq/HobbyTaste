@@ -16,7 +16,7 @@ import butterknife.ButterKnife;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.dialog.BaseBottomDialogFragment;
 import ir.asparsa.android.ui.view.DialogControlLayout;
-import ir.asparsa.common.net.dto.AuthenticateDto;
+import ir.asparsa.common.net.dto.AuthenticateProto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.net.UserService;
@@ -99,7 +99,7 @@ public class SetUsernameDialogFragment extends BaseBottomDialogFragment {
                 username)
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Observer<AuthenticateDto>() {
+                    .subscribe(new Observer<AuthenticateProto.Authenticate>() {
                         @Override public void onCompleted() {
                         }
 
@@ -108,7 +108,7 @@ public class SetUsernameDialogFragment extends BaseBottomDialogFragment {
                             mUsernameLayout.setError(e.getLocalizedMessage());
                         }
 
-                        @Override public void onNext(AuthenticateDto authenticateDto) {
+                        @Override public void onNext(AuthenticateProto.Authenticate authenticateDto) {
                             OnSetUsernameDialogResultEvent event
                                     = (OnSetUsernameDialogResultEvent) getOnDialogResultEvent();
                             event.setUsername(username);

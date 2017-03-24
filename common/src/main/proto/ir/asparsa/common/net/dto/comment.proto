@@ -1,0 +1,20 @@
+syntax = "proto3";
+package ir.asparsa.common.net.dto;
+
+option java_outer_classname = "CommentProto";
+
+message Comments {
+     repeated Comment comment = 1;
+     int64 totalElements = 2;
+}
+
+message Comment {
+    string description = 1;
+    int64 hash_code = 2;
+
+    string creator = 3;
+    int64 created = 4;
+    int64 store_hash_code = 5;
+    int64 rate = 6;
+    bool  like = 7;
+}

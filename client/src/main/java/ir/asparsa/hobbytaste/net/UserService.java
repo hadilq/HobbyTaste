@@ -1,7 +1,6 @@
 package ir.asparsa.hobbytaste.net;
 
-import ir.asparsa.common.net.dto.AuthenticateDto;
-import ir.asparsa.common.net.dto.AuthenticateRequestDto;
+import ir.asparsa.common.net.dto.AuthenticateProto;
 import ir.asparsa.common.net.path.UserServicePath;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
@@ -15,12 +14,12 @@ import rx.Observable;
  */
 public interface UserService {
     @POST(UserServicePath.SERVICE + UserServicePath.AUTHENTICATE)
-    Observable<AuthenticateDto> authenticate(
-            @Body AuthenticateRequestDto oldTokenDto
+    Observable<AuthenticateProto.Authenticate> authenticate(
+            @Body AuthenticateProto.Request oldTokenDto
     );
 
     @POST(UserServicePath.SERVICE + UserServicePath.USERNAME)
-    Observable<AuthenticateDto> changeUsername(
+    Observable<AuthenticateProto.Authenticate> changeUsername(
             @Path("hashCode") long hashCode,
             @Query("new") String username
     );

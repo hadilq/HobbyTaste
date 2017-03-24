@@ -6,7 +6,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.common.database.model.Comment;
-import ir.asparsa.common.net.dto.StoreCommentDto;
+import ir.asparsa.common.net.dto.CommentProto;
 
 /**
  * @author hadi
@@ -70,15 +70,19 @@ public class CommentModel extends BaseModel implements Parcelable {
 
     public static CommentModel newInstance(
             long storeId,
-            StoreCommentDto storeCommentDto
+            CommentProto.Comment storeCommentDto
     ) {
         return new CommentModel(storeCommentDto.getDescription(), storeCommentDto.getRate(), storeCommentDto.getLike(),
                                 storeCommentDto.getCreator(), storeCommentDto.getCreated(),
                                 storeId, storeCommentDto.getHashCode());
     }
 
-    public StoreCommentDto convertToDto() {
-        return new StoreCommentDto(getDescription(), getHashCode());
+    public CommentProto.Comment convertToDto() {
+        return CommentProto.Comment
+                .newBuilder()
+                .setDescription(getDescription())
+                .setHashCode(getHashCode())
+                .build();
     }
 
     public long getId() {

@@ -1,0 +1,30 @@
+syntax = "proto3";
+package ir.asparsa.common.net.dto;
+
+option java_outer_classname = "StoreProto";
+
+message Stores {
+     repeated Store store = 1;
+     int64 totalElements = 2;
+}
+
+message Store {
+     double lat = 1;
+     double lon = 2;
+
+     string title = 3;
+     string description = 7;
+     int64 hash_code = 8;
+
+     int64 viewed = 4;
+     int64 rate = 5;
+     bool  like = 6;
+     int64 created = 9;
+
+     repeated Banner banner = 10;
+}
+
+message Banner {
+    string main_url = 1;
+    string thumbnail_url = 2;
+}

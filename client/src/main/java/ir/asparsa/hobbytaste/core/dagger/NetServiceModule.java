@@ -17,7 +17,7 @@ import ir.asparsa.hobbytaste.net.UserService;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.protobuf.ProtoConverterFactory;
 
 import javax.inject.Singleton;
 import javax.net.ssl.HostnameVerifier;
@@ -95,7 +95,7 @@ public class NetServiceModule {
     Retrofit.Builder provideRetrofitBuilder() {
         return new Retrofit.Builder()
                 .baseUrl(BuildConfig.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(ProtoConverterFactory.create())
                 .addCallAdapterFactory(RxErrorHandlingCallAdapterFactory.create());
     }
 

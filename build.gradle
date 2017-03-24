@@ -65,6 +65,7 @@ subprojects {
     ext.global_junitVersion = "4.12"
     ext.global_mockitoCoreVersion = "2.7.19"
     ext.global_dexmakerVersion = "1.2"
+    ext.global_protobufVersion = "3.0.0"
 
     ext.global_serverAddress = "192.168.1.7"
     ext.global_serverPort = "8090"

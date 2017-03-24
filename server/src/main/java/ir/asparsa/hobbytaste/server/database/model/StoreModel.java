@@ -1,14 +1,11 @@
 package ir.asparsa.hobbytaste.server.database.model;
 
 import ir.asparsa.common.database.model.Store;
-import ir.asparsa.common.net.dto.BannerDto;
-import ir.asparsa.common.net.dto.StoreDto;
+import ir.asparsa.common.net.dto.StoreProto;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author hadi
@@ -48,7 +45,7 @@ public class StoreModel implements Serializable {
     StoreModel() {
     }
 
-    public static StoreModel newInstance(StoreDto store) {
+    public static StoreModel newInstance(StoreProto.Store store) {
         StoreModel storeModel = new StoreModel();
         storeModel.lat = store.getLat();
         storeModel.lon = store.getLon();
@@ -59,14 +56,28 @@ public class StoreModel implements Serializable {
         return storeModel;
     }
 
-    public StoreDto convertToDto(boolean like) {
-        List<BannerDto> banners = new ArrayList<>();
+    public StoreProto.Store convertToDto(boolean like) {
+        StoreProto.Store.Builder builder = StoreProto.Store
+                .newBuilder()
+                .setLat(lat)
+                .setLon(lon)
+                .setTitle(title)
+                .setViewed(viewed)
+                .setRate(rate)
+                .setLike(like)
+                .setDescription(description)
+                .setHashCode(hashCode)
+                .setCreated(created);
         if (this.banners != null && this.banners.size() != 0) {
             for (BannerModel banner : this.banners) {
-                banners.add(new BannerDto(banner.getMainUrl(), banner.getThumbnailUrl()));
+                builder.addBanner(StoreProto.Banner
+                                          .newBuilder()
+                                          .setMainUrl(banner.getMainUrl())
+                                          .setThumbnailUrl(banner.getThumbnailUrl())
+                                          .build());
             }
         }
-        return new StoreDto(lat, lon, title, viewed, rate, like, description, hashCode, created, banners);
+        return builder.build();
     }
 
     public long getId() {

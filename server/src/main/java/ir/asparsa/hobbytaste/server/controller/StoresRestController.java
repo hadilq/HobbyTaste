@@ -1,10 +1,8 @@
 package ir.asparsa.hobbytaste.server.controller;
 
 import ir.asparsa.common.database.model.Comment;
-import ir.asparsa.common.net.dto.BannerDto;
-import ir.asparsa.common.net.dto.PageDto;
-import ir.asparsa.common.net.dto.StoreCommentDto;
-import ir.asparsa.common.net.dto.StoreDto;
+import ir.asparsa.common.net.dto.CommentProto;
+import ir.asparsa.common.net.dto.StoreProto;
 import ir.asparsa.common.net.path.StoreServicePath;
 import ir.asparsa.hobbytaste.server.database.model.*;
 import ir.asparsa.hobbytaste.server.database.repository.*;
@@ -28,7 +26,10 @@ import rx.Observable;
 import rx.Observer;
 import rx.schedulers.Schedulers;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author hadi
@@ -56,7 +57,7 @@ import java.util.*;
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    Collection<StoreDto> readStores(
+    StoreProto.Stores readStores(
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
             @AuthenticationPrincipal AuthenticatedUser user
     ) {
@@ -64,7 +65,8 @@ import java.util.*;
 
         List<StoreLikeModel> storeLikes = storeLikeRepository.findByAccount(user.getAccount());
 
-        Collection<StoreDto> collection = new LinkedList<>();
+        StoreProto.Stores.Builder builder = StoreProto.Stores.newBuilder();
+        builder.setTotalElements(0);
         for (StoreModel storeModel : storeRepository.findAll()) {
             boolean like = false;
             for (StoreLikeModel storeLike : storeLikes) {
@@ -73,14 +75,14 @@ import java.util.*;
                     break;
                 }
             }
-            collection.add(storeModel.convertToDto(like));
+            builder.addStore(storeModel.convertToDto(like));
         }
-        return collection;
+        return builder.build();
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    StoreDto saveStore(
-            @RequestBody StoreDto store,
+    StoreProto.Store saveStore(
+            @RequestBody StoreProto.Store store,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
             @AuthenticationPrincipal AuthenticatedUser user
     ) {
@@ -97,9 +99,9 @@ import java.util.*;
         StoreModel storeModel = storeRepository.save(StoreModel.newInstance(store));
         logger.info("Store model saved");
         Collection<BannerModel> banners = new ArrayDeque<>();
-        if (store.getBanners() != null && store.getBanners().size() != 0) {
+        if (store.getBannerCount() != 0) {
             logger.info("Banners is not empty");
-            for (BannerDto banner : store.getBanners()) {
+            for (StoreProto.Banner banner : store.getBannerList()) {
                 logger.info("1 Banner main: " + banner.getMainUrl() + ", thumbnail: " + banner.getMainUrl());
                 String mainFilename = storageService.getFilename(banner.getMainUrl(), locale);
                 String thumbnailFilename = storageService.getFilename(banner.getThumbnailUrl(), locale);
@@ -124,7 +126,7 @@ import java.util.*;
     }
 
     @RequestMapping(value = StoreServicePath.VIEWED, method = RequestMethod.PUT)
-    StoreDto storeViewed(
+    StoreProto.Store storeViewed(
             @PathVariable("storeHashCode") Long hashCode,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
             @AuthenticationPrincipal AuthenticatedUser user
@@ -144,7 +146,7 @@ import java.util.*;
     }
 
     @RequestMapping(value = StoreServicePath.COMMENTS, method = RequestMethod.POST)
-    PageDto<StoreCommentDto> readStoreCommentsList(
+    CommentProto.Comments readStoreCommentsList(
             @PathVariable("storeHashCode") Long hashCode,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size,
@@ -162,20 +164,23 @@ import java.util.*;
 
         List<CommentLikeModel> commentLikes = commentLikeRepository
                 .findByAccountAndStore(user.getAccount(), storeModel.get());
-        List<StoreCommentDto> list = new ArrayList<>();
+
+        CommentProto.Comments.Builder builder = CommentProto.Comments
+                .newBuilder()
+                .setTotalElements(comments.getTotalElements());
         for (CommentModel comment : comments) {
             boolean like = isLikedComment(commentLikes, comment);
-            list.add(comment.convertToDto(like));
+            builder.addComment(comment.convertToDto(like));
             logger.info("Loaded comment: " + comment);
         }
 
-        return new PageDto<>(comments.getTotalElements(), list);
+        return builder.build();
     }
 
     @RequestMapping(value = StoreServicePath.COMMENTS, method = RequestMethod.PUT)
-    StoreCommentDto saveStoreComments(
+    CommentProto.Comment saveStoreComments(
             @PathVariable("storeHashCode") Long hashCode,
-            @RequestBody StoreCommentDto comment,
+            @RequestBody CommentProto.Comment comment,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
             @AuthenticationPrincipal AuthenticatedUser user
     ) {
@@ -198,7 +203,7 @@ import java.util.*;
     }
 
     @RequestMapping(value = StoreServicePath.LIKE, method = RequestMethod.PUT)
-    StoreDto saveStoreLike(
+    StoreProto.Store saveStoreLike(
             @PathVariable("storeHashCode") Long hashCode,
             @PathVariable("like") Boolean like,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
@@ -241,7 +246,7 @@ import java.util.*;
     }
 
     @RequestMapping(value = StoreServicePath.LIKE_COMMENT, method = RequestMethod.PUT)
-    StoreCommentDto saveCommentLike(
+    CommentProto.Comment saveCommentLike(
             @PathVariable("storeHashCode") Long storeHashCode,
             @PathVariable("commentHashCode") Long hashCode,
             @PathVariable("like") Boolean like,
