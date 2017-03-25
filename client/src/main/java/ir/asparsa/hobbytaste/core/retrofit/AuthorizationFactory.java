@@ -2,11 +2,11 @@ package ir.asparsa.hobbytaste.core.retrofit;
 
 import android.text.TextUtils;
 import com.google.common.net.HttpHeaders;
-import com.google.firebase.crash.FirebaseCrash;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.common.net.dto.AuthenticateProto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.BuildConfig;
+import ir.asparsa.hobbytaste.core.logger.FirebaseLogger;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 import ir.asparsa.hobbytaste.core.util.LanguageUtil;
@@ -146,7 +146,7 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
 
                         @Override public void onError(Throwable e) {
                             L.i(Authorization.class, "Error on authentication!", e);
-                            FirebaseCrash.report(e);
+                            FirebaseLogger.e(e);
                         }
 
                         @Override public void onNext(AuthenticateProto.Authenticate authenticateDto) {

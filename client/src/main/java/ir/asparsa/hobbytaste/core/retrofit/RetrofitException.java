@@ -2,11 +2,11 @@ package ir.asparsa.hobbytaste.core.retrofit;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
-import com.google.firebase.crash.FirebaseCrash;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.common.net.dto.ResponseProto;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
+import ir.asparsa.hobbytaste.core.logger.FirebaseLogger;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
@@ -118,7 +118,7 @@ public class RetrofitException extends RuntimeException {
             case UNEXPECTED:
                 if (getCause() != null) {
                     L.e(RetrofitException.class, "Unexpected error", getCause());
-                    FirebaseCrash.report(getCause());
+                    FirebaseLogger.e(getCause());
                 }
 //                throw this;
         }
