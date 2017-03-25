@@ -1,7 +1,9 @@
 package ir.asparsa.hobbytaste.server.security;
 
+import ir.asparsa.hobbytaste.server.exception.JwtTokenMissingException;
 import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.model.JwtAuthenticationToken;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -39,6 +41,11 @@ public class JwtAuthenticationTokenFilterMock extends AbstractAuthenticationProc
             HttpServletResponse response
     ) {
         logger.debug("attemptAuthentication gets called");
+
+        if (StringUtils.isEmpty(token)) {
+            throw new JwtTokenMissingException(
+                    "No JWT token found in request headers", Strings.NO_JWT_HEADER_FOUND, Strings.DEFAULT_LOCALE);
+        }
 
         return getAuthenticationManager()
                 .authenticate(new JwtAuthenticationToken(token, "", "", Strings.DEFAULT_LOCALE));

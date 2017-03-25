@@ -5,7 +5,6 @@ import ir.asparsa.common.net.dto.StoreProto;
 import ir.asparsa.common.net.path.StoreServicePath;
 import ir.asparsa.hobbytaste.server.Application;
 import ir.asparsa.hobbytaste.server.database.model.AccountModel;
-import ir.asparsa.hobbytaste.server.database.model.StoreLikeModel;
 import ir.asparsa.hobbytaste.server.database.model.StoreModel;
 import ir.asparsa.hobbytaste.server.database.repository.*;
 import ir.asparsa.hobbytaste.server.security.*;
