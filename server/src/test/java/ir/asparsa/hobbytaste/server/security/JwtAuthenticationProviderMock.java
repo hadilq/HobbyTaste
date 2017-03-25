@@ -2,6 +2,8 @@ package ir.asparsa.hobbytaste.server.security;
 
 
 import ir.asparsa.hobbytaste.server.database.model.AccountModel;
+import ir.asparsa.hobbytaste.server.exception.JwtTokenMalformedException;
+import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.model.AuthenticatedUser;
 import ir.asparsa.hobbytaste.server.security.model.JwtAuthenticationToken;
 import org.slf4j.Logger;
@@ -44,6 +46,11 @@ public class JwtAuthenticationProviderMock extends AbstractUserDetailsAuthentica
             UsernamePasswordAuthenticationToken authentication
     ) throws AuthenticationException {
         logger.debug("retrieveUser gets called");
+
+        if (parsedUser == null) {
+            throw new JwtTokenMalformedException(
+                    "JWT token is not valid", Strings.JWT_TOKEN_NOT_VALID, Strings.DEFAULT_LOCALE);
+        }
 
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
         return new AuthenticatedUser(

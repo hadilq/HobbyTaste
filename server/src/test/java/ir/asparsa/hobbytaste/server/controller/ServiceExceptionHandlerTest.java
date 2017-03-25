@@ -9,6 +9,8 @@ import ir.asparsa.hobbytaste.server.util.JwtTokenUtil;
 import ir.asparsa.hobbytaste.server.util.RequestLogUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserRestController.class)
 public class ServiceExceptionHandlerTest extends BaseControllerTest {
+
+    private final static Logger logger = LoggerFactory.getLogger(ServiceExceptionHandlerTest.class);
 
     @MockBean
     private AccountRepository accountRepository;
@@ -56,6 +60,35 @@ public class ServiceExceptionHandlerTest extends BaseControllerTest {
 
         ResponseProto.Response error = ResponseProto.Response
                 .parseFrom(result.getResponse().getContentAsByteArray());
+        logger.info("Error dto: " + error);
         assertThat(error.getStatus()).isEqualTo(ResponseProto.Response.StatusType.ERROR);
+        assertThat(error.getDetailMessage()).isEqualTo("No JWT token found in request headers");
+        assertThat(error.getLocalizedMessage()).isEqualTo("Token is not found");
+    }
+
+
+    @Test
+    public void withoutParsedAccountTest() throws Exception {
+        long hashCode = new Random().nextLong();
+
+        String token = "token";
+        jwtAuthenticationTokenFilterMock.setToken(token);
+
+        String newUsername = "newUsername";
+        MvcResult result = this.mockMvc.perform(
+                post(WebSecurityConfig.ENTRY_POINT_API + "/" +
+                     UserServicePath.SERVICE + UserServicePath.USERNAME.replace("{hashCode}", Long.toString(hashCode)))
+                        .param("new", newUsername)
+                        .accept(ProtobufHttpMessageConverter.PROTOBUF))
+                                       .andExpect(status().is(HttpStatus.UNAUTHORIZED.value()))
+                                       .andExpect(content().contentType(ProtobufHttpMessageConverter.PROTOBUF))
+                                       .andReturn();
+
+        ResponseProto.Response error = ResponseProto.Response
+                .parseFrom(result.getResponse().getContentAsByteArray());
+        logger.info("Error dto: " + error);
+        assertThat(error.getStatus()).isEqualTo(ResponseProto.Response.StatusType.ERROR);
+        assertThat(error.getDetailMessage()).isEqualTo("JWT token is not valid");
+        assertThat(error.getLocalizedMessage()).isEqualTo("Token is not valid");
     }
 }
