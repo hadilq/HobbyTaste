@@ -9,6 +9,6 @@ message Authenticate {
 }
 
 message Request {
-    int64 hash_code = 1;
+    string hash = 1;
     string token = 2;
 }

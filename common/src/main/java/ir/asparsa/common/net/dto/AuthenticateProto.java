@@ -659,9 +659,14 @@ public final class AuthenticateProto {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>int64 hash_code = 1;</code>
+     * <code>string hash = 1;</code>
      */
-    long getHashCode();
+    java.lang.String getHash();
+    /**
+     * <code>string hash = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getHashBytes();
 
     /**
      * <code>string token = 2;</code>
@@ -685,7 +690,7 @@ public final class AuthenticateProto {
       super(builder);
     }
     private Request() {
-      hashCode_ = 0L;
+      hash_ = "";
       token_ = "";
     }
 
@@ -714,9 +719,10 @@ public final class AuthenticateProto {
               }
               break;
             }
-            case 8: {
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
 
-              hashCode_ = input.readInt64();
+              hash_ = s;
               break;
             }
             case 18: {
@@ -748,13 +754,38 @@ public final class AuthenticateProto {
               ir.asparsa.common.net.dto.AuthenticateProto.Request.class, ir.asparsa.common.net.dto.AuthenticateProto.Request.Builder.class);
     }
 
-    public static final int HASH_CODE_FIELD_NUMBER = 1;
-    private long hashCode_;
+    public static final int HASH_FIELD_NUMBER = 1;
+    private volatile java.lang.Object hash_;
     /**
-     * <code>int64 hash_code = 1;</code>
+     * <code>string hash = 1;</code>
      */
-    public long getHashCode() {
-      return hashCode_;
+    public java.lang.String getHash() {
+      java.lang.Object ref = hash_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        hash_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string hash = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getHashBytes() {
+      java.lang.Object ref = hash_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        hash_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     public static final int TOKEN_FIELD_NUMBER = 2;
@@ -803,8 +834,8 @@ public final class AuthenticateProto {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (hashCode_ != 0L) {
-        output.writeInt64(1, hashCode_);
+      if (!getHashBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, hash_);
       }
       if (!getTokenBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, token_);
@@ -816,9 +847,8 @@ public final class AuthenticateProto {
       if (size != -1) return size;
 
       size = 0;
-      if (hashCode_ != 0L) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(1, hashCode_);
+      if (!getHashBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, hash_);
       }
       if (!getTokenBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, token_);
@@ -839,8 +869,8 @@ public final class AuthenticateProto {
       ir.asparsa.common.net.dto.AuthenticateProto.Request other = (ir.asparsa.common.net.dto.AuthenticateProto.Request) obj;
 
       boolean result = true;
-      result = result && (getHashCode()
-          == other.getHashCode());
+      result = result && getHash()
+          .equals(other.getHash());
       result = result && getToken()
           .equals(other.getToken());
       return result;
@@ -853,9 +883,8 @@ public final class AuthenticateProto {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + HASH_CODE_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getHashCode());
+      hash = (37 * hash) + HASH_FIELD_NUMBER;
+      hash = (53 * hash) + getHash().hashCode();
       hash = (37 * hash) + TOKEN_FIELD_NUMBER;
       hash = (53 * hash) + getToken().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -976,7 +1005,7 @@ public final class AuthenticateProto {
       }
       public Builder clear() {
         super.clear();
-        hashCode_ = 0L;
+        hash_ = "";
 
         token_ = "";
 
@@ -1002,7 +1031,7 @@ public final class AuthenticateProto {
 
       public ir.asparsa.common.net.dto.AuthenticateProto.Request buildPartial() {
         ir.asparsa.common.net.dto.AuthenticateProto.Request result = new ir.asparsa.common.net.dto.AuthenticateProto.Request(this);
-        result.hashCode_ = hashCode_;
+        result.hash_ = hash_;
         result.token_ = token_;
         onBuilt();
         return result;
@@ -1045,8 +1074,9 @@ public final class AuthenticateProto {
 
       public Builder mergeFrom(ir.asparsa.common.net.dto.AuthenticateProto.Request other) {
         if (other == ir.asparsa.common.net.dto.AuthenticateProto.Request.getDefaultInstance()) return this;
-        if (other.getHashCode() != 0L) {
-          setHashCode(other.getHashCode());
+        if (!other.getHash().isEmpty()) {
+          hash_ = other.hash_;
+          onChanged();
         }
         if (!other.getToken().isEmpty()) {
           token_ = other.token_;
@@ -1078,28 +1108,71 @@ public final class AuthenticateProto {
         return this;
       }
 
-      private long hashCode_ ;
+      private java.lang.Object hash_ = "";
       /**
-       * <code>int64 hash_code = 1;</code>
+       * <code>string hash = 1;</code>
        */
-      public long getHashCode() {
-        return hashCode_;
+      public java.lang.String getHash() {
+        java.lang.Object ref = hash_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          hash_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
-       * <code>int64 hash_code = 1;</code>
+       * <code>string hash = 1;</code>
        */
-      public Builder setHashCode(long value) {
-        
-        hashCode_ = value;
+      public com.google.protobuf.ByteString
+          getHashBytes() {
+        java.lang.Object ref = hash_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          hash_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string hash = 1;</code>
+       */
+      public Builder setHash(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        hash_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>int64 hash_code = 1;</code>
+       * <code>string hash = 1;</code>
        */
-      public Builder clearHashCode() {
+      public Builder clearHash() {
         
-        hashCode_ = 0L;
+        hash_ = getDefaultInstance().getHash();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string hash = 1;</code>
+       */
+      public Builder setHashBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        hash_ = value;
         onChanged();
         return this;
       }
@@ -1242,9 +1315,9 @@ public final class AuthenticateProto {
     java.lang.String[] descriptorData = {
       "\n\022authenticate.proto\022\031ir.asparsa.common." +
       "net.dto\"/\n\014Authenticate\022\r\n\005token\030\001 \001(\t\022\020" +
-      "\n\010username\030\002 \001(\t\"+\n\007Request\022\021\n\thash_code" +
-      "\030\001 \001(\003\022\r\n\005token\030\002 \001(\tB\023B\021AuthenticatePro" +
-      "tob\006proto3"
+      "\n\010username\030\002 \001(\t\"&\n\007Request\022\014\n\004hash\030\001 \001(" +
+      "\t\022\r\n\005token\030\002 \001(\tB\023B\021AuthenticateProtob\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1269,7 +1342,7 @@ public final class AuthenticateProto {
     internal_static_ir_asparsa_common_net_dto_Request_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ir_asparsa_common_net_dto_Request_descriptor,
-        new java.lang.String[] { "HashCode", "Token", });
+        new java.lang.String[] { "Hash", "Token", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

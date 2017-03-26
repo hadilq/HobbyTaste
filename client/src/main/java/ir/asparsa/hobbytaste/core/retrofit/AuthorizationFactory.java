@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.security.SecureRandom;
+import java.util.UUID;
 
 /**
  * @author hadi
@@ -33,8 +34,8 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
 
     private SecureRandom secureRandom = new SecureRandom();
 
-    private long lastTimeRefreshed = System.currentTimeMillis();
-    private long hashCode = generateHashCode();
+    private long lastTimeRefreshed;
+    private String hash;
 
     @Inject
     AuthorizationManager mAuthorizationManager;
@@ -44,8 +45,8 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
     @Inject AuthorizationFactory() {
     }
 
-    private long generateHashCode() {
-        return lastTimeRefreshed ^ secureRandom.nextLong();
+    private String generateHash() {
+        return UUID.randomUUID().toString();
     }
 
     @Override public Request authenticate(
@@ -100,11 +101,15 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
 
     private void authorize(String oldToken) {
         long current = System.currentTimeMillis();
+        if (TextUtils.isEmpty(hash)) {
+            lastTimeRefreshed = current;
+            hash = generateHash();
+        }
         if (current - lastTimeRefreshed > BuildConfig.HASH_CODE_EXPIRATION_TIME) {
             lastTimeRefreshed = current;
-            hashCode = generateHashCode();
+            hash = generateHash();
         }
-        new Authorization(hashCode, mAuthorizationManager, oldToken);
+        new Authorization(hash, mAuthorizationManager, oldToken);
     }
 
     public static class Authorization {
@@ -115,23 +120,23 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
         Retrofit.Builder mRetrofitBuilder;
 
         private Authorization(
-                long hashCode,
+                String hash,
                 AuthorizationManager authorizationManager,
                 String oldToken
         ) {
             ApplicationLauncher.mainComponent().inject(this);
-            authorize(hashCode, authorizationManager, oldToken);
+            authorize(hash, authorizationManager, oldToken);
         }
 
         private void authorize(
-                long hashCode,
+                String hash,
                 final AuthorizationManager authorizationManager,
                 String oldToken
         ) {
             Retrofit retrofit = mRetrofitBuilder.client(mHttpClientBuilder.build()).build();
             AuthenticateProto.Request.Builder builder = AuthenticateProto.Request
                     .newBuilder()
-                    .setHashCode(hashCode);
+                    .setHash(hash);
 
             if (!TextUtils.isEmpty(oldToken)) {
                 builder.setToken(oldToken);

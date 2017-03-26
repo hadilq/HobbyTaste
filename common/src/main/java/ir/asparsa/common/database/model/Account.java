@@ -9,7 +9,7 @@ public interface Account {
     interface Columns {
         String PASSWORD = "password";
         String USERNAME = "username";
-        String HASH_CODE = "hash_code";
+        String HASH = "hash";
         String CREATED = "created";
         String ROLE = "role";
     }

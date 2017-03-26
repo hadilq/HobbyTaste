@@ -54,11 +54,11 @@ import java.util.Random;
     ) {
         logger.debug("Authentication gets called");
         AccountModel accountModel;
-        Optional<AccountModel> account = accountRepository.findByHashCode(authenticateRequestDto.getHashCode());
+        Optional<AccountModel> account = accountRepository.findByHash(authenticateRequestDto.getHash());
         if (!account.isPresent()) {
-            accountModel = new AccountModel(generateUsername(), authenticateRequestDto.getHashCode(), "USER");
+            accountModel = new AccountModel(generateUsername(), authenticateRequestDto.getHash(), "USER");
             accountModel = accountRepository.save(accountModel);
-            logger.debug("New username: " + accountModel.getUsername());
+            logger.debug("New user: " + accountModel.getUsername());
         } else if (System.currentTimeMillis() - account.get().getCreated() > hashCodeExpirationTime) {
             logger.debug("Authentication is expired");
             String locale = request.getParameter("locale");
@@ -91,7 +91,6 @@ import java.util.Random;
         AccountModel account = user.getAccount();
 
         account.setUsername(username);
-        account.setHashCode(hashCode);
         accountRepository.save(account);
 
         return AuthenticateProto.Authenticate

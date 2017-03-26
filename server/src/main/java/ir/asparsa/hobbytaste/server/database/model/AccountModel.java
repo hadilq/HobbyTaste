@@ -27,8 +27,8 @@ public class AccountModel implements Serializable {
     @Column(name = Account.Columns.USERNAME)
     private String username;
 
-    @Column(name = Account.Columns.HASH_CODE)
-    private Long hashCode;
+    @Column(name = Account.Columns.HASH)
+    private String hash;
 
     @Column(name = Account.Columns.CREATED)
     private Long created;
@@ -41,11 +41,11 @@ public class AccountModel implements Serializable {
 
     public AccountModel(
             String username,
-            long hashCode,
+            String hash,
             String role
     ) {
         this.username = username;
-        this.hashCode = hashCode;
+        this.hash = hash;
         this.created = System.currentTimeMillis();
         this.role = role;
     }
@@ -62,16 +62,16 @@ public class AccountModel implements Serializable {
         return username;
     }
 
+    public String getHash() {
+        return hash;
+    }
+
     public String getRole() {
         return role;
     }
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public void setHashCode(Long hashCode) {
-        this.hashCode = hashCode;
     }
 
     public long getCreated() {
@@ -86,6 +86,8 @@ public class AccountModel implements Serializable {
         final AccountModel other = (AccountModel) otherObj;
         return ((getUsername() == null && other.getUsername() == null) ||
                 (getUsername() != null && getUsername().equals(other.getUsername()))) &&
+               ((getHash() == null && other.getHash() == null) ||
+                (getHash() != null && getHash().equals(other.getHash()))) &&
                (getId() == getId());
     }
 
@@ -99,6 +101,8 @@ public class AccountModel implements Serializable {
                "id=" + id +
                ", password='" + password + '\'' +
                ", username='" + username + '\'' +
+               ", hash='" + hash + '\'' +
+               ", created=" + created +
                ", role='" + role + '\'' +
                '}';
     }
