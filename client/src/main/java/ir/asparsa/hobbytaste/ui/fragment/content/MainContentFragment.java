@@ -3,9 +3,7 @@ package ir.asparsa.hobbytaste.ui.fragment.content;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -44,7 +42,8 @@ public class MainContentFragment extends BaseContentFragment
     private GoogleMap mMap;
     private List<StoreModel> mStores;
     private List<Marker> mMarkers = new ArrayList<>();
-    private CompositeSubscription subscription = new CompositeSubscription();
+    private CompositeSubscription mSubscription = new CompositeSubscription();
+    private boolean mTryAgainLater = true;
 
     public static MainContentFragment instantiate() {
         MainContentFragment fragment = new MainContentFragment();
@@ -55,15 +54,6 @@ public class MainContentFragment extends BaseContentFragment
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
-    }
-
-    @Nullable @Override public View onCreateView(
-            LayoutInflater inflater,
-            @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState
-    ) {
-        subscription.add(mStoresManager.loadStores(getStoreObserver()));
-        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -79,6 +69,14 @@ public class MainContentFragment extends BaseContentFragment
         }
     }
 
+    @Override public void onStart() {
+        super.onStart();
+        if (mTryAgainLater) {
+            mTryAgainLater = false;
+            mSubscription.add(mStoresManager.loadStores(getStoreObserver()));
+        }
+    }
+
     @Override public void onDestroyView() {
         if (mMap != null) {
             getArguments().putParcelable(BUNDLE_KEY_CAMERA, mMap.getCameraPosition());
@@ -86,7 +84,7 @@ public class MainContentFragment extends BaseContentFragment
         for (Marker marker : mMarkers) {
             marker.remove();
         }
-        subscription.clear();
+        mSubscription.clear();
         super.onDestroyView();
     }
 
@@ -104,6 +102,7 @@ public class MainContentFragment extends BaseContentFragment
             @Override public void onError(Throwable e) {
                 L.w(MainContentFragment.class, "Store gets error", e);
                 Toast.makeText(getContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                mTryAgainLater = true;
             }
 
             @Override public void onNext(Collection<StoreModel> stores) {
