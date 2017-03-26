@@ -125,9 +125,9 @@ public class CommentManager {
 
     private void loadFromDatabase(
             Constraint constraint,
-            Observer<Collection<CommentModel>> observer
+            final Observer<Collection<CommentModel>> observer
     ) {
-        getLoadCommentsObservable(constraint).subscribe(observer);
+        getLoadCommentsObservable(constraint).subscribe(onLoadFromDatabaseObserver(observer));
     }
 
     public Subscription saveComment(
@@ -217,8 +217,7 @@ public class CommentManager {
             }
 
             @Override public void onNext(CommentProto.Comments comments) {
-                L.i(CommentManager.class, "Loaded comments from server: " + comments.getCommentCount() +
-                                          " " + comments.getTotalElements());
+                L.i(CommentManager.class, "Loaded comments from server: " + comments);
                 List<CommentModel> list = new ArrayList<>();
                 for (CommentProto.Comment storeCommentDto : comments.getCommentList()) {
                     if (constraint.getStore().getHashCode() != storeCommentDto.getStoreHashCode()) {
@@ -255,6 +254,22 @@ public class CommentManager {
                 mCommentDao.countOf(constraint.getStore().getId())
                            .subscribe(onCheckTotalCountObserver(constraint, totalElements, observer));
 
+            }
+        };
+    }
+
+    private Observer<List<CommentModel>> onLoadFromDatabaseObserver(final Observer<Collection<CommentModel>> observer) {
+        return new Observer<List<CommentModel>>() {
+            @Override public void onCompleted() {
+                // Don't call observer's on completed method
+            }
+
+            @Override public void onError(Throwable e) {
+                observer.onError(e);
+            }
+
+            @Override public void onNext(List<CommentModel> commentModels) {
+                observer.onNext(commentModels);
             }
         };
     }
