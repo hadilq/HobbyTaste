@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.R;
@@ -32,6 +33,7 @@ public class UserNameViewHolder extends BaseViewHolder<UsernameData> {
     }
 
     @Override public void onBindView(final UsernameData data) {
+        L.d(getClass(), "On bind gets called");
         mUsernameTextView.setText(data.getUsername());
         mLayout.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {

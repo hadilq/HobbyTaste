@@ -2,6 +2,7 @@ package ir.asparsa.hobbytaste.core.manager;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import ir.asparsa.android.core.logger.L;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -60,6 +61,7 @@ public class AuthorizationManager {
         synchronized (usernameSync) {
             this.username = username;
             mPreferencesManager.put(PreferencesManager.KEY_USERNAME, username);
+            L.d(getClass(), "On change username");
             mOnUsernameChangeSubject.onNext(username);
         }
     }
@@ -86,7 +88,7 @@ public class AuthorizationManager {
 
     public Subscription register(OnUsernameChangeObserver onUsernameChangeObserver) {
         return mOnUsernameChangeSubject
-                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(onUsernameChangeObserver);
     }
 

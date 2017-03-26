@@ -57,6 +57,7 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
     }
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        L.d(getClass(), "On activity created");
         super.onActivityCreated(savedInstanceState);
         mSubscription.add(mAuthorizationManager.register(new AuthorizationManager.OnUsernameChangeObserver() {
             @Override public void onNext(String s) {
@@ -151,7 +152,9 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
     }
 
     private void changeUsername(String username) {
+        L.i(getClass(), "On change username");
         for (BaseRecyclerData data : mAdapter.findData(UsernameData.class)) {
+            L.d(getClass(), "Username data is found");
             ((UsernameData) data).setUsername(username);
             int index = mAdapter.getList().indexOf(data);
             if (index != -1) {
