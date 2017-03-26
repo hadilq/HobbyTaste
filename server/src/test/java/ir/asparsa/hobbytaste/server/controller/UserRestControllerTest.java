@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -44,19 +45,19 @@ public class UserRestControllerTest extends BaseControllerTest {
 
     @Test
     public void authenticationTest() throws Exception {
-        long hashCode = new Random().nextLong();
+        String hash = UUID.randomUUID().toString();
 
         String token = "token";
 
-        AccountModel accountModel = new AccountModel("testUser", hashCode, "USER");
-        given(accountRepository.findByHashCode(hashCode))
+        AccountModel accountModel = new AccountModel("testUser", hash, "USER");
+        given(accountRepository.findByHash(hash))
                 .willReturn(Optional.of(accountModel));
         given(jwtTokenUtil.generateToken(accountModel))
                 .willReturn(token);
 
         AuthenticateProto.Request request = AuthenticateProto.Request
                 .newBuilder()
-                .setHashCode(hashCode)
+                .setHash(hash)
                 .build();
 
         MvcResult result = this.mockMvc.perform(
@@ -78,11 +79,12 @@ public class UserRestControllerTest extends BaseControllerTest {
     @Test
     public void changeUsernameTest() throws Exception {
         long hashCode = new Random().nextLong();
+        String hash = UUID.randomUUID().toString();
 
         String token = "token";
         jwtAuthenticationTokenFilterMock.setToken(token);
 
-        AccountModel accountModel = new AccountModel("testUser", hashCode, "USER");
+        AccountModel accountModel = new AccountModel("testUser", hash, "USER");
         jwtAuthenticationProviderMock.setParsedUser(accountModel);
 
         given(jwtTokenUtil.generateToken(accountModel))

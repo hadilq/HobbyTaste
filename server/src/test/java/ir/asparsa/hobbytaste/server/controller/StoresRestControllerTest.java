@@ -16,10 +16,7 @@ import org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,12 +50,12 @@ public class StoresRestControllerTest extends BaseControllerTest {
 
     @Test
     public void readEmptyStores() throws Exception {
-        long hashCode = new Random().nextLong();
+        String hash = UUID.randomUUID().toString();
 
         String token = "token";
         jwtAuthenticationTokenFilterMock.setToken(token);
 
-        AccountModel accountModel = new AccountModel("testUser", hashCode, "USER");
+        AccountModel accountModel = new AccountModel("testUser", hash, "USER");
         jwtAuthenticationProviderMock.setParsedUser(accountModel);
 
         given(storeRepository.findAll())
@@ -80,12 +77,12 @@ public class StoresRestControllerTest extends BaseControllerTest {
 
     @Test
     public void readFilledStores() throws Exception {
-        long hashCode = new Random().nextLong();
+        String hash = UUID.randomUUID().toString();
 
         String token = "token";
         jwtAuthenticationTokenFilterMock.setToken(token);
 
-        AccountModel accountModel = new AccountModel("testUser", hashCode, "USER");
+        AccountModel accountModel = new AccountModel("testUser", hash, "USER");
         jwtAuthenticationProviderMock.setParsedUser(accountModel);
 
         ArrayList<StoreModel> models = new ArrayList<>();
@@ -124,11 +121,12 @@ public class StoresRestControllerTest extends BaseControllerTest {
     @Test
     public void readFilledLikeStores() throws Exception {
         long hashCode = new Random().nextLong();
+        String hash = UUID.randomUUID().toString();
 
         String token = "token";
         jwtAuthenticationTokenFilterMock.setToken(token);
 
-        AccountModel accountModel = new AccountModel("testUser", hashCode, "USER");
+        AccountModel accountModel = new AccountModel("testUser", hash, "USER");
         jwtAuthenticationProviderMock.setParsedUser(accountModel);
 
         ArrayList<StoreModel> models = new ArrayList<>();
@@ -172,14 +170,13 @@ public class StoresRestControllerTest extends BaseControllerTest {
 
     @Test
     public void saveStore() throws Exception {
-        Random random = new Random();
-        long userHashCode = random.nextLong();
-        long hashCode = random.nextLong();
+        String hash = UUID.randomUUID().toString();
+        long hashCode = new Random().nextLong();
 
         String token = "token";
         jwtAuthenticationTokenFilterMock.setToken(token);
 
-        AccountModel accountModel = new AccountModel("testUser", userHashCode, "USER");
+        AccountModel accountModel = new AccountModel("testUser", hash, "USER");
         jwtAuthenticationProviderMock.setParsedUser(accountModel);
 
         StoreProto.Store store = StoreProto.Store
@@ -217,14 +214,13 @@ public class StoresRestControllerTest extends BaseControllerTest {
 
     @Test
     public void savedStore() throws Exception {
-        Random random = new Random();
-        long userHashCode = random.nextLong();
-        long hashCode = random.nextLong();
+        String hash = UUID.randomUUID().toString();
+        long hashCode = new Random().nextLong();
 
         String token = "token";
         jwtAuthenticationTokenFilterMock.setToken(token);
 
-        AccountModel accountModel = new AccountModel("testUser", userHashCode, "USER");
+        AccountModel accountModel = new AccountModel("testUser", hash, "USER");
         jwtAuthenticationProviderMock.setParsedUser(accountModel);
 
         StoreProto.Store store = StoreProto.Store
@@ -263,14 +259,13 @@ public class StoresRestControllerTest extends BaseControllerTest {
 
     @Test
     public void savedLikedStore() throws Exception {
-        Random random = new Random();
-        long userHashCode = random.nextLong();
-        long hashCode = random.nextLong();
+        String hash = UUID.randomUUID().toString();
+        long hashCode = new Random().nextLong();
 
         String token = "token";
         jwtAuthenticationTokenFilterMock.setToken(token);
 
-        AccountModel accountModel = new AccountModel("testUser", userHashCode, "USER");
+        AccountModel accountModel = new AccountModel("testUser", hash, "USER");
         jwtAuthenticationProviderMock.setParsedUser(accountModel);
 
         StoreProto.Store store = StoreProto.Store

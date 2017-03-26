@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
@@ -35,7 +36,7 @@ public class CommentLikeRepositoryTest {
 
     @Test
     public void findByAccountAndStoreTest() {
-        entityManager.persist(new AccountModel("Foo", 29847L, "USER"));
+        entityManager.persist(new AccountModel("Foo", UUID.randomUUID().toString(), "USER"));
         StoreModel storeModel = StoreModel
                 .newInstance(StoreProto.Store
                                      .newBuilder()
@@ -48,9 +49,9 @@ public class CommentLikeRepositoryTest {
         entityManager.persist(storeModel);
         entityManager.persist(new BannerModel("test", "thumbnailTest", storeModel));
 
-        AccountModel commenter = new AccountModel("Commenter", 29844237L, "USER");
+        AccountModel commenter = new AccountModel("Commenter", UUID.randomUUID().toString(), "USER");
         entityManager.persist(commenter);
-        AccountModel liker = new AccountModel("Liker", 4574294L, "USER");
+        AccountModel liker = new AccountModel("Liker", UUID.randomUUID().toString(), "USER");
         entityManager.persist(liker);
 
         CommentModel commentModel = new CommentModel("lsfdjnvlsdf", 7649128374L, storeModel, commenter);
