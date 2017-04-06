@@ -88,7 +88,8 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
                     CommentModel comment1,
                     CommentModel comment2
             ) {
-                return (int) (comment2.getCreated() - comment1.getCreated());
+                return comment2.getCreated() == comment1.getCreated() ? 0 :
+                       (comment2.getCreated() > comment1.getCreated() ? 1 : -1);
             }
         });
 
