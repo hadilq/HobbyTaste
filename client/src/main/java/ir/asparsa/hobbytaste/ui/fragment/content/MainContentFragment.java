@@ -179,14 +179,14 @@ public class MainContentFragment extends BaseContentFragment
     }
 
     @Override public boolean onMarkerClick(Marker marker) {
-        for (Marker mMarker : mMarkers) {
-            if (marker.equals(mMarker)) {
-                NavigationUtil.startContentFragment(
-                        getFragmentManager(),
-                        StoreDetailsContentFragment.instantiate(mStores.get(mMarkers.indexOf(mMarker)))
-                );
-                return true;
-            }
+        int index = mMarkers.indexOf(marker);
+        if (index != -1) {
+
+            NavigationUtil.startContentFragment(
+                    getFragmentManager(),
+                    StoreDetailsContentFragment.instantiate(mStores.get(index))
+            );
+            return true;
         }
         return false;
     }
