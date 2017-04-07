@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Optional;
 
 /**
@@ -44,14 +43,18 @@ public class CleanPermanentDirTask {
                     String name = file.getName();
                     logger.info("Name: " + name);
                     if (!StringUtils.isEmpty(name)) {
-                        String url = storageService.getServerFileUrl(name);
-                        logger.info("Url: " + url);
                         if (name.startsWith(StorageService.THUMBNAIL_PREFIX)) {
-                            logger.info("Deleting " + name);
-                            removeFile(path, bannerRepository.findByThumbnailUrl(url));
+                            Optional<BannerModel> thumbnailUrl = bannerRepository.findByThumbnailName(name);
+                            if (!thumbnailUrl.isPresent()) {
+                                logger.info("Deleting thumbnail " + name);
+                                Files.delete(path);
+                            }
                         } else {
-                            logger.info("Deleting " + name);
-                            removeFile(path, bannerRepository.findByMainUrl(url));
+                            Optional<BannerModel> mainUrl = bannerRepository.findByMainName(name);
+                            if (!mainUrl.isPresent()) {
+                                logger.info("Deleting main " + name);
+                                Files.delete(path);
+                            }
                         }
                     }
                 }
@@ -59,14 +62,5 @@ public class CleanPermanentDirTask {
                 logger.error("Couldn't delete file : " + file.getAbsolutePath(), e);
             }
         });
-    }
-
-    private void removeFile(
-            Path path,
-            Optional<BannerModel> banner
-    ) throws IOException {
-        if (!banner.isPresent()) {
-            Files.delete(path);
-        }
     }
 }

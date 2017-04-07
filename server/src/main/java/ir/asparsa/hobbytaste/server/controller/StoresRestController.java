@@ -75,7 +75,7 @@ import java.util.Optional;
                     break;
                 }
             }
-            builder.addStore(storeModel.convertToDto(like));
+            builder.addStore(storeModel.convertToDto(like, storageService));
         }
         return builder.build();
     }
@@ -92,7 +92,7 @@ import java.util.Optional;
         if (existStore.isPresent()) {
             boolean like = isLiked(user.getAccount(), existStore.get());
 
-            return existStore.get().convertToDto(like);
+            return existStore.get().convertToDto(like, storageService);
         }
 
         logger.info("Store model about to save");
@@ -113,16 +113,13 @@ import java.util.Optional;
                 } catch (StorageException e) {
                     logger.info("Thumbnail is not available! ");
                 }
-                banners.add(storeBannerRepository.save(new BannerModel(
-                        storageService.getServerFileUrl(mainFilename),
-                        storageService.getServerFileUrl(thumbnailFilename),
-                        storeModel)));
+                banners.add(storeBannerRepository.save(new BannerModel(mainFilename, thumbnailFilename, storeModel)));
                 logger.info("Banner saved to " + mainFilename + " with thumbnail of " + thumbnailFilename);
             }
         }
         storeModel.setBanners(banners);
         logger.info("Store saved");
-        return storeModel.convertToDto(false);
+        return storeModel.convertToDto(false, storageService);
     }
 
     @RequestMapping(value = StoreServicePath.VIEWED, method = RequestMethod.PUT)
@@ -142,7 +139,7 @@ import java.util.Optional;
                   .subscribeOn(Schedulers.newThread())
                   .subscribe();
 
-        return storeModel.get().convertToDto(storeLike.isPresent());
+        return storeModel.get().convertToDto(storeLike.isPresent(), storageService);
     }
 
     @RequestMapping(value = StoreServicePath.COMMENTS, method = RequestMethod.POST)
@@ -242,7 +239,7 @@ import java.util.Optional;
                       }
                   });
 
-        return storeModel.get().convertToDto(like);
+        return storeModel.get().convertToDto(like, storageService);
     }
 
     @RequestMapping(value = StoreServicePath.LIKE_COMMENT, method = RequestMethod.PUT)

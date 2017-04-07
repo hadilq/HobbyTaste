@@ -10,6 +10,8 @@ public interface Banner {
         String ID = "id";
         String MAIN_URL = "main_url";
         String THUMBNAIL_URL = "thumbnail_url";
+        String MAIN_NAME = "main_name";
+        String THUMBNAIL_NAME = "thumbnail_name";
         String STORE = "store";
     }
 }

@@ -16,7 +16,7 @@ public interface StoreBannerRepository extends JpaRepository<BannerModel, Long> 
 
     Optional<List<BannerModel>> findByStore(StoreModel model);
 
-    Optional<BannerModel> findByMainUrl(String mainUrl);
+    Optional<BannerModel> findByMainName(String mainName);
 
-    Optional<BannerModel> findByThumbnailUrl(String thumbnailUrl);
+    Optional<BannerModel> findByThumbnailName(String thumbnailName);
 }

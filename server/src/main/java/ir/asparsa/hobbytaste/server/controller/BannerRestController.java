@@ -41,7 +41,7 @@ import java.util.Random;
             @PathVariable("filename") String filename,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale
     ) {
-        logger.info("Server file " + filename);
+        logger.info("Serve file " + filename);
         Resource file = storageService.loadAsResource(filename, locale);
         return ResponseEntity
                 .ok()
@@ -55,7 +55,7 @@ import java.util.Random;
             @PathVariable("filename") String filename,
             @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale
     ) {
-        logger.info("Server tmp file " + filename);
+        logger.info("Serve tmp file " + filename);
         Resource file = storageService.loadTmpAsResource(filename, locale);
         return ResponseEntity
                 .ok()

@@ -16,10 +16,10 @@ public class BannerModel {
     @GeneratedValue
     private long id;
 
-    @Column(name = Banner.Columns.MAIN_URL)
-    private String mainUrl;
-    @Column(name = Banner.Columns.THUMBNAIL_URL)
-    private String thumbnailUrl;
+    @Column(name = Banner.Columns.MAIN_NAME)
+    private String mainName;
+    @Column(name = Banner.Columns.THUMBNAIL_NAME)
+    private String thumbnailName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = Banner.Columns.STORE)
@@ -29,12 +29,12 @@ public class BannerModel {
     }
 
     public BannerModel(
-            String mainUrl,
-            String thumbnailUrl,
+            String mainName,
+            String thumbnailName,
             StoreModel store
     ) {
-        this.mainUrl = mainUrl;
-        this.thumbnailUrl = thumbnailUrl;
+        this.mainName = mainName;
+        this.thumbnailName = thumbnailName;
         this.store = store;
     }
 
@@ -42,12 +42,12 @@ public class BannerModel {
         return id;
     }
 
-    public String getMainUrl() {
-        return mainUrl;
+    public String getMainName() {
+        return mainName;
     }
 
-    public String getThumbnailUrl() {
-        return thumbnailUrl;
+    public String getThumbnailName() {
+        return thumbnailName;
     }
 
     public StoreModel getStore() {
@@ -60,25 +60,25 @@ public class BannerModel {
             return false;
         }
         final BannerModel other = (BannerModel) otherObj;
-        return ((getMainUrl() == null && other.getMainUrl() == null) ||
-                (getMainUrl() != null && getMainUrl().equals(other.getMainUrl()))) &&
-               ((getThumbnailUrl() == null && other.getThumbnailUrl() == null) ||
-                (getThumbnailUrl() != null && getThumbnailUrl().equals(other.getThumbnailUrl()))) &&
+        return ((getMainName() == null && other.getMainName() == null) ||
+                (getMainName() != null && getMainName().equals(other.getMainName()))) &&
+               ((getThumbnailName() == null && other.getThumbnailName() == null) ||
+                (getThumbnailName() != null && getThumbnailName().equals(other.getThumbnailName()))) &&
                ((getStore() == null && other.getStore() == null) ||
                 (getStore() != null && getStore().equals(other.getStore())));
     }
 
     @Override
     public int hashCode() {
-        return ((getMainUrl() == null ? 0 : getMainUrl().hashCode()) ^
-                (getThumbnailUrl() == null ? 0 : getThumbnailUrl().hashCode())) ^ (int) ((getId() ^ getId() >> 31));
+        return ((getMainName() == null ? 0 : getMainName().hashCode()) ^
+                (getThumbnailName() == null ? 0 : getThumbnailName().hashCode())) ^ (int) ((getId() ^ getId() >> 31));
     }
 
     @Override public String toString() {
         return "BannerModel{" +
                "id=" + id +
-               ", mainUrl='" + mainUrl + '\'' +
-               ", thumbnailUrl='" + thumbnailUrl + '\'' +
+               ", mainName='" + mainName + '\'' +
+               ", thumbnailName='" + thumbnailName + '\'' +
                ", storeId=" + store.getId() +
                '}';
     }

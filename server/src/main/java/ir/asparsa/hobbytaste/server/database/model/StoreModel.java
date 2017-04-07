@@ -2,6 +2,7 @@ package ir.asparsa.hobbytaste.server.database.model;
 
 import ir.asparsa.common.database.model.Store;
 import ir.asparsa.common.net.dto.StoreProto;
+import ir.asparsa.hobbytaste.server.storage.StorageService;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -56,7 +57,10 @@ public class StoreModel implements Serializable {
         return storeModel;
     }
 
-    public StoreProto.Store convertToDto(boolean like) {
+    public StoreProto.Store convertToDto(
+            boolean like,
+            StorageService storageService
+    ) {
         StoreProto.Store.Builder builder = StoreProto.Store
                 .newBuilder()
                 .setLat(lat)
@@ -72,8 +76,8 @@ public class StoreModel implements Serializable {
             for (BannerModel banner : this.banners) {
                 builder.addBanner(StoreProto.Banner
                                           .newBuilder()
-                                          .setMainUrl(banner.getMainUrl())
-                                          .setThumbnailUrl(banner.getThumbnailUrl())
+                                          .setMainUrl(storageService.getServerFileUrl(banner.getMainName()))
+                                          .setThumbnailUrl(storageService.getServerFileUrl(banner.getThumbnailName()))
                                           .build());
             }
         }
