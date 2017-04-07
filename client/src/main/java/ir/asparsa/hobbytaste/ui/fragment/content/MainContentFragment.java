@@ -14,6 +14,7 @@ import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
+import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
@@ -38,6 +39,8 @@ public class MainContentFragment extends BaseContentFragment
     AuthorizationManager mAuthorizationManager;
     @Inject
     StoresManager mStoresManager;
+    @Inject
+    PreferencesManager mPreferencesManager;
 
     private GoogleMap mMap;
     private List<StoreModel> mStores;
@@ -54,6 +57,13 @@ public class MainContentFragment extends BaseContentFragment
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
+
+        double lat = mPreferencesManager.getFloat(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LATITUDE, 0f);
+        double lng = mPreferencesManager.getFloat(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LONGITUDE, 0f);
+        float zoom = mPreferencesManager.getFloat(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_ZOOM, 0f);
+        if (lat != 0f && lng != 0f && zoom != 0) {
+            getArguments().putParcelable(BUNDLE_KEY_CAMERA, CameraPosition.fromLatLngZoom(new LatLng(lat, lng), zoom));
+        }
     }
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -74,12 +84,24 @@ public class MainContentFragment extends BaseContentFragment
         if (mTryAgainLater) {
             mTryAgainLater = false;
             mSubscription.add(mStoresManager.loadStores(getStoreObserver()));
+        } else {
+            fillMap();
         }
     }
 
     @Override public void onDestroyView() {
         if (mMap != null) {
-            getArguments().putParcelable(BUNDLE_KEY_CAMERA, mMap.getCameraPosition());
+            CameraPosition cameraPosition = mMap.getCameraPosition();
+            getArguments().putParcelable(BUNDLE_KEY_CAMERA, cameraPosition);
+            if (cameraPosition != null && cameraPosition.target != null) {
+                mPreferencesManager.put(
+                        PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LATITUDE,
+                        (float) cameraPosition.target.latitude);
+                mPreferencesManager.put(
+                        PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LONGITUDE,
+                        (float) cameraPosition.target.longitude);
+                mPreferencesManager.put(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_ZOOM, cameraPosition.zoom);
+            }
         }
         for (Marker marker : mMarkers) {
             marker.remove();
@@ -87,7 +109,6 @@ public class MainContentFragment extends BaseContentFragment
         mSubscription.clear();
         super.onDestroyView();
     }
-
 
     @Override protected String setHeaderTitle() {
         return getString(R.string.app_name);
