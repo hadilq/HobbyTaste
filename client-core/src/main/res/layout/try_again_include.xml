@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="@dimen/progress_bar_size"
+            android:layout_height="@dimen/progress_bar_size"
+            android:layout_centerInParent="true"
+            style="?android:attr/progressBarStyleLarge"/>
+
+    <RelativeLayout
+            android:id="@+id/try_again_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone">
+
+        <TextView
+                android:id="@+id/try_again_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:textSize="@dimen/font_size_normal"
+                android:text="@string/try_again_message"/>
+
+        <ImageView
+                android:id="@+id/try_again_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/try_again_message"
+                android:src="@drawable/refresh"/>
+
+    </RelativeLayout>
+
+    <FrameLayout
+            android:id="@+id/extra_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:visibility="gone"/>
+
+</merge>

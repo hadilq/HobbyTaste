@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name"
+            translatable="false">Free Map</string>
+
+    <string name="persian"
+            translatable="false">پارسی</string>
+    <string name="english"
+            translatable="false">English</string>
+
+</resources>

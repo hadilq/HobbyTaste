@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ir.asparsa.android.ui.view.TryAgainView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/try_again_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/try_again_height"/>

@@ -1,0 +1,201 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
+
+jar {
+    baseName = 'hobbytaste-server'
+    version = "${global_versionName}.0"
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+def attachGenerateDefaultConfiguration = { properties ->
+    //################### DataSource Configuration ##########################
+    properties.setProperty("spring.datasource.testWhileIdle", "true")
+    properties.setProperty("spring.datasource.validationQuery", "SELECT 1")
+    properties.setProperty("spring.jpa.hibernate.naming-strategy", "org.hibernate.cfg.ImprovedNamingStrategy")
+
+    //###################         JPA MySql        ##########################
+    properties.setProperty("spring.jpa.show-sql", "true")
+    properties.setProperty("spring.jpa.generate-ddl", "true")
+    properties.setProperty("spring.jpa.hibernate.ddl-auto", "update")
+
+    //###################         Security         ##########################
+    properties.setProperty("jwt.secret", "${keystoreProperties['jwtSecret']}")
+    properties.setProperty("jwt.header", "$global_jwtHeader")
+    properties.setProperty("security.request.minInterval", '100')
+
+    //###################      Storage Service     ##########################
+    properties.setProperty("storage.location", "upload-banners-dir")
+    properties.setProperty("storage.location.tmp", "upload-banners-dir-tmp")
+
+    //###################       Image Service      ##########################
+    properties.setProperty("image.maxLongHeight", "500")
+    properties.setProperty("spring.http.multipart.max-file-size", "$global_maxFileSize")
+    properties.setProperty("spring.http.multipart.max-request-size", "5MB")
+
+    //###################           Logger         ##########################
+    // DEBUG, ERROR, INFO
+    properties.setProperty("logging.level.ir.asparsa.hobbytaste.server.controller.controllers", "INFO")
+    properties.setProperty("logging.level.org.hibernate", "ERROR")
+    properties.setProperty("logging.path", "logs")
+
+    //###################         Exception       ##########################
+    properties.setProperty("spring.mvc.throw-exception-if-no-handler-found", "true")
+    properties.setProperty("spring.resources.add-mappings", "false")
+
+    //###################         General       ##########################
+    properties.setProperty("authorization.hashCodeExpirationTime", "$global_hashCodeExpirationTime")
+
+
+    exec {
+        executable "sh"
+        args "-c", "native2ascii -encoding UTF-8 ${project.rootDir}/server/src/main/resources/messages_fa.properties ${project.rootDir}/server/src/main/resources/locale/messages_fa.properties"
+    }
+}
+
+def attachDevelopConfiguration = { properties ->
+    //###################          Server          ##########################
+    properties.setProperty("server.address", "$global_serverAddress")
+    properties.setProperty("server.scheme", "$global_serverScheme")
+    properties.setProperty("server.port", "$global_serverPort")
+    properties.setProperty("server.realAddress", "$global_serverAddress:$global_serverPort")
+    properties.setProperty("server.realScheme", "$global_serverScheme")
+
+    //###################           Logger         ##########################
+    // DEBUG, ERROR, INFO
+    properties.setProperty("logging.level.ir.asparsa.hobbytaste.server.controller", "DEBUG")
+}
+
+def attachTestConfiguration = { properties ->
+
+    //###################          Security          ##########################
+//    properties.setProperty("security.basic.enabled", 'false')
+//    properties.setProperty("management.security.enabled", 'false')
+}
+
+def attachProductConfiguration = { properties ->
+    //################### DataSource Configuration ##########################
+    properties.setProperty("spring.datasource.platform", "postgres")
+    properties.setProperty("spring.datasource.url", "jdbc:postgresql://localhost:5432/hobbytastedb")
+    properties.setProperty("spring.datasource.driver-class-name", "org.postgresql.Driver")
+    properties.setProperty("spring.datasource.username", "hobbytaste")
+    properties.setProperty("spring.datasource.password", "${keystoreProperties['postgresDbPass']}")
+
+    //###################         JPA MySql        ##########################
+    properties.setProperty("spring.jpa.database", "POSTGRESQL")
+
+    //###################          Server          ##########################
+    properties.setProperty("server.address", "$global_productServerAddress")
+    properties.setProperty("server.scheme", "$global_productServerScheme")
+    properties.setProperty("server.port", "$global_productServerPort")
+    properties.setProperty("server.realAddress", "$global_productServerRealAddress")
+    properties.setProperty("server.realScheme", "$global_productServerRealScheme")
+
+    //###################           Logger         ##########################
+    // DEBUG, ERROR, INFO
+    properties.setProperty("logging.level.ir.asparsa.hobbytaste.server.controller", "ERROR")
+}
+
+def developConfiguration = {
+    println "developConfig " + project.name
+    def properties = new Properties()
+    def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
+    propertiesFile.createNewFile()
+
+    attachGenerateDefaultConfiguration(properties)
+    attachDevelopConfiguration(properties)
+
+    properties.store(propertiesFile.newWriter(), null)
+}
+
+def testConfiguration = {
+    println "testConfig " + project.name
+    def properties = new Properties()
+    def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
+    propertiesFile.createNewFile()
+
+    attachGenerateDefaultConfiguration(properties)
+    attachDevelopConfiguration(properties)
+    attachTestConfiguration(properties)
+
+    properties.store(propertiesFile.newWriter(), null)
+}
+
+
+def productConfiguration = {
+    println "productConfig  " + project.name
+    def properties = new Properties()
+    def propertiesFile = new File("${project.rootDir}/server/src/main/resources/application.properties")
+    propertiesFile.createNewFile()
+
+    attachGenerateDefaultConfiguration(properties)
+    attachProductConfiguration(properties)
+
+    properties.store(propertiesFile.newWriter(), null)
+}
+
+task deployProduct(dependsOn: 'bootRepackage') {
+    doLast {
+        File outputJar = null
+        for (File libs : project.buildDir.listFiles()) {
+            if (libs.getName().contains('libs') && libs.isDirectory()) {
+                for (File jar : libs.listFiles()) {
+                    if (jar.getName().contains('.jar')) {
+                        outputJar = jar
+                        break
+                    }
+                }
+            }
+            if (outputJar != null) {
+                break
+            }
+        }
+        println "Upload app to server " + outputJar.getAbsolutePath()
+
+        exec {
+            executable "sh"
+            args "-c", "scp ${outputJar.getAbsolutePath()} 2.asparsa.ir:/root/hobbytaste"
+        }
+    }
+}
+
+task runDevelop(dependsOn: 'bootRun')
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(deployProduct)) {
+        tasks.clean.execute()
+        productConfiguration()
+    } else if (taskGraph.hasTask(runDevelop)) {
+        developConfiguration()
+    }
+    for (Task task : taskGraph.allTasks) {
+        if (task.name.contains('Test')) {
+            testConfiguration()
+        }
+    }
+}
+
+dependencies {
+    compile(project(':common'))
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.springframework.boot:spring-boot-starter-hateoas'
+    compile 'org.springframework.boot:spring-boot-starter-security'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-configuration-processor'
+    compile 'org.apache.commons:commons-lang3:3.5'
+    compile 'io.jsonwebtoken:jjwt:0.7.0'
+    compile "io.reactivex:rxjava:$global_rxjavaVersion"
+    compile "com.googlecode.protobuf-java-format:protobuf-java-format:1.4"
+    runtime 'org.postgresql:postgresql:9.4.1212'
+    runtime 'com.h2database:h2:1.4.193'
+
+    testCompile "org.mockito:mockito-core:$global_mockitoCoreVersion"
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+    testCompile 'org.springframework.security:spring-security-test:4.2.2.RELEASE'
+}

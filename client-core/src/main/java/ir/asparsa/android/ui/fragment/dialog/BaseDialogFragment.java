@@ -1,0 +1,57 @@
+package ir.asparsa.android.ui.fragment.dialog;
+
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.view.*;
+import ir.asparsa.android.core.util.UiUtil;
+
+/**
+ * Created by hadi on 12/15/2016 AD.
+ */
+public abstract class BaseDialogFragment extends DialogFragment implements IDialogFragment {
+
+    @Nullable @Override public View onCreateView(
+            LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState
+    ) {
+        WindowManager.LayoutParams params = getDialog().getWindow().getAttributes();
+        params.height = WindowManager.LayoutParams.MATCH_PARENT;
+        getDialog().getWindow().setAttributes(params);
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        return null;
+    }
+
+    @Override
+    public void setOnDialogResultEvent(BaseOnDialogResultEvent event) {
+        getArguments().putParcelable(BUNDLE_KEY_DIALOG_RESULT_EVENT, event);
+    }
+
+    protected BaseOnDialogResultEvent getOnDialogResultEvent() {
+        return getArguments().getParcelable(BUNDLE_KEY_DIALOG_RESULT_EVENT);
+    }
+
+    protected void sendEvent() {
+        BaseOnDialogResultEvent event = getOnDialogResultEvent();
+        UiUtil.invokeEventReceiver(event, getFragmentManager());
+    }
+
+    @Override public void onCancel(DialogInterface dialog) {
+        BaseOnDialogResultEvent onDialogResultEvent = getOnDialogResultEvent();
+        if (onDialogResultEvent != null) {
+            onDialogResultEvent.setDialogResult(DialogResult.CANCEL);
+            sendEvent();
+        }
+        super.onCancel(dialog);
+    }
+
+    @Override
+    public void show(
+            FragmentManager manager
+    ) {
+        super.show(manager, getClass().getName());
+    }
+}

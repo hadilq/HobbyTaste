@@ -1,0 +1,99 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext {
+        springBootVersion = '1.5.2.RELEASE'
+    }
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'
+        classpath 'com.google.gms:google-services:3.0.0'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2'
+}
+
+subprojects {
+
+    // The most recent interface number that the library implements.
+    def appCurrent = 0
+    // The implementation number of the current interface.
+    def appRevision = 0
+    // The difference between the newest and oldest interfaces that the library implements.
+    def appAge = 3
+
+    ext.global_compileSdkVersion = 25
+    ext.global_buildToolsVersion = "25.0.1"
+
+    ext.global_minSdkVersion = 17
+    ext.global_targetSdkVersion = 25
+    ext.global_versionCode = appCurrent * 100 + appRevision * 10 + appAge
+    ext.global_versionName = "$appCurrent.$appRevision.$appAge"
+
+    ext.global_appcompatVersion = "25.0.1"
+    ext.global_designVersion = "25.0.1"
+    ext.global_supportVersion = "25.0.1"
+    ext.global_daggerVersion = "2.8"
+    ext.global_butterknifeVersion = "8.4.0"
+    ext.global_rxandroidVersion = "1.2.1"
+    ext.global_rxjavaVersion = "1.1.6"
+    // In case of updating play services, find TODOs in StoreMapViewHolder
+    ext.global_playServicesVersion = "9.2.0"
+    ext.global_ormliteVersion = "4.48"
+    ext.global_retrofitVersion = "2.2.0"
+    ext.global_okHttpVersion = "3.6.0"
+    ext.global_picassoVersion = "2.5.2"
+    ext.global_picassoDownloaderVersion = "1.1.0"
+    ext.global_junitVersion = "4.12"
+    ext.global_mockitoCoreVersion = "2.7.19"
+    ext.global_dexmakerVersion = "1.2"
+    ext.global_protobufVersion = "3.0.0"
+
+    ext.global_serverAddress = "192.168.1.7"
+    ext.global_serverPort = "8090"
+    ext.global_serverScheme = "http"
+
+    ext.global_productServerAddress = "127.0.0.1"
+    ext.global_productServerPort = "8090"
+    ext.global_productServerScheme = "http"
+    ext.global_productServerRealAddress = "hobbytaste.asparsa.ir"
+    ext.global_productServerRealScheme = "https"
+
+    ext.global_jwtHeader= "Authorization"
+    ext.global_maxFileSize= "10MB"
+    ext.global_hashCodeExpirationTime= "30000"
+
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            android {
+                compileSdkVersion global_compileSdkVersion
+                buildToolsVersion global_buildToolsVersion
+
+                defaultConfig {
+                    minSdkVersion global_minSdkVersion
+                    targetSdkVersion global_targetSdkVersion
+                    versionCode global_versionCode
+                    versionName global_versionName
+                }
+            }
+        }
+    }
+}

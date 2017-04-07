@@ -1,0 +1,4 @@
+<resources>
+    <string translatable="false"
+            name="app_name">client-core</string>
+</resources>

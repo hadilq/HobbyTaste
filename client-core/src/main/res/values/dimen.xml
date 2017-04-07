@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="font_size_small">12sp</dimen>
+    <dimen name="font_size_normal">18sp</dimen>
+    <dimen name="font_size_medium">20sp</dimen>
+    <dimen name="font_size_big">23sp</dimen>
+
+    <dimen name="try_again_height">100dp</dimen>
+    <dimen name="progress_bar_size">35dp</dimen>
+
+    <dimen name="horizontal_margin_eighth">4dp</dimen>
+    <dimen name="horizontal_margin_quarter">8dp</dimen>
+    <dimen name="horizontal_margin_half">16dp</dimen>
+    <dimen name="horizontal_margin">32dp</dimen>
+    <dimen name="horizontal_margin_double">64dp</dimen>
+
+    <dimen name="vertical_margin_quarter">8dp</dimen>
+    <dimen name="vertical_margin_half">16dp</dimen>
+    <dimen name="vertical_margin">32dp</dimen>
+    <dimen name="vertical_margin_double">64dp</dimen>
+    <dimen name="vertical_margin_triple">128dp</dimen>
+    <dimen name="vertical_margin_quadruple">256dp</dimen>
+
+</resources>

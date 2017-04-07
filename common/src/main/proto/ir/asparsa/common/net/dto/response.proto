@@ -1,0 +1,16 @@
+syntax = "proto3";
+package ir.asparsa.common.net.dto;
+
+option java_outer_classname = "ResponseProto";
+
+message Response {
+    enum StatusType {
+        SUCCEED = 0;
+        ERROR = 1;
+    }
+
+    StatusType status = 1;
+
+    string detail_message = 2;
+    string localized_message = 3;
+}

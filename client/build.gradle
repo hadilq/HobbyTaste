@@ -1,0 +1,128 @@
+apply plugin: 'com.android.application'
+
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+def maxFileSizeInByte = "$global_maxFileSize".replace("MB", " * ${(int) Math.pow(2, 20)}")
+
+android {
+    signingConfigs {
+        config {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFile = new File(
+                    output.outputFile.parent,
+                    output.outputFile.name.replace(".apk", "-${variant.versionName}.apk")
+                            .replace("client", "FreeMap"))
+        }
+    }
+
+    defaultConfig {
+        applicationId "ir.asparsa.hobbytaste"
+
+        buildConfigField 'String', 'Authorization', "\"$global_jwtHeader\""
+        buildConfigField 'int', 'MAX_FILE_SIZE', "$maxFileSizeInByte"
+        buildConfigField 'int', 'HASH_CODE_EXPIRATION_TIME', "$global_hashCodeExpirationTime"
+    }
+
+    buildTypes {
+        debug {
+            multiDexEnabled true
+            signingConfig signingConfigs.config
+        }
+        release {
+            multiDexEnabled true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
+    }
+
+    productFlavors {
+        product {
+            buildConfigField 'boolean', 'PRODUCT', "true"
+            buildConfigField 'boolean', 'DEVELOP', "false"
+            buildConfigField 'String', 'BASE_URL', "\"$global_productServerRealScheme://$global_productServerRealAddress/api/v1/\""
+            buildConfigField 'String', 'HOSTNAME', "\"$global_productServerRealAddress\""
+        }
+
+        develop {
+            buildConfigField 'boolean', 'PRODUCT', "true"
+            buildConfigField 'boolean', 'DEVELOP', "true"
+            buildConfigField 'String', 'BASE_URL', "\"$global_serverScheme://$global_serverAddress:$global_serverPort/api/v1/\""
+            buildConfigField 'String', 'HOSTNAME', "\"$global_serverAddress\""
+            versionNameSuffix '-SNAPSHOT'
+        }
+
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+
+android.variantFilter { variant ->
+    if (variant.buildType.name == 'release' && variant.getFlavors().get(0).name == 'develop') {
+        variant.setIgnore(true)
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    debugCompile project(path: ':client-core', configuration: 'debug')
+    releaseCompile(project(path: ':client-core', configuration: 'release')) {
+        exclude group: 'com.android.support'
+        exclude group: 'com.google.dagger'
+        exclude group: 'com.jakewharton'
+        exclude group: 'io.reactivex'
+    }
+    compile(project(':common'))
+    compile 'com.android.support:multidex:1.0.1'
+    compile "com.android.support:appcompat-v7:$global_appcompatVersion"
+    compile "com.android.support:design:$global_designVersion"
+    compile "com.android.support:support-v4:$global_supportVersion"
+    // OrmLite
+    compile "com.j256.ormlite:ormlite-core:$global_ormliteVersion"
+    compile "com.j256.ormlite:ormlite-android:$global_ormliteVersion"
+    // Dagger
+    provided "com.google.dagger:dagger-compiler:$global_daggerVersion"
+    compile "com.google.dagger:dagger:$global_daggerVersion"
+    provided 'javax.annotation:jsr250-api:1.0'
+    // Butter Knife
+    compile "com.jakewharton:butterknife:$global_butterknifeVersion"
+    provided "com.jakewharton:butterknife-compiler:$global_butterknifeVersion"
+    // RxAndroid
+    compile "io.reactivex:rxandroid:$global_rxandroidVersion"
+    compile "io.reactivex:rxjava:$global_rxjavaVersion"
+    // Google map
+    compile "com.google.android.gms:play-services:$global_playServicesVersion"
+    // Fire base
+    compile "com.google.firebase:firebase-core:$global_playServicesVersion"
+    compile "com.google.firebase:firebase-crash:$global_playServicesVersion"
+    // Retrofit
+    compile "com.squareup.retrofit2:retrofit:$global_retrofitVersion"
+    compile "com.squareup.retrofit2:converter-protobuf:$global_retrofitVersion"
+    compile "com.squareup.retrofit2:adapter-rxjava:$global_retrofitVersion"
+    compile "com.squareup.okhttp3:logging-interceptor:$global_okHttpVersion"
+    // Picasso
+    compile "com.squareup.picasso:picasso:$global_picassoVersion"
+    compile "com.jakewharton.picasso:picasso2-okhttp3-downloader:$global_picassoDownloaderVersion"
+
+    // Test
+    testCompile "junit:junit:$global_junitVersion"
+    testCompile "org.mockito:mockito-core:$global_mockitoCoreVersion"
+    // required if you want to use Mockito for Android instrumentation tests
+    androidTestCompile "org.mockito:mockito-core:$global_mockitoCoreVersion"
+    androidTestCompile "com.google.dexmaker:dexmaker:$global_dexmakerVersion"
+    androidTestCompile "com.google.dexmaker:dexmaker-mockito:$global_dexmakerVersion"
+}
+
+apply plugin: 'com.google.gms.google-services'

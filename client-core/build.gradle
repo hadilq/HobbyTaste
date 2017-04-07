@@ -1,0 +1,34 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.jakewharton.butterknife'
+
+android {
+    publishNonDefault true
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile "com.android.support:appcompat-v7:$global_appcompatVersion"
+    compile "com.android.support:design:$global_designVersion"
+    compile "com.android.support:support-v4:$global_supportVersion"
+    // Dagger
+    provided "com.google.dagger:dagger-compiler:$global_daggerVersion"
+    compile "com.google.dagger:dagger:$global_daggerVersion"
+    provided 'javax.annotation:jsr250-api:1.0'
+    // Butter Knife
+    compile "com.jakewharton:butterknife:$global_butterknifeVersion"
+    provided "com.jakewharton:butterknife-compiler:$global_butterknifeVersion"
+    // RxAndroid
+    compile "io.reactivex:rxandroid:$global_rxandroidVersion"
+    compile "io.reactivex:rxjava:$global_rxjavaVersion"
+
+    // Test
+    testCompile "junit:junit:$global_junitVersion"
+
+}

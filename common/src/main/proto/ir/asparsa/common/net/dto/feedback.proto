@@ -1,0 +1,10 @@
+syntax = "proto3";
+package ir.asparsa.common.net.dto;
+
+option java_outer_classname = "FeedbackProto";
+
+message Feedback {
+    string body = 1;
+    string crash_throwable_name = 2;
+    string crash_message = 3;
+}

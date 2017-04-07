@@ -1,0 +1,14 @@
+syntax = "proto3";
+package ir.asparsa.common.net.dto;
+
+option java_outer_classname = "AuthenticateProto";
+
+message Authenticate {
+    string token = 1;
+    string username = 2;
+}
+
+message Request {
+    string hash = 1;
+    string token = 2;
+}

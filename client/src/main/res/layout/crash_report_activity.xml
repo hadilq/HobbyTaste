@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/dark_background">
+
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="@dimen/horizontal_margin_double"
+            android:layout_marginEnd="@dimen/horizontal_margin_double"
+            android:background="@color/light_background">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_margin_half"
+                android:layout_marginStart="@dimen/horizontal_margin"
+                android:layout_marginEnd="@dimen/horizontal_margin"
+                android:textColor="@color/text_hint"
+                android:textSize="@dimen/font_size_small"
+                android:text="@string/crash_report_hint"
+                android:background="@color/light_background"/>
+
+        <EditText
+                android:id="@+id/feedback_text"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/feedback_text_height"
+                android:layout_marginTop="@dimen/vertical_margin_half"
+                android:layout_marginStart="@dimen/horizontal_margin"
+                android:layout_marginEnd="@dimen/horizontal_margin"
+                android:textColor="@color/text"
+                android:textSize="@dimen/font_size_normal"
+                android:maxLines="5"
+                android:maxLength="500"
+                android:inputType="textMultiLine"/>
+
+        <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/horizontal_margin_quarter"
+                android:layout_marginBottom="@dimen/horizontal_margin_quarter"
+                android:layout_gravity="center"
+                android:visibility="gone"/>
+
+        <TextView
+                android:id="@+id/error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/horizontal_margin"
+                android:layout_marginEnd="@dimen/horizontal_margin"
+                android:layout_marginTop="@dimen/horizontal_margin_quarter"
+                android:layout_marginBottom="@dimen/horizontal_margin_quarter"
+                android:textColor="@color/text_error"
+                android:textSize="@dimen/font_size_small"
+                android:visibility="gone"/>
+
+        <ir.asparsa.android.ui.view.DialogControlLayout
+                android:id="@+id/controller"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/vertical_margin_half"
+                android:layout_marginBottom="@dimen/vertical_margin_half"
+                android:layout_marginStart="@dimen/horizontal_margin_half"
+                android:layout_marginEnd="@dimen/horizontal_margin_half"
+                android:background="@color/light_background"/>
+
+    </LinearLayout>
+</RelativeLayout>

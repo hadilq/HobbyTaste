@@ -1,0 +1,67 @@
+<resources>
+
+    <string name="title_main">Main</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_store_details">Place</string>
+    <string name="title_add_banner">Adding picture</string>
+    <string name="title_add_store">Adding place</string>
+    <string name="title_about_us">About Us</string>
+
+    <string name="connection_error">Connection problem</string>
+
+    <string name="username_hint">Please insert your username</string>
+    <string name="username">Username</string>
+    <string name="username_title">Your username</string>
+    <string name="username_is_empty">Username is empty</string>
+
+    <string name="language">Language</string>
+    <string name="language_title">Language</string>
+
+    <string name="commit">OK</string>
+    <string name="close">Close</string>
+    <string name="next">Next</string>
+    <string name="choose">Choose</string>
+    <string name="finish">Finish</string>
+    <string name="send">send</string>
+
+    <string name="comment_title">Comment</string>
+    <string name="comment_hint">Please insert your comment here</string>
+    <string name="comment_is_empty">Comment is empty</string>
+    <string name="comment_store_is_empty">A problem detected! Please reopen this dialog</string>
+
+    <string name="new_store_name_hint">Place name</string>
+    <string name="new_store_description_hint">Place description</string>
+    <string name="new_store_marker_empty">Please touch the map to choose the place</string>
+    <string name="new_store_name_empty">Please set a name for the place</string>
+    <string name="new_store_description_empty">Please describe the location</string>
+    <string name="new_store_at_least_banner">At least three picture is needed</string>
+    <string name="new_store_banner_is_empty">No picture selected or picture is not prepared.</string>
+    <string name="new_store_banner_is_not_sent">Picture is not sent</string>
+    <string name="new_store_banner_successfully_sent">Picture is uploaded successfully</string>
+    <string name="new_store_banner_successfully_prepared">Picture is prepared successfully</string>
+    <string name="new_store_banner_error_prepared">Picture isn\'t prepared, please try again!</string>
+    <string name="new_store_banner_error_max_size">Picture isn\'t prepared, size of the picture is more than 10MB!</string>
+    <string name="new_store_saving">Saving to server …</string>
+    <string name="new_store_preparing">Preparing picture …</string>
+    <string name="new_store_uploading">Uploading picture …</string>
+
+    <string name="month_0">January</string>
+    <string name="month_1">February</string>
+    <string name="month_2">March</string>
+    <string name="month_3">April</string>
+    <string name="month_4">May</string>
+    <string name="month_5">June</string>
+    <string name="month_6">July</string>
+    <string name="month_7">August</string>
+    <string name="month_8">September</string>
+    <string name="month_9">October</string>
+    <string name="month_10">November</string>
+    <string name="month_11">December</string>
+
+    <string name="about_us_description">This app is designed to exchange information of places. ُThese places can be any kind of places, such as historical sites, public or private dates, stores etc. Also you can add your comments and share them to others.\n\nTo contact the developers you can email to:\nhadilq.dev@gmail.com</string>
+
+    <string name="crash_report_hint">We are so sorry for this crash. Would you explain what\'s happened? \nWe\'re so appreciate it.\nIf you feel we can contact you, would you put your email or phone number here. We promise to not disclose or use your personal information in other ways.</string>
+    <string name="crash_report_is_empty">Feedback is empty</string>
+    <string name="crash_report_successfully_sent">Feedback is sent successfully</string>
+
+</resources>

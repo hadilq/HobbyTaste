@@ -1,0 +1,66 @@
+<resources>
+    <string name="title_main">اصلی</string>
+    <string name="title_settings">تنظیمات</string>
+    <string name="title_store_details">مکان</string>
+    <string name="title_add_banner">اضافه‌کردن تصویر</string>
+    <string name="title_add_store">اضافه‌کردن مکان</string>
+    <string name="title_about_us">درباره ما</string>
+
+    <string name="connection_error">مشکلی در برقراری ارتباط بوجود آمده‌است</string>
+
+    <string name="username_hint">لطفا نام‌کاربری دلخواه خود را وارد نمایید</string>
+    <string name="username">نام‌کاربری</string>
+    <string name="username_title">نام‌کاربری شما</string>
+    <string name="username_is_empty">نام‌کابری شما خالی است</string>
+
+    <string name="language">زبان برنامه</string>
+    <string name="language_title">زبان</string>
+
+    <string name="commit">باشه</string>
+    <string name="close">بستن</string>
+    <string name="next">ادامه</string>
+    <string name="choose">انتخاب</string>
+    <string name="finish">اتمام</string>
+    <string name="send">بفرست</string>
+
+    <string name="comment_title">نظر</string>
+    <string name="comment_hint">لطفا نظر خود را وارد نمایید</string>
+    <string name="comment_is_empty">نظر شما خالی است</string>
+    <string name="comment_store_is_empty">مشکلی پیش آمده! لطفا دوباره این دیالوگ را باز نمایید</string>
+
+    <string name="new_store_name_hint">نام مکان</string>
+    <string name="new_store_description_hint">توضیحات مکان</string>
+    <string name="new_store_marker_empty">لطفا این مکان را روی نقشه مشخص نمایید</string>
+    <string name="new_store_name_empty">لطفا نام مکان را مشخص نمایید</string>
+    <string name="new_store_description_empty">لطفا توضیحاتی را اضافه نمایید</string>
+    <string name="new_store_at_least_banner">حداقل سه تصویر لازم است</string>
+    <string name="new_store_banner_is_empty">تصویری انتخاب نشده‌است یا تصویر آماده‌نشده‌است.</string>
+    <string name="new_store_banner_is_not_sent">تصویر فرستاده نشده‌است</string>
+    <string name="new_store_banner_successfully_sent">تصویر با موفقیت فرستاده‌شده</string>
+    <string name="new_store_banner_successfully_prepared">تصویر با موفقیت آماده شده</string>
+    <string name="new_store_banner_error_prepared">تصویر آماده نشده‌است! لطفا دوباره تلاش نمایید.</string>
+    <string name="new_store_banner_error_max_size">تصویر آماده نشده‌است! اندازه فایل بیشتر از ۱۰MB می‌باشد.</string>
+    <string name="new_store_saving">در حال ذخیره‌کردن در سرور …</string>
+    <string name="new_store_preparing">در حال آماده‌سازی تصویر …</string>
+    <string name="new_store_uploading">در حال فرستادن تصویر …</string>
+
+    <string name="month_0">فروردین</string>
+    <string name="month_1">اردیبهشت</string>
+    <string name="month_2">خرداد</string>
+    <string name="month_3">تیر</string>
+    <string name="month_4">مرداد</string>
+    <string name="month_5">شهریور</string>
+    <string name="month_6">مهر</string>
+    <string name="month_7">آبان</string>
+    <string name="month_8">آذر</string>
+    <string name="month_9">دی</string>
+    <string name="month_10">بهمن</string>
+    <string name="month_11">اسفند</string>
+
+    <string name="about_us_description">این برنامه جهت نشانه‌گذاری مکان‌ها روی نقشه و انتقال اطلاعات در مورد آن‌ها طراحی شده‌است. این مکان‌ها می‌توانند مکان‌های تاریخی یا مکان‌‌های قرار عمومی و یا حتی خصوصی، فروشگاه‌ها، مغازه‌ها و … باشند. همچنین شما می‌توانید نظر خودتان در مورد آن‌ها را با دیگران به اشتراک بگذارید.\n\nبرای تماس با توسعه‌دهندگان این برنامه با این ایمیل تماس بگیرید: \n hadilq.dev@gmail.com</string>
+
+    <string name="crash_report_hint">با عرض پوزش برای این اتفاق. لطفا توضیحاتی در مورد اینکه چه اتفاقی افتاد می‌نویسید؟ \n با سپاس فراوان. \n اگر مایل بودید ایمیل یا شماره تماسی جهت پیگیری به توضیحات خود اضافه نمایید.</string>
+    <string name="crash_report_is_empty">نظر شما خالی است</string>
+    <string name="crash_report_successfully_sent">توضیحات شما با موفقیت فرستاده‌شد.</string>
+
+</resources>
