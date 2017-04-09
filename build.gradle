@@ -38,7 +38,7 @@ subprojects {
     // The implementation number of the current interface.
     def appRevision = 0
     // The difference between the newest and oldest interfaces that the library implements.
-    def appAge = 3
+    def appAge = 4
 
     ext.global_compileSdkVersion = 25
     ext.global_buildToolsVersion = "25.0.1"
