@@ -1,11 +1,13 @@
 package ir.asparsa.hobbytaste.ui.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
@@ -21,6 +23,7 @@ import ir.asparsa.hobbytaste.core.util.LaunchUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.core.util.UncaughtExceptionHandler;
 import ir.asparsa.hobbytaste.ui.adapter.NavigationAdapter;
+import ir.asparsa.hobbytaste.ui.behavior.ShrinkBehavior;
 import ir.asparsa.hobbytaste.ui.fragment.container.BaseContainerFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.BaseContentFragment;
 
@@ -33,6 +36,7 @@ import java.util.List;
  */
 public class LaunchActivity extends BaseActivity implements FragmentManager.OnBackStackChangedListener {
 
+    private static final String BUNDLE_KEY_CONFIGURATION_CHANGED = "BUNDLE_KEY_CONFIGURATION_CHANGED";
     private final BaseContainerFragment[] mContainers = new BaseContainerFragment[NavigationAdapter.PAGE_COUNT];
 
     @BindView(R.id.toolbar)
@@ -49,6 +53,8 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         add(R.id.action_settings);
     }};
     private NavigationAdapter mPagerAdapter;
+    private boolean mConfigurationChanged = false;
+    private ShrinkBehavior mShrinkBehavior;
 
     @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,16 +96,30 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                     }
                 });
 
+        mShrinkBehavior = (ShrinkBehavior) ((CoordinatorLayout.LayoutParams) mFloatingActionButton.getLayoutParams())
+                .getBehavior();
+
         if (UncaughtExceptionHandler.DEBUG) {
             throw new RuntimeException("Test");
         }
 
-        LaunchUtil.launch(this, SplashActivity.class);
-
+        if (!getIntent().hasExtra(BUNDLE_KEY_CONFIGURATION_CHANGED)) {
+            mConfigurationChanged = false;
+            LaunchUtil.launch(this, SplashActivity.class);
+        } else {
+            mConfigurationChanged = true;
+            getIntent().removeExtra(BUNDLE_KEY_CONFIGURATION_CHANGED);
+        }
     }
 
     @Override protected void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        getIntent().putExtra(BUNDLE_KEY_CONFIGURATION_CHANGED, newConfig.orientation);
     }
 
     @Override
@@ -155,15 +175,17 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                 mFloatingActionButton.hide();
             }
 
-            AppBarLayout.LayoutParams params =
+            boolean scrollToolbar = fragment.scrollToolbar();
+            mShrinkBehavior.setScrollToolbar(scrollToolbar);
+            AppBarLayout.LayoutParams tp =
                     (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
-            if (fragment.scrollToolbar()) {
-                params.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
-                                      AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS |
-                                      AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
+            if (scrollToolbar) {
+                tp.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
+                                  AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS |
+                                  AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
                 );
             } else {
-                params.setScrollFlags(0);
+                tp.setScrollFlags(0);
             }
 
             if (fragment.hasHomeAsUp()) {
@@ -191,5 +213,9 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
     ) {
         mContainers[pos] = fragment;
         fragment.getChildFragmentManager().addOnBackStackChangedListener(this);
+    }
+
+    public boolean isConfigurationChanged() {
+        return mConfigurationChanged;
     }
 }

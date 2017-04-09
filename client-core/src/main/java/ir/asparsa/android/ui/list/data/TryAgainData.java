@@ -41,7 +41,6 @@ public class TryAgainData extends BaseRecyclerData {
         return !((otherObj == null) || !(otherObj instanceof TryAgainData));
     }
 
-
     @Override public int describeContents() {
         return 0;
     }

@@ -24,8 +24,6 @@ import rx.functions.Action1;
  */
 public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements OnMapReadyCallback {
 
-    public static final String MAP_FRAGMENT_TAG = "GoogleMapTag";
-
     @BindView(R.id.map)
     MapView mMapView;
 
@@ -42,7 +40,8 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
         super(itemView, observer, savedInstanceState);
         ButterKnife.bind(this, itemView);
 
-        mMapView.onCreate(savedInstanceState);
+        // TODO why savedInstanceState is not working here?
+        mMapView.onCreate(null);
         mMapView.onResume();
         mMapView.getMapAsync(this);
     }

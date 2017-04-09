@@ -34,6 +34,7 @@ public class MainContentFragment extends BaseContentFragment
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private static final String BUNDLE_KEY_CAMERA = "BUNDLE_KEY_CAMERA";
+    private static final String BUNDLE_KEY_STORES = "BUNDLE_KEY_STORES";
 
     @Inject
     AuthorizationManager mAuthorizationManager;
@@ -43,7 +44,7 @@ public class MainContentFragment extends BaseContentFragment
     PreferencesManager mPreferencesManager;
 
     private GoogleMap mMap;
-    private List<StoreModel> mStores;
+    private ArrayList<StoreModel> mStores;
     private List<Marker> mMarkers = new ArrayList<>();
     private CompositeSubscription mSubscription = new CompositeSubscription();
     private boolean mTryAgainLater = true;
@@ -76,6 +77,13 @@ public class MainContentFragment extends BaseContentFragment
                                      .replace(R.id.content_nested, mapFragment)
                                      .commit();
             mapFragment.getMapAsync(this);
+        } else {
+            ((SupportMapFragment) fragment).getMapAsync(this);
+        }
+
+        mStores = getArguments().getParcelableArrayList(BUNDLE_KEY_STORES);
+        if (mStores != null) {
+            mTryAgainLater = false;
         }
     }
 
@@ -138,6 +146,7 @@ public class MainContentFragment extends BaseContentFragment
             return;
         }
         mStores = new ArrayList<>(stores);
+        getArguments().putParcelableArrayList(BUNDLE_KEY_STORES, mStores);
         fillMap();
     }
 

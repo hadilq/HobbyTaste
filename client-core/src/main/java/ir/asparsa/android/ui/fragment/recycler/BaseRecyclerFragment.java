@@ -102,7 +102,6 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mProvider = provideDataList(mAdapter, new OnInsertData());
         return rootView;
     }
 
@@ -113,8 +112,10 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         mLimit = getArguments().getInt(BUNDLE_KEY_LIMIT, LIMIT_DEFAULT);
         ArrayList<BaseRecyclerData> parcelableArrayList = getArguments().getParcelableArrayList(BUNDLE_KEY_LIST);
         if (parcelableArrayList != null) {
+            mAdapter.getList().clear();
             mAdapter.getList().addAll(parcelableArrayList);
         }
+        mProvider = provideDataList(mAdapter, new OnInsertData());
         provideDataAndStart();
     }
 
