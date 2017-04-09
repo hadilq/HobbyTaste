@@ -42,17 +42,26 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
         ApplicationLauncher.mainComponent().inject(this);
         this.mStore = store;
 
+        final List<BaseRecyclerData> headers = new ArrayList<>();
+        headers.add(new StoreMapData(mStore));
+        if (mStore.getBanners() != null && mStore.getBanners().size() != 0) {
+            headers.add(new GalleryData(mStore.getBanners()));
+        }
+        headers.add(new RatingData(mStore.getRate(), mStore.getViewed(), mStore.getDescription(),
+                                   mStore.isLiked()));
         mOnInsertData.OnDataInserted(new DataObserver() {
             @Override public void onCompleted() {
-                deque.add(new StoreMapData(mStore));
-                if (mStore.getBanners() != null && mStore.getBanners().size() != 0) {
-                    deque.add(new GalleryData(mStore.getBanners()));
+                for (; index < headers.size(); index++) {
+                    deque.add(headers.get(index));
+                    mAdapter.notifyItemInserted(deque.size() - 1);
                 }
-                deque.add(new RatingData(mStore.getRate(), mStore.getViewed(), mStore.getDescription(),
-                                         mStore.isLiked()));
             }
 
             @Override public void onNext(BaseRecyclerData baseRecyclerData) {
+                if (headers.contains(baseRecyclerData)) {
+                    index = headers.size();
+                }
+                deque.add(baseRecyclerData);
             }
         });
     }

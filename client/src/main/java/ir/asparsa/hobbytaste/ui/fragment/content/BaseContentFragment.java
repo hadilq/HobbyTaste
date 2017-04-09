@@ -2,11 +2,13 @@ package ir.asparsa.hobbytaste.ui.fragment.content;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import ir.asparsa.android.ui.fragment.BaseFragment;
 import ir.asparsa.hobbytaste.R;
+import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
 import rx.Observer;
 
 /**
@@ -60,6 +62,13 @@ public abstract class BaseContentFragment extends BaseFragment {
         }
     }
 
+    protected LaunchActivity activity() {
+        FragmentActivity activity = getActivity();
+        if (activity instanceof LaunchActivity) {
+            return (LaunchActivity) activity;
+        }
+        throw new RuntimeException("Activity is not launch activity");
+    }
 
     public enum BackState {
         CLOSE_APP,

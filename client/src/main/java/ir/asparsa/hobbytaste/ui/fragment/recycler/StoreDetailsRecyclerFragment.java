@@ -231,5 +231,4 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
     public void addComment(CommentModel comment) {
         mProvider.addComment(comment);
     }
-
 }

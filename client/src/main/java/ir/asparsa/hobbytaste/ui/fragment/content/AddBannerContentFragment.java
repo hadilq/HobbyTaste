@@ -56,7 +56,6 @@ public class AddBannerContentFragment extends BaseContentFragment {
     private static final String BUNDLE_KEY_BITMAP_FILE_PATH = "BUNDLE_KEY_BITMAP_FILE_PATH";
     public static final String BUNDLE_KEY_DIALOG_RESULT_EVENT = "BUNDLE_KEY_DIALOG_RESULT_EVENT";
     private static final String BUNDLE_KEY_BANNER = "BUNDLE_KEY_BANNER";
-    private static final String BUNDLE_KEY_FILE = "BUNDLE_KEY_FILE";
     private static final int PICK_IMAGE_REQUEST = 23445;
 
     @Inject
@@ -124,6 +123,13 @@ public class AddBannerContentFragment extends BaseContentFragment {
             mBannerImageView.setImageBitmap(BitmapFactory.decodeFile(
                     new File(mFilePath).getAbsolutePath(),
                     new BitmapFactory.Options()));
+            mHintTextView.setText(getString(R.string.new_store_banner_successfully_prepared));
+        }
+
+        mBanner = getArguments().getParcelable(BUNDLE_KEY_BANNER);
+        if (mBanner != null) {
+            store.getBanners().remove(mBanner);
+            mHintTextView.setText(getString(R.string.new_store_banner_successfully_sent));
         }
 
         mBannerImageView.setOnClickListener(new View.OnClickListener() {
@@ -135,10 +141,11 @@ public class AddBannerContentFragment extends BaseContentFragment {
             }
         });
 
-        if (store.getBanners().size() >= 2) {
+        if (store.getBanners().size() >= 2 && mBanner == null) {
             mController.setCommitText(getString(R.string.finish));
+            mHintTextView.setText(getString(R.string.new_store_banner_choose_banner));
         }
-        if (store.getBanners().size() <= 20) {
+        if (store.getBanners().size() <= 8) {
             mController.setNeutralText(getString(R.string.next));
         }
 
@@ -149,12 +156,6 @@ public class AddBannerContentFragment extends BaseContentFragment {
         return view;
     }
 
-    @Override public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        mBanner = getArguments().getParcelable(BUNDLE_KEY_BANNER);
-        mFilePath = getArguments().getString(BUNDLE_KEY_FILE);
-    }
-
     @Override public void onDestroyView() {
         mSubscription.clear();
         super.onDestroyView();
@@ -162,8 +163,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
 
     @Override public void onDestroy() {
         super.onDestroy();
-        getArguments().putString(BUNDLE_KEY_FILE, mFilePath);
-        getArguments().putParcelable(BUNDLE_KEY_BANNER, mBanner);
+        tryToDeleteFile();
     }
 
     @Override public boolean hasHomeAsUp() {
@@ -216,6 +216,10 @@ public class AddBannerContentFragment extends BaseContentFragment {
                     return;
                 }
                 mHintTextView.setText("");
+                if (mBanner != null) {
+                    store.getBanners().remove(mBanner);
+                    mBanner = null;
+                }
                 File file = new File(mFilePath);
                 ProgressRequestBody requestFile = new ProgressRequestBody(file)
                         .registerObserver(getProgressObserver());
@@ -279,9 +283,9 @@ public class AddBannerContentFragment extends BaseContentFragment {
 
             @Override public void onNext(StoreProto.Banner bannerDto) {
                 mBanner = new BannerModel(bannerDto.getMainUrl(), bannerDto.getThumbnailUrl());
+                getArguments().putParcelable(BUNDLE_KEY_BANNER, mBanner);
                 L.i(AddBannerContentFragment.class, "Banner is uploaded " + mBanner);
                 mHintTextView.setText(getString(R.string.new_store_banner_successfully_sent));
-                tryToDeleteFile();
                 dismissLoadingProgressDialog();
             }
         };
@@ -296,58 +300,61 @@ public class AddBannerContentFragment extends BaseContentFragment {
         L.i(getClass(), "onActivityResult gets called");
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null &&
             data.getData() != null) {
-            L.i(getClass(), "Starting to prepare banner");
+            prepareBanner(data.getData());
+        }
+    }
 
-            Uri uri = data.getData();
-            try {
-                final Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
-                mBannerImageView.setImageBitmap(bitmap);
-                if (bitmap.getByteCount() > BuildConfig.MAX_FILE_SIZE) {
-                    mHintTextView.setText(getString(R.string.new_store_banner_error_max_size));
-                    return;
-                }
+    private void prepareBanner(Uri uri) {
+        L.i(getClass(), "Starting to prepare banner");
 
-                Observable.create(new Observable.OnSubscribe<Void>() {
-                    @Override public void call(Subscriber<? super Void> subscriber) {
-                        try {
-                            L.i(getClass(), "Starting to prepare banner asynchronously");
-                            tryToDeleteFile();
-                            String filePath = getContext().getCacheDir().getAbsolutePath() + "file_" +
-                                              System.currentTimeMillis();
-                            FileOutputStream out = new FileOutputStream(filePath);
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-                            out.close();
-
-                            mFilePath = filePath;
-                            getArguments().putString(BUNDLE_KEY_BITMAP_FILE_PATH, mFilePath);
-                            L.i(getClass(), "Preparing banner is finished");
-                            subscriber.onNext(null);
-                        } catch (IOException e) {
-                            L.i(getClass(), "Preparing banner is finished with error", e);
-                            subscriber.onError(e);
-                        }
-                    }
-                }).subscribeOn(Schedulers.newThread())
-                          .observeOn(AndroidSchedulers.mainThread())
-                          .subscribe(new Action1<Void>() {
-                              @Override public void call(Void aVoid) {
-                                  L.i(getClass(), "Successfully preparing is finished");
-                                  mHintTextView.setText(getString(R.string.new_store_banner_successfully_prepared));
-                                  dismissProgressDialog();
-                              }
-                          }, new Action1<Throwable>() {
-                              @Override public void call(Throwable throwable) {
-                                  L.i(getClass(), "Preparing is finished with error", throwable);
-                                  mHintTextView.setText(getString(R.string.new_store_banner_error_prepared));
-                                  dismissProgressDialog();
-                              }
-                          });
-                mHintTextView.setText("");
-                showProgressDialog(R.string.new_store_preparing);
-
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            final Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
+            mBannerImageView.setImageBitmap(bitmap);
+            if (bitmap.getByteCount() > BuildConfig.MAX_FILE_SIZE) {
+                mHintTextView.setText(getString(R.string.new_store_banner_error_max_size));
+                return;
             }
+
+            Observable.create(new Observable.OnSubscribe<Void>() {
+                @Override public void call(Subscriber<? super Void> subscriber) {
+                    try {
+                        L.i(getClass(), "Starting to prepare banner asynchronously");
+                        tryToDeleteFile();
+                        String filePath = getContext().getCacheDir().getAbsolutePath() + "file_" +
+                                          System.currentTimeMillis();
+                        FileOutputStream out = new FileOutputStream(filePath);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                        out.close();
+
+                        mFilePath = filePath;
+                        getArguments().putString(BUNDLE_KEY_BITMAP_FILE_PATH, mFilePath);
+                        L.i(getClass(), "Preparing banner is finished");
+                        subscriber.onNext(null);
+                    } catch (IOException e) {
+                        L.i(getClass(), "Preparing banner is finished with error", e);
+                        subscriber.onError(e);
+                    }
+                }
+            }).subscribeOn(Schedulers.newThread())
+                      .observeOn(AndroidSchedulers.mainThread())
+                      .subscribe(new Action1<Void>() {
+                          @Override public void call(Void aVoid) {
+                              L.i(getClass(), "Successfully preparing is finished");
+                              mHintTextView.setText(getString(R.string.new_store_banner_successfully_prepared));
+                              dismissProgressDialog();
+                          }
+                      }, new Action1<Throwable>() {
+                          @Override public void call(Throwable throwable) {
+                              L.i(getClass(), "Preparing is finished with error", throwable);
+                              mHintTextView.setText(getString(R.string.new_store_banner_error_prepared));
+                              dismissProgressDialog();
+                          }
+                      });
+            mHintTextView.setText("");
+            showProgressDialog(R.string.new_store_preparing);
+
+        } catch (IOException e) {
+            L.w(getClass(), "Cannot prepare banner", e);
         }
     }
 
