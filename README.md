@@ -54,5 +54,8 @@ Just a hobby android project. This project is meant to give you the ability to p
 see by others. As you can see in the code, I named those places as "store" but basically they can be any places.
 While posting the place, it let you to upload pictures of that place, so others can comment, like, etc. on your post.
 
-I tried to simplify the process of making an account. The user has a generated username on authentication. It's not
-even unique! So provided the most anonymity imaginable(beside the security).
+More precisely, this project is the proof of concept for its new way of making accounts and also its way of handling
+offline mode. I tried to simplify the process of making an account. The user has a generated username on
+authentication. Username isn't even unique! So provided the most anonymity imaginable(beside the security). Also, this
+app's offline mode supports browsing of all pages that was opened before, which overall is not a new concept, but the
+implementation is new.

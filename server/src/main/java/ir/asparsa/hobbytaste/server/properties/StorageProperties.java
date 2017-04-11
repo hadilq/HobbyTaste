@@ -13,6 +13,8 @@ public class StorageProperties {
     private String location;
     @Value("${storage.location.tmp}")
     private String tmpLocation;
+    @Value("${storage.location.trash}")
+    private String trashLocation;
 
     private String userDir = System.getProperty("user.dir") + "/";
 
@@ -22,6 +24,10 @@ public class StorageProperties {
 
     public String getTmpLocation() {
         return userDir + tmpLocation;
+    }
+
+    public String getTrashLocation() {
+        return userDir + trashLocation;
     }
 
     public void setLocation(String location) {

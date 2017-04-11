@@ -2,6 +2,7 @@ package ir.asparsa.hobbytaste.database.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import ir.asparsa.android.core.model.BaseModel;
@@ -135,11 +136,16 @@ public class CommentModel extends BaseModel implements Parcelable {
         return getStoreId() == other.getStoreId() && getHashCode() == other.getHashCode();
     }
 
+    public boolean changed(CommentModel comment) {
+        return equals(comment) &&
+               (getRate() != comment.getRate() || isLiked() != comment.isLiked() ||
+                (!TextUtils.isEmpty(getCreator()) && !getCreator().equals(comment.getCreator())));
+    }
+
     @Override
     public int hashCode() {
         return (int) (getHashCode() >> 15);
     }
-
 
     @Override public String toString() {
         return "CommentModel{" +
@@ -147,6 +153,7 @@ public class CommentModel extends BaseModel implements Parcelable {
                ", description='" + description + '\'' +
                ", rate=" + rate +
                ", liked=" + liked +
+               ", creator='" + creator + '\'' +
                ", created=" + created +
                ", storeId=" + storeId +
                ", hashCode=" + hashCode +
@@ -189,5 +196,4 @@ public class CommentModel extends BaseModel implements Parcelable {
             return new CommentModel[size];
         }
     };
-
 }

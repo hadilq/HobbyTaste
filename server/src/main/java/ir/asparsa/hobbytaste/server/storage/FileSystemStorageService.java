@@ -29,6 +29,7 @@ public class FileSystemStorageService implements StorageService {
 
     private final Path rootLocation;
     private final Path rootTmpLocation;
+    private final Path rootTrashLocation;
     private final ServerProperties serverProperties;
 
     @Autowired
@@ -39,6 +40,7 @@ public class FileSystemStorageService implements StorageService {
         this.serverProperties = serverProperties;
         this.rootLocation = Paths.get(properties.getLocation());
         this.rootTmpLocation = Paths.get(properties.getTmpLocation());
+        this.rootTrashLocation = Paths.get(properties.getTrashLocation());
     }
 
     @Override
@@ -49,6 +51,9 @@ public class FileSystemStorageService implements StorageService {
             }
             if (!rootTmpLocation.toFile().exists()) {
                 Files.createDirectory(rootTmpLocation);
+            }
+            if (!rootTrashLocation.toFile().exists()) {
+                Files.createDirectory(rootTrashLocation);
             }
         } catch (IOException e) {
             throw new StorageException(
@@ -100,6 +105,10 @@ public class FileSystemStorageService implements StorageService {
         return rootTmpLocation.resolve(filename);
     }
 
+    @Override public Path loadTrash(String filename) {
+        return rootTrashLocation.resolve(filename);
+    }
+
     @Override public boolean exists(String filename) {
         Path file = load(filename);
         try {
@@ -147,6 +156,21 @@ public class FileSystemStorageService implements StorageService {
         } catch (IOException e) {
             throw new StorageException(
                     "Failed to move tmp source to permanent store. File " + filename, e, Strings.CANNOT_MOVE_FILE,
+                    locale);
+        }
+    }
+
+    @Override public void moveFromPermanentToTrash(
+            String filename,
+            String locale
+    ) {
+        Path source = load(filename);
+        Path target = loadTrash(filename);
+        try {
+            Files.move(source, target);
+        } catch (IOException e) {
+            throw new StorageException(
+                    "Failed to move permanent source to trash store. File " + filename, e, Strings.CANNOT_MOVE_FILE,
                     locale);
         }
     }
