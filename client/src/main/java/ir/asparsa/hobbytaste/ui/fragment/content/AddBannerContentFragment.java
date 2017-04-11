@@ -118,6 +118,15 @@ public class AddBannerContentFragment extends BaseContentFragment {
             return view;
         }
 
+        mBannerImageView.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+            }
+        });
+
         mFilePath = getArguments().getString(BUNDLE_KEY_BITMAP_FILE_PATH);
         if (mFilePath != null) {
             mBannerImageView.setImageBitmap(BitmapFactory.decodeFile(
@@ -132,16 +141,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
             mHintTextView.setText(getString(R.string.new_store_banner_successfully_sent));
         }
 
-        mBannerImageView.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
-            }
-        });
-
-        if (store.getBanners().size() >= 2 && mBanner == null) {
+        if (store.getBanners().size() >= 2) {
             mController.setCommitText(getString(R.string.finish));
             mHintTextView.setText(getString(R.string.new_store_banner_choose_banner));
         }
