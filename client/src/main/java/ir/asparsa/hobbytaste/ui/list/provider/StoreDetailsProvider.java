@@ -123,7 +123,12 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
                     CommentModel comment = listModel.get(index);
                     if (addedBeforeComment.equals(comment)) {
                         missRecyclerData = false;
-                        deque.add(baseRecyclerData);
+                        if (addedBeforeComment.changed(comment)) {
+                            deque.add(new CommentData(comment));
+                            mAdapter.notifyItemChanged(deque.size() - 1);
+                        } else {
+                            deque.add(baseRecyclerData);
+                        }
                         index++;
                         break;
                     } else if (comment.getCreated() > addedBeforeComment.getCreated()) {
