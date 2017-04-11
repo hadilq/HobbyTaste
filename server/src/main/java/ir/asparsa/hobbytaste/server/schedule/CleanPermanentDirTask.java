@@ -13,8 +13,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Optional;
 
 /**
@@ -47,18 +45,18 @@ public class CleanPermanentDirTask {
                             Optional<BannerModel> thumbnailUrl = bannerRepository.findByThumbnailName(name);
                             if (!thumbnailUrl.isPresent()) {
                                 logger.info("Deleting thumbnail " + name);
-                                Files.delete(path);
+                                storageService.moveFromPermanentToTrash(name, Strings.DEFAULT_LOCALE);
                             }
                         } else {
                             Optional<BannerModel> mainUrl = bannerRepository.findByMainName(name);
                             if (!mainUrl.isPresent()) {
                                 logger.info("Deleting main " + name);
-                                Files.delete(path);
+                                storageService.moveFromPermanentToTrash(name, Strings.DEFAULT_LOCALE);
                             }
                         }
                     }
                 }
-            } catch (IOException | NumberFormatException | SecurityException e) {
+            } catch (NumberFormatException | SecurityException e) {
                 logger.error("Couldn't delete file : " + file.getAbsolutePath(), e);
             }
         });

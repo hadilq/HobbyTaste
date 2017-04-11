@@ -27,6 +27,8 @@ public interface StorageService {
 
     Path loadTmp(String filename);
 
+    Path loadTrash(String filename);
+
     boolean exists(String filename);
 
     Resource loadAsResource(
@@ -40,6 +42,11 @@ public interface StorageService {
     );
 
     void moveFromTmpToPermanent(
+            String filename,
+            String locale
+    );
+
+    void moveFromPermanentToTrash(
             String filename,
             String locale
     );

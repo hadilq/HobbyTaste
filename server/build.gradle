@@ -33,6 +33,7 @@ def attachGenerateDefaultConfiguration = { properties ->
     //###################      Storage Service     ##########################
     properties.setProperty("storage.location", "upload-banners-dir")
     properties.setProperty("storage.location.tmp", "upload-banners-dir-tmp")
+    properties.setProperty("storage.location.trash", "upload-banners-dir-trash")
 
     //###################       Image Service      ##########################
     properties.setProperty("image.maxLongHeight", "500")
