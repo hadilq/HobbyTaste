@@ -235,8 +235,11 @@ public class MainContentFragment extends BaseContentFragment
     @Override public void onEvent(BaseEvent event) {
         if (event instanceof AddStoreContentFragment.StoreSaveResultEvent) {
             AddStoreContentFragment.StoreSaveResultEvent result = (AddStoreContentFragment.StoreSaveResultEvent) event;
+            L.i(MainContentFragment.class, "Added store: " + result.getStoreModel());
             if (mStores != null) {
                 mStores.add(result.getStoreModel());
+            } else {
+                mTryAgainLater = true;
             }
         }
     }
