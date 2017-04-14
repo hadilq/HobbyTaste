@@ -17,6 +17,7 @@ import ir.asparsa.hobbytaste.ui.fragment.recycler.SettingsRecyclerFragment;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.StoreDetailsRecyclerFragment;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
+import ir.asparsa.hobbytaste.ui.mvp.presenter.StorePresenter;
 
 import javax.inject.Singleton;
 
@@ -59,4 +60,6 @@ public interface MainComponent {
     void inject(AdditionalKeyStoresSSLSocketFactory additionalKeyStoresSSLSocketFactory);
 
     void inject(AuthorizationFactory.Authorization authorization);
+
+    void inject(StorePresenter storePresenter);
 }
