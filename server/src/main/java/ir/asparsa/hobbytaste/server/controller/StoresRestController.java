@@ -290,13 +290,15 @@ import java.util.Optional;
     }
 
     private Optional<CommentModel> getCommentModel(
-            @PathVariable("commentHashCode") Long hashCode,
+            Long hashCode,
             StoreModel storeModel,
             String locale
     ) {
         Optional<CommentModel> commentModel = storeCommentRepository.findByHashCodeAndStore(hashCode, storeModel);
         if (!commentModel.isPresent()) {
-            throw new CommentNotFoundException("Comment not found", Strings.COMMENT_NOT_FOUND, locale);
+            throw new CommentNotFoundException(
+                    "Comment is not found with hash code " + hashCode + " in store " + storeModel,
+                    Strings.COMMENT_NOT_FOUND, locale);
         }
         return commentModel;
     }
@@ -307,7 +309,8 @@ import java.util.Optional;
     ) {
         Optional<StoreModel> storeModel = storeRepository.findByHashCode(hashCode);
         if (!storeModel.isPresent()) {
-            throw new StoreNotFoundException("Store not found", Strings.STORE_NOT_FOUND, locale);
+            throw new StoreNotFoundException(
+                    "Store is not found with hash code: " + hashCode, Strings.STORE_NOT_FOUND, locale);
         }
         return storeModel;
     }
