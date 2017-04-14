@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -64,6 +65,10 @@ android {
 
     }
 
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
     testOptions {
         unitTests.returnDefaultValues = true
     }
@@ -115,6 +120,12 @@ dependencies {
     // Picasso
     compile "com.squareup.picasso:picasso:$global_picassoVersion"
     compile "com.jakewharton.picasso:picasso2-okhttp3-downloader:$global_picassoDownloaderVersion"
+    // Anko
+    compile "org.jetbrains.anko:anko-sdk15:$global_ankoVersion" // sdk19, sdk21, sdk23 are also available
+    compile "org.jetbrains.anko:anko-support-v4:$global_ankoVersion"// In case you need support-v4 bindings
+    compile "org.jetbrains.anko:anko-appcompat-v7:$global_ankoVersion" // For appcompat-v7 bindings
+    // Kotlin
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
     // Test
     testCompile "junit:junit:$global_junitVersion"
