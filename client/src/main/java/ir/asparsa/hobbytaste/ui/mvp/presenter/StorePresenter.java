@@ -4,22 +4,23 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.*;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
-import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
+import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
 import ir.asparsa.hobbytaste.ui.mvp.holder.MainContentViewHolder;
+import junit.framework.Assert;
 import rx.Observer;
 import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author hadi
@@ -27,20 +28,25 @@ import java.util.List;
  */
 public class StorePresenter implements Presenter<MainContentViewHolder> {
 
-    private static final String BUNDLE_KEY_CAMERA = "BUNDLE_KEY_CAMERA";
     private static final String BUNDLE_KEY_STORES = "BUNDLE_KEY_STORES";
+    private static final String BUNDLE_KEY_OFFSET = "BUNDLE_KEY_OFFSET";
+    private static final int STORES_LIMIT = 20;
+    private CameraPosition mCameraPosition;
 
     @Inject
     StoresManager mStoresManager;
     @Inject
     PreferencesManager mPreferencesManager;
+    @Inject
+    MapUtil mMapUtil;
 
     private final MainContentFragment mFragment;
     private MainContentViewHolder mHolder;
-    private ArrayList<StoreModel> mStores;
+    private ArrayList<StoreModel> mStores = new ArrayList<>();
     private List<Marker> mMarkers = new ArrayList<>();
     private CompositeSubscription mSubscription = new CompositeSubscription();
     private boolean mTryAgainLater = true;
+    private int mOffset;
 
     public StorePresenter(
             MainContentFragment fragment
@@ -52,44 +58,54 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
         double lng = mPreferencesManager.getFloat(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LONGITUDE, 0f);
         float zoom = mPreferencesManager.getFloat(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_ZOOM, 0f);
         if (lat != 0f && lng != 0f && zoom != 0) {
-            mFragment.getArguments()
-                     .putParcelable(BUNDLE_KEY_CAMERA, CameraPosition.fromLatLngZoom(new LatLng(lat, lng), zoom));
+            mCameraPosition = mMapUtil.fromLatLngZoom(lat, lng, zoom);
         }
-
     }
 
     @Override public void bindView(@NonNull MainContentViewHolder viewHolder) {
+        L.d(getClass(), "bind view gets called. " + mStores);
         mHolder = viewHolder;
-        mStores = mFragment.getArguments().getParcelableArrayList(BUNDLE_KEY_STORES);
-        if (mStores != null) {
-            mTryAgainLater = false;
+        ArrayList<StoreModel> stores = mFragment.getArguments().getParcelableArrayList(BUNDLE_KEY_STORES);
+        if (stores != null) {
+            addNewStores(stores);
         }
 
         if (mTryAgainLater) {
             mTryAgainLater = false;
-            mSubscription.add(mStoresManager.loadStores(getStoreObserver()));
+
+            double latitude = 0d;
+            double longitude = 0d;
+
+            if (mCameraPosition != null && mCameraPosition.target != null) {
+                latitude = mCameraPosition.target.latitude;
+                longitude = mCameraPosition.target.longitude;
+            }
+            mOffset = mFragment.getArguments().getInt(BUNDLE_KEY_OFFSET, 0);
+            StoresManager.Constraint constraint = new StoresManager.Constraint(
+                    latitude, longitude, mOffset, STORES_LIMIT);
+            mSubscription.add(mStoresManager.loadStores(constraint, getStoreObserver(constraint)));
         } else {
             publish();
         }
     }
 
     @Override public void unbindView() {
+        L.d(getClass(), "unbind view gets called. " + mStores);
         if (mHolder == null) {
             return;
         }
 
         GoogleMap map = mHolder.getMap();
         if (map != null) {
-            CameraPosition cameraPosition = map.getCameraPosition();
-            mFragment.getArguments().putParcelable(BUNDLE_KEY_CAMERA, cameraPosition);
-            if (cameraPosition != null && cameraPosition.target != null) {
+            mCameraPosition = map.getCameraPosition();
+            if (mCameraPosition != null && mCameraPosition.target != null) {
                 mPreferencesManager.put(
                         PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LATITUDE,
-                        (float) cameraPosition.target.latitude);
+                        (float) mCameraPosition.target.latitude);
                 mPreferencesManager.put(
                         PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LONGITUDE,
-                        (float) cameraPosition.target.longitude);
-                mPreferencesManager.put(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_ZOOM, cameraPosition.zoom);
+                        (float) mCameraPosition.target.longitude);
+                mPreferencesManager.put(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_ZOOM, mCameraPosition.zoom);
             }
         }
         for (Marker marker : mMarkers) {
@@ -99,6 +115,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
     }
 
     @Override public void publish() {
+        L.d(getClass(), "publish gets called. " + mStores);
         if (mHolder == null) {
             return;
         }
@@ -107,43 +124,37 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
         if (map != null && mStores != null) {
             double accumulatedLat = 0d;
             double accumulatedLon = 0d;
-            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.placeholder);
 
-            removeMarkers(mMarkers);
+            mHolder.removeMarkers(mMarkers);
             for (StoreModel store : mStores) {
                 accumulatedLat += store.getLat();
                 accumulatedLon += store.getLon();
                 LatLng latLng = new LatLng(store.getLat(), store.getLon());
 
-                Marker marker = map.addMarker(
-                        new MarkerOptions()
-                                .position(latLng)
-                                .title(store.getTitle())
-                                .icon(icon));
+                Marker marker = mHolder.addMarker(latLng, store.getTitle());
                 mMarkers.add(marker);
             }
-            CameraPosition camera = mFragment.getArguments().getParcelable(BUNDLE_KEY_CAMERA);
-            if (camera == null) {
+
+            if (mCameraPosition == null) {
                 LatLng latLng = new LatLng(accumulatedLat / mStores.size(), accumulatedLon / mStores.size());
                 map.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            } else {
-                map.moveCamera(CameraUpdateFactory.newCameraPosition(camera));
+                mCameraPosition = mHolder.getMap().getCameraPosition();
             }
             map.setOnMarkerClickListener(mHolder);
         }
     }
 
-    private void removeMarkers(Collection<Marker> mMarkers) {
-        if (mMarkers.size() != 0) {
-            for (Marker marker : mMarkers) {
-                marker.remove();
-            }
-            mMarkers.clear();
+    public void onMapReady() {
+        L.d(getClass(), "on map ready gets called.");
+        Assert.assertNotNull(mHolder);
+        Assert.assertNotNull(mHolder.getMap());
+        if (mCameraPosition != null) {
+            mHolder.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
         }
     }
 
-    private Observer<Collection<StoreModel>> getStoreObserver() {
-        return new Observer<Collection<StoreModel>>() {
+    private Observer<StoresManager.SoresResult> getStoreObserver(final StoresManager.Constraint constraint) {
+        return new Observer<StoresManager.SoresResult>() {
             @Override public void onCompleted() {
                 L.i(MainContentFragment.class, "Refresh request gets completed");
             }
@@ -154,20 +165,41 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
                 mTryAgainLater = true;
             }
 
-            @Override public void onNext(Collection<StoreModel> stores) {
-                onSuccessfullyReceived(stores);
+            @Override public void onNext(StoresManager.SoresResult result) {
+                if (result.getStores() == null || result.getStores().size() == 0) {
+                    return;
+                }
+
+                if (mOffset + STORES_LIMIT < result.getTotalElements()) {
+                    mOffset += STORES_LIMIT;
+                    mFragment.getArguments().putInt(BUNDLE_KEY_OFFSET, mOffset);
+                    StoresManager.Constraint newConstraint = new StoresManager.Constraint(
+                            constraint.getLatitude(), constraint.getLongitude(), mOffset, STORES_LIMIT);
+                    mSubscription.add(mStoresManager.loadStores(newConstraint, getStoreObserver(newConstraint)));
+                }
+                onSuccessfullyReceived(result.getStores());
             }
         };
     }
 
     private void onSuccessfullyReceived(Collection<StoreModel> stores) {
         L.i(MainContentFragment.class, "Stores successfully received: " + stores);
-        if (stores.size() == 0) {
-            return;
-        }
-        mStores = new ArrayList<>(stores);
-        mFragment.getArguments().putParcelableArrayList(BUNDLE_KEY_STORES, mStores);
+
+        addNewStores(stores);
         publish();
+    }
+
+    private void addNewStores(@NonNull Collection<StoreModel> stores) {
+        Collection<StoreModel> s = new ArrayDeque<>(stores);
+        Iterator<StoreModel> iterator = s.iterator();
+        do {
+            if (mStores.contains(iterator.next())) {
+                iterator.remove();
+            }
+        } while (iterator.hasNext());
+
+        mStores.addAll(s);
+        mFragment.getArguments().putParcelableArrayList(BUNDLE_KEY_STORES, mStores);
     }
 
 

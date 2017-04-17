@@ -1,6 +1,5 @@
 package ir.asparsa.hobbytaste.database.dao;
 
-import com.j256.ormlite.dao.Dao;
 import ir.asparsa.common.database.model.Comment;
 import ir.asparsa.hobbytaste.database.DatabaseHelper;
 import ir.asparsa.hobbytaste.database.model.CommentModel;

@@ -15,6 +15,7 @@ import ir.asparsa.hobbytaste.ui.fragment.dialog.CommentDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.SetUsernameDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.SettingsRecyclerFragment;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.StoreDetailsRecyclerFragment;
+import ir.asparsa.hobbytaste.ui.list.holder.StoreMapViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.StorePresenter;
@@ -62,4 +63,6 @@ public interface MainComponent {
     void inject(AuthorizationFactory.Authorization authorization);
 
     void inject(StorePresenter storePresenter);
+
+    void inject(StoreMapViewHolder storeMapViewHolder);
 }

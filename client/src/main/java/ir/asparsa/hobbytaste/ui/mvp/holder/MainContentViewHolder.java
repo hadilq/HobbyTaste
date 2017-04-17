@@ -3,8 +3,11 @@ package ir.asparsa.hobbytaste.ui.mvp.holder;
 import android.support.annotation.Nullable;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.*;
+import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.StorePresenter;
+
+import java.util.Collection;
 
 /**
  * @author hadi
@@ -13,6 +16,7 @@ import ir.asparsa.hobbytaste.ui.mvp.presenter.StorePresenter;
 public class MainContentViewHolder implements ViewHolder, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private final StorePresenter mPresenter;
+    private BitmapDescriptor mIcon;
     private GoogleMap mMap;
 
     public MainContentViewHolder(StorePresenter presenter) {
@@ -33,12 +37,33 @@ public class MainContentViewHolder implements ViewHolder, OnMapReadyCallback, Go
      * installed Google Play services and returned to the app.
      */
     @Override public void onMapReady(GoogleMap googleMap) {
+        mIcon = BitmapDescriptorFactory.fromResource(R.drawable.placeholder);
         mMap = googleMap;
-        mPresenter.publish();
+        mPresenter.onMapReady();
     }
 
     @Nullable
     public GoogleMap getMap() {
         return mMap;
+    }
+
+    public void removeMarkers(Collection<Marker> mMarkers) {
+        if (mMarkers.size() != 0) {
+            for (Marker marker : mMarkers) {
+                marker.remove();
+            }
+            mMarkers.clear();
+        }
+    }
+
+    public Marker addMarker(
+            LatLng latLng,
+            String title
+    ) {
+        return mMap.addMarker(
+                new MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .icon(mIcon));
     }
 }
