@@ -3,8 +3,6 @@ package ir.asparsa.hobbytaste.ui.mvp.presenter;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -15,7 +13,10 @@ import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
+import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
 import ir.asparsa.hobbytaste.ui.mvp.holder.MainContentViewHolder;
+import ir.asparsa.hobbytaste.ui.wrappers.WCameraPosition;
+import ir.asparsa.hobbytaste.ui.wrappers.WMap;
 import junit.framework.Assert;
 import rx.Observer;
 import rx.subscriptions.CompositeSubscription;
@@ -32,7 +33,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
     private static final String BUNDLE_KEY_STORES = "BUNDLE_KEY_STORES";
     private static final String BUNDLE_KEY_OFFSET = "BUNDLE_KEY_OFFSET";
     private static final int STORES_LIMIT = 20;
-    private CameraPosition mCameraPosition;
+    private WCameraPosition mCameraPosition;
 
     @Inject
     StoresManager mStoresManager;
@@ -41,7 +42,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
     @Inject
     MapUtil mMapUtil;
 
-    private final MainContentFragment mFragment;
+    private final FragmentHolder mFragment;
     private MainContentViewHolder mHolder;
     private ArrayList<StoreModel> mStores = new ArrayList<>();
     private List<Marker> mMarkers = new ArrayList<>();
@@ -50,7 +51,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
     private int mOffset;
 
     public StorePresenter(
-            MainContentFragment fragment
+            FragmentHolder fragment
     ) {
         ApplicationLauncher.mainComponent().inject(this);
         this.mFragment = fragment;
@@ -68,7 +69,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
         double lng = mPreferencesManager.getFloat(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LONGITUDE, 0f);
         float zoom = mPreferencesManager.getFloat(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_ZOOM, 0f);
         if (lat != 0f && lng != 0f && zoom != 0) {
-            mCameraPosition = mMapUtil.fromLatLngZoom(lat, lng, zoom);
+            mCameraPosition = new WCameraPosition(mMapUtil.fromLatLngZoom(lat, lng, zoom));
         }
         if (mTryAgainLater) {
             mTryAgainLater = false;
@@ -88,22 +89,20 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
             return;
         }
 
-        GoogleMap map = mHolder.getMap();
+        WMap map = mHolder.getMap();
         if (map != null) {
             mCameraPosition = map.getCameraPosition();
-            if (mCameraPosition != null && mCameraPosition.target != null) {
+            if (mCameraPosition != null && mCameraPosition.getTarget() != null) {
                 mPreferencesManager.put(
                         PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LATITUDE,
-                        (float) mCameraPosition.target.latitude);
+                        (float) mCameraPosition.getTarget().getLatitude());
                 mPreferencesManager.put(
                         PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LONGITUDE,
-                        (float) mCameraPosition.target.longitude);
-                mPreferencesManager.put(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_ZOOM, mCameraPosition.zoom);
+                        (float) mCameraPosition.getTarget().getLongitude());
+                mPreferencesManager.put(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_ZOOM, mCameraPosition.getZoom());
             }
         }
-        for (Marker marker : mMarkers) {
-            marker.remove();
-        }
+        mHolder.removeMarkers(mMarkers);
         mFragment.getArguments().putInt(BUNDLE_KEY_OFFSET, mOffset);
         mFragment.getArguments().putParcelableArrayList(BUNDLE_KEY_STORES, mStores);
         mHolder = null;
@@ -115,8 +114,8 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
             return;
         }
 
-        GoogleMap map = mHolder.getMap();
-        if (map != null && mStores != null) {
+        WMap map = mHolder.getMap();
+        if (map != null && mStores.size() != 0) {
 
             mHolder.removeMarkers(mMarkers);
             for (StoreModel store : mStores) {
@@ -144,7 +143,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
         Assert.assertNotNull(mHolder);
         Assert.assertNotNull(mHolder.getMap());
         if (mCameraPosition != null) {
-            mHolder.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition));
+            mHolder.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition.getRealCameraPosition()));
         }
     }
 
@@ -175,9 +174,9 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
                         if (!mHolder.getMap().getProjection().getVisibleRegion().latLngBounds
                                 .contains(new LatLng(lastModel.getLat(), lastModel.getLon()))) {
                             mCameraPosition = mHolder.getMap().getCameraPosition();
-                            if (mCameraPosition != null && mCameraPosition.target != null) {
-                                lat = mCameraPosition.target.latitude;
-                                lng = mCameraPosition.target.longitude;
+                            if (mCameraPosition != null && mCameraPosition.getTarget() != null) {
+                                lat = mCameraPosition.getTarget().getLatitude();
+                                lng = mCameraPosition.getTarget().getLongitude();
                             }
                         }
                     }
@@ -216,7 +215,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
     public boolean onMarkerClick(Marker marker) {
         int index = mMarkers.indexOf(marker);
         if (index != -1) {
-            mFragment.instantiateStoreDetail(mStores.get(index));
+            mFragment.onClick(MainContentFragment.EVENT_KEY_INSTANTIATE_STORE_DETAIL, mStores.get(index));
             return true;
         }
         return false;

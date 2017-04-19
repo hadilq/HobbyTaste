@@ -6,6 +6,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.*;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.StorePresenter;
+import ir.asparsa.hobbytaste.ui.wrappers.WMap;
 
 import java.util.Collection;
 
@@ -17,7 +18,7 @@ public class MainContentViewHolder implements ViewHolder, OnMapReadyCallback, Go
 
     private final StorePresenter mPresenter;
     private BitmapDescriptor mIcon;
-    private GoogleMap mMap;
+    private WMap mMap;
 
     public MainContentViewHolder(StorePresenter presenter) {
         this.mPresenter = presenter;
@@ -38,12 +39,12 @@ public class MainContentViewHolder implements ViewHolder, OnMapReadyCallback, Go
      */
     @Override public void onMapReady(GoogleMap googleMap) {
         mIcon = BitmapDescriptorFactory.fromResource(R.drawable.placeholder);
-        mMap = googleMap;
+        mMap = new WMap(googleMap);
         mPresenter.onMapReady();
     }
 
     @Nullable
-    public GoogleMap getMap() {
+    public WMap getMap() {
         return mMap;
     }
 

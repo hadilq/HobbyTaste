@@ -26,9 +26,12 @@ public class ApplicationLauncher extends Application {
 
     @Override public void onCreate() {
         super.onCreate();
-
         L.i(getClass(), "Application created");
-        setupDagger();
+        initialize();
+    }
+
+    private void initialize() {
+        sMainComponent = setupDagger();
         sMainComponent.inject(this);
         LanguageUtil.setupDefaultLocale(mPreferencesManager, this);
 
@@ -37,14 +40,18 @@ public class ApplicationLauncher extends Application {
                         Thread.getDefaultUncaughtExceptionHandler()), this));
     }
 
-    private void setupDagger() {
-        sMainComponent = DaggerMainComponent.builder()
-                                            .appModule(new AppModule(this))
-                                            .build();
+    private MainComponent setupDagger() {
+        return DaggerMainComponent.builder()
+                                  .appModule(new AppModule(this))
+                                  .build();
     }
 
     public static MainComponent mainComponent() {
         return sMainComponent;
+    }
+
+    public static void setTestMainComponent(MainComponent testMainComponent) {
+        sMainComponent = testMainComponent;
     }
 
     @Override protected void attachBaseContext(Context base) {

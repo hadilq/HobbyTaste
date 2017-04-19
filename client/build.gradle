@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -119,10 +120,14 @@ dependencies {
     // Test
     testCompile "junit:junit:$global_junitVersion"
     testCompile "org.mockito:mockito-core:$global_mockitoCoreVersion"
+    testApt "com.google.dagger:dagger-compiler:$global_daggerVersion"
+    testProvided 'javax.annotation:jsr250-api:1.0'
     // required if you want to use Mockito for Android instrumentation tests
     androidTestCompile "org.mockito:mockito-core:$global_mockitoCoreVersion"
     androidTestCompile "com.google.dexmaker:dexmaker:$global_dexmakerVersion"
     androidTestCompile "com.google.dexmaker:dexmaker-mockito:$global_dexmakerVersion"
+    androidTestApt "com.google.dagger:dagger-compiler:$global_daggerVersion"
+    androidTestProvided 'javax.annotation:jsr250-api:1.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -124,7 +124,6 @@ public class StoresRestControllerTest extends BaseControllerTest {
 
     @Test
     public void readFilledLikeStores() throws Exception {
-        long hashCode = new Random().nextLong();
         String hash = UUID.randomUUID().toString();
 
         String token = "token";
