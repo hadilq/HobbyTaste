@@ -62,15 +62,15 @@ public class MainContentFragment extends BaseContentFragment {
         super.onActivityCreated(savedInstanceState);
         Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
         SupportMapFragment mapFragment;
-        if (!(fragment instanceof SupportMapFragment)) {
+        if (fragment instanceof SupportMapFragment) {
+            mapFragment = (SupportMapFragment) fragment;
+        } else {
             mapFragment = SupportMapFragment.newInstance();
             getChildFragmentManager().beginTransaction()
                                      .replace(R.id.content_nested, mapFragment)
                                      .commit();
-            mapFragment.getMapAsync(mHolder);
-        } else {
-            ((SupportMapFragment) fragment).getMapAsync(mHolder);
         }
+        mapFragment.getMapAsync(mHolder);
     }
 
     @Override public void onStart() {

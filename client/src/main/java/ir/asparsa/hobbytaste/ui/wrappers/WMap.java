@@ -1,8 +1,10 @@
 package ir.asparsa.hobbytaste.ui.wrappers;
 
 import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -37,8 +39,8 @@ public class WMap {
         map.setOnMarkerClickListener(listener);
     }
 
-    public void moveCamera(CameraUpdate cameraUpdate) {
-        map.moveCamera(cameraUpdate);
+    public void moveCamera(CameraPosition cameraPosition) {
+        map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
     public Projection getProjection() {

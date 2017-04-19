@@ -143,7 +143,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
         Assert.assertNotNull(mHolder);
         Assert.assertNotNull(mHolder.getMap());
         if (mCameraPosition != null) {
-            mHolder.getMap().moveCamera(CameraUpdateFactory.newCameraPosition(mCameraPosition.getRealCameraPosition()));
+            mHolder.getMap().moveCamera(mCameraPosition.getRealCameraPosition());
         }
     }
 
