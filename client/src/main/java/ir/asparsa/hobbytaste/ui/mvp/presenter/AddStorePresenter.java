@@ -8,7 +8,7 @@ import com.google.android.gms.maps.model.Marker;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.fragment.content.AddStoreContentFragment;
-import ir.asparsa.hobbytaste.ui.mvp.holder.AddStoreContentViewHolder;
+import ir.asparsa.hobbytaste.ui.mvp.holder.AddStoreViewHolder;
 import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
 import junit.framework.Assert;
 
@@ -16,7 +16,7 @@ import junit.framework.Assert;
  * @author hadi
  * @since 4/19/2017 AD.
  */
-public class AddStorePresenter implements Presenter<AddStoreContentViewHolder> {
+public class AddStorePresenter implements Presenter<AddStoreViewHolder> {
 
     public static final String BUNDLE_KEY_STORE = "BUNDLE_KEY_STORE";
     public static final String BUNDLE_KEY_LAT_LNG = "BUNDLE_KEY_LAT_LNG";
@@ -24,13 +24,13 @@ public class AddStorePresenter implements Presenter<AddStoreContentViewHolder> {
 
     private final FragmentHolder mFragment;
     private Marker mMarker;
-    private AddStoreContentViewHolder mHolder;
+    private AddStoreViewHolder mHolder;
 
     public AddStorePresenter(FragmentHolder fragment) {
         this.mFragment = fragment;
     }
 
-    @Override public void bindView(@NonNull AddStoreContentViewHolder viewHolder) {
+    @Override public void bindView(@NonNull AddStoreViewHolder viewHolder) {
         mHolder = viewHolder;
         publish();
     }

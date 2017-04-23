@@ -15,7 +15,7 @@ import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
-import ir.asparsa.hobbytaste.ui.mvp.holder.AddStoreContentViewHolder;
+import ir.asparsa.hobbytaste.ui.mvp.holder.AddStoreViewHolder;
 import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.AddStorePresenter;
 
@@ -28,7 +28,7 @@ public class AddStoreContentFragment extends BaseContentFragment {
     public static final String BUNDLE_KEY_DIALOG_RESULT_EVENT = "BUNDLE_KEY_DIALOG_RESULT_EVENT";
     public static final String EVENT_KEY_START_NEXT = "EVENT_KEY_START_NEXT";
 
-    private AddStoreContentViewHolder mHolder;
+    private AddStoreViewHolder mHolder;
     private AddStorePresenter mPresenter;
 
     public static AddStoreContentFragment instantiate(
@@ -68,7 +68,7 @@ public class AddStoreContentFragment extends BaseContentFragment {
                 }
             }
         });
-        mHolder = new AddStoreContentViewHolder(view, mPresenter);
+        mHolder = new AddStoreViewHolder(view, mPresenter);
 
         return view;
     }

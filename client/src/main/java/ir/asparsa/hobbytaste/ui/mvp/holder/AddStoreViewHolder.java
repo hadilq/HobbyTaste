@@ -23,7 +23,7 @@ import junit.framework.Assert;
  * @author hadi
  * @since 4/19/2017 AD.
  */
-public class AddStoreContentViewHolder implements ViewHolder, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class AddStoreViewHolder implements ViewHolder, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private final View mView;
     private final AddStorePresenter mPresenter;
@@ -42,7 +42,7 @@ public class AddStoreContentViewHolder implements ViewHolder, OnMapReadyCallback
     private WMap mMap;
     private BitmapDescriptor mIcon;
 
-    public AddStoreContentViewHolder(
+    public AddStoreViewHolder(
             View view,
             AddStorePresenter presenter
     ) {

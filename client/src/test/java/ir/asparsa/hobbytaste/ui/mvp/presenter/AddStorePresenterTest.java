@@ -5,7 +5,7 @@ import android.os.Parcelable;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
-import ir.asparsa.hobbytaste.ui.mvp.holder.AddStoreContentViewHolder;
+import ir.asparsa.hobbytaste.ui.mvp.holder.AddStoreViewHolder;
 import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
 import ir.asparsa.hobbytaste.ui.wrappers.WCameraPosition;
 import ir.asparsa.hobbytaste.ui.wrappers.WMap;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 public class AddStorePresenterTest extends BasePresenterTest {
 
     @Mock
-    AddStoreContentViewHolder addStoreContentViewHolder;
+    AddStoreViewHolder addStoreContentViewHolder;
     @Mock
     FragmentHolder fragmentHolder;
     @Mock
