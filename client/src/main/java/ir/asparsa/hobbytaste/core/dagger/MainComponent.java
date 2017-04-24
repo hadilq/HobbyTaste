@@ -18,6 +18,7 @@ import ir.asparsa.hobbytaste.ui.fragment.recycler.StoreDetailsRecyclerFragment;
 import ir.asparsa.hobbytaste.ui.list.holder.StoreMapViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
+import ir.asparsa.hobbytaste.ui.mvp.presenter.AddBannerPresenter;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.StorePresenter;
 
 import javax.inject.Singleton;
@@ -54,8 +55,6 @@ public interface MainComponent {
 
     void inject(StoreDetailsRecyclerFragment storeDetailsRecyclerFragment);
 
-    void inject(AddBannerContentFragment addBannerContentFragment);
-
     void inject(RetrofitException retrofitException);
 
     void inject(AdditionalKeyStoresSSLSocketFactory additionalKeyStoresSSLSocketFactory);
@@ -65,4 +64,6 @@ public interface MainComponent {
     void inject(StorePresenter storePresenter);
 
     void inject(StoreMapViewHolder storeMapViewHolder);
+
+    void inject(AddBannerPresenter addBannerPresenter);
 }
