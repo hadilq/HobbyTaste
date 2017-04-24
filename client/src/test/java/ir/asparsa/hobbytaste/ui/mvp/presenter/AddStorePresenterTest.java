@@ -5,8 +5,8 @@ import android.os.Parcelable;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
+import ir.asparsa.hobbytaste.ui.fragment.content.FragmentDelegate;
 import ir.asparsa.hobbytaste.ui.mvp.holder.AddStoreViewHolder;
-import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
 import ir.asparsa.hobbytaste.ui.wrappers.WCameraPosition;
 import ir.asparsa.hobbytaste.ui.wrappers.WMap;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class AddStorePresenterTest extends BasePresenterTest {
     @Mock
     AddStoreViewHolder addStoreContentViewHolder;
     @Mock
-    FragmentHolder fragmentHolder;
+    FragmentDelegate fragmentDelegate;
     @Mock
     Bundle bundle;
     @Mock
@@ -38,7 +38,7 @@ public class AddStorePresenterTest extends BasePresenterTest {
     @Test
     public void bindViewTest() throws Exception {
 
-        AddStorePresenter presenter = new AddStorePresenter(fragmentHolder);
+        AddStorePresenter presenter = new AddStorePresenter(fragmentDelegate);
 
         presenter.bindView(addStoreContentViewHolder);
 
@@ -46,11 +46,11 @@ public class AddStorePresenterTest extends BasePresenterTest {
 
         when(addStoreContentViewHolder.getMap())
                 .thenReturn(map);
-        when(fragmentHolder.getArguments())
+        when(fragmentDelegate.getArguments())
                 .thenReturn(bundle);
         when(bundle.getParcelable(eq(AddStorePresenter.BUNDLE_KEY_CAMERA_POSITION)))
                 .thenReturn(CameraPosition.fromLatLngZoom(new LatLng(20, 34), 5));
-        assert fragmentHolder.getArguments().getParcelable(AddStorePresenter.BUNDLE_KEY_CAMERA_POSITION) != null;
+        assert fragmentDelegate.getArguments().getParcelable(AddStorePresenter.BUNDLE_KEY_CAMERA_POSITION) != null;
 
         presenter.bindView(addStoreContentViewHolder);
 
@@ -68,15 +68,15 @@ public class AddStorePresenterTest extends BasePresenterTest {
     @Test
     public void publishTest() throws Exception {
 
-        AddStorePresenter presenter = new AddStorePresenter(fragmentHolder);
+        AddStorePresenter presenter = new AddStorePresenter(fragmentDelegate);
 
         when(addStoreContentViewHolder.getMap())
                 .thenReturn(map);
-        when(fragmentHolder.getArguments())
+        when(fragmentDelegate.getArguments())
                 .thenReturn(bundle);
         when(bundle.getParcelable(eq(AddStorePresenter.BUNDLE_KEY_CAMERA_POSITION)))
                 .thenReturn(CameraPosition.fromLatLngZoom(new LatLng(20, 34), 5));
-        assert fragmentHolder.getArguments().getParcelable(AddStorePresenter.BUNDLE_KEY_CAMERA_POSITION) != null;
+        assert fragmentDelegate.getArguments().getParcelable(AddStorePresenter.BUNDLE_KEY_CAMERA_POSITION) != null;
 
         StoreModel store = Mockito.mock(StoreModel.class);
         when(bundle.getParcelable(eq(AddStorePresenter.BUNDLE_KEY_STORE)))

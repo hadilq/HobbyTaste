@@ -5,8 +5,8 @@ import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.fragment.content.AddBannerContentFragment;
+import ir.asparsa.hobbytaste.ui.fragment.content.FragmentDelegate;
 import ir.asparsa.hobbytaste.ui.mvp.holder.AddBannerViewHolder;
-import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,15 +29,15 @@ public class AddBannerPresenterTest extends BasePresenterTest {
     @Mock
     AddBannerViewHolder addBannerViewHolder;
     @Mock
-    FragmentHolder fragmentHolder;
+    FragmentDelegate fragmentDelegate;
     @Mock
     Bundle bundle;
 
     @Test
     public void bindViewWithoutBitmapAndBannerTest() throws Exception {
-        AddBannerPresenter presenter = new AddBannerPresenter(fragmentHolder);
+        AddBannerPresenter presenter = new AddBannerPresenter(fragmentDelegate);
 
-        when(fragmentHolder.getArguments())
+        when(fragmentDelegate.getArguments())
                 .thenReturn(bundle);
         StoreModel store = Mockito.mock(StoreModel.class);
         ArrayList<BannerModel> banners = new ArrayList<>();
@@ -58,12 +58,12 @@ public class AddBannerPresenterTest extends BasePresenterTest {
 
     @Test
     public void bindViewWithBitmapAndWithoutBannerTest() throws Exception {
-        AddBannerPresenter presenter = new AddBannerPresenter(fragmentHolder);
+        AddBannerPresenter presenter = new AddBannerPresenter(fragmentDelegate);
 
-        when(fragmentHolder.getArguments())
+        when(fragmentDelegate.getArguments())
                 .thenReturn(bundle);
         String string = "any string";
-        when(fragmentHolder.getString(anyInt()))
+        when(fragmentDelegate.getString(anyInt()))
                 .thenReturn(string);
 
         StoreModel store = Mockito.mock(StoreModel.class);
@@ -92,12 +92,12 @@ public class AddBannerPresenterTest extends BasePresenterTest {
 
     @Test
     public void bindViewWithBitmapAndWithBannerTest() throws Exception {
-        AddBannerPresenter presenter = new AddBannerPresenter(fragmentHolder);
+        AddBannerPresenter presenter = new AddBannerPresenter(fragmentDelegate);
 
-        when(fragmentHolder.getArguments())
+        when(fragmentDelegate.getArguments())
                 .thenReturn(bundle);
         String string = "any string";
-        when(fragmentHolder.getString(anyInt()))
+        when(fragmentDelegate.getString(anyInt()))
                 .thenReturn(string);
 
         StoreModel store = Mockito.mock(StoreModel.class);
@@ -132,7 +132,7 @@ public class AddBannerPresenterTest extends BasePresenterTest {
 
     @Test
     public void publishTest() throws Exception {
-        AddBannerPresenter presenter = new AddBannerPresenter(fragmentHolder);
+        AddBannerPresenter presenter = new AddBannerPresenter(fragmentDelegate);
 
         presenter.publish();
 

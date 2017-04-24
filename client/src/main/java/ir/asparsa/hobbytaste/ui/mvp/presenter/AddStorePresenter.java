@@ -9,7 +9,7 @@ import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.fragment.content.AddStoreContentFragment;
 import ir.asparsa.hobbytaste.ui.mvp.holder.AddStoreViewHolder;
-import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
+import ir.asparsa.hobbytaste.ui.fragment.content.FragmentDelegate;
 import junit.framework.Assert;
 
 /**
@@ -22,11 +22,11 @@ public class AddStorePresenter implements Presenter<AddStoreViewHolder> {
     public static final String BUNDLE_KEY_LAT_LNG = "BUNDLE_KEY_LAT_LNG";
     public static final String BUNDLE_KEY_CAMERA_POSITION = "BUNDLE_KEY_CAMERA_POSITION";
 
-    private final FragmentHolder mFragment;
+    private final FragmentDelegate mFragment;
     private Marker mMarker;
     private AddStoreViewHolder mHolder;
 
-    public AddStorePresenter(FragmentHolder fragment) {
+    public AddStorePresenter(FragmentDelegate fragment) {
         this.mFragment = fragment;
     }
 
@@ -89,7 +89,7 @@ public class AddStorePresenter implements Presenter<AddStoreViewHolder> {
                 BUNDLE_KEY_STORE,
                 new StoreModel(latLng.latitude, latLng.longitude, name, description));
 
-        mFragment.onClick(
+        mFragment.onEvent(
                 AddStoreContentFragment.EVENT_KEY_START_NEXT,
                 new StoreModel(latLng.latitude, latLng.longitude, name, description));
     }

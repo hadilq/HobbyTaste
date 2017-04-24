@@ -1,12 +1,9 @@
 package ir.asparsa.hobbytaste.ui.fragment.content;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.View;
 import com.google.android.gms.maps.SupportMapFragment;
 import ir.asparsa.android.core.logger.L;
@@ -14,7 +11,6 @@ import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
-import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
 import ir.asparsa.hobbytaste.ui.mvp.holder.MainContentViewHolder;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.StorePresenter;
 import ir.asparsa.hobbytaste.ui.wrappers.WMap;
@@ -39,32 +35,7 @@ public class MainContentFragment extends BaseContentFragment {
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
-        mPresenter = new StorePresenter(new FragmentHolder() {
-            @Override public Bundle getArguments() {
-                return MainContentFragment.this.getArguments();
-            }
-
-            @Override public Context getContext() {
-                return MainContentFragment.this.getContext();
-            }
-
-            @Override public String getString(@StringRes int res) {
-                return MainContentFragment.this.getString(res);
-            }
-
-            @Override public FragmentManager getFragmentManager() {
-                return MainContentFragment.this.getFragmentManager();
-            }
-
-            @Override public void onClick(
-                    String event,
-                    Object... data
-            ) {
-                if (data != null && data.length == 1 && data[0] instanceof StoreModel) {
-                    instantiateStoreDetail((StoreModel) data[0]);
-                }
-            }
-        });
+        mPresenter = new StorePresenter(getDelegate());
         mHolder = new MainContentViewHolder(mPresenter);
     }
 
@@ -121,6 +92,15 @@ public class MainContentFragment extends BaseContentFragment {
             AddStoreContentFragment.StoreSaveResultEvent result = (AddStoreContentFragment.StoreSaveResultEvent) event;
             L.i(MainContentFragment.class, "Added store: " + result.getStoreModel());
             mPresenter.onNewStore(result.getStoreModel());
+        }
+    }
+
+    @Override protected void onEvent(
+            String event,
+            Object... data
+    ) {
+        if (data != null && data.length == 1 && data[0] instanceof StoreModel) {
+            instantiateStoreDetail((StoreModel) data[0]);
         }
     }
 

@@ -2,7 +2,7 @@ package ir.asparsa.hobbytaste.ui.mvp.presenter;
 
 import android.os.Bundle;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
-import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
+import ir.asparsa.hobbytaste.ui.fragment.content.FragmentDelegate;
 import ir.asparsa.hobbytaste.ui.mvp.holder.MainContentViewHolder;
 import ir.asparsa.hobbytaste.ui.wrappers.WCameraPosition;
 import ir.asparsa.hobbytaste.ui.wrappers.WLatLng;
@@ -41,7 +41,7 @@ public class StorePresenterTest extends BasePresenterTest {
     @Mock
     Subscription subscription;
     @Mock
-    FragmentHolder fragmentHolder;
+    FragmentDelegate fragmentDelegate;
     @Mock
     Bundle bundle;
 
@@ -54,13 +54,13 @@ public class StorePresenterTest extends BasePresenterTest {
                 .thenReturn(0f);
         when(storesManager.loadStores(any(StoresManager.Constraint.class), any(Observer.class)))
                 .thenReturn(subscription);
-        when(fragmentHolder.getArguments())
+        when(fragmentDelegate.getArguments())
                 .thenReturn(bundle);
 
-        StorePresenter presenter = new StorePresenter(fragmentHolder);
+        StorePresenter presenter = new StorePresenter(fragmentDelegate);
         presenter.bindView(mainContentViewHolder);
 
-        verify(fragmentHolder, times(2)).getArguments();
+        verify(fragmentDelegate, times(2)).getArguments();
         verify(bundle, times(1)).getParcelableArrayList(anyString());
         verify(bundle, times(1)).getInt(anyString(), anyInt());
         verify(storesManager, times(1)).loadStores(any(StoresManager.Constraint.class), any(Observer.class));

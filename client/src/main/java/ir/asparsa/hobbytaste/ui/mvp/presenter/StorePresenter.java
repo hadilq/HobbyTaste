@@ -13,7 +13,7 @@ import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
-import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
+import ir.asparsa.hobbytaste.ui.fragment.content.FragmentDelegate;
 import ir.asparsa.hobbytaste.ui.mvp.holder.MainContentViewHolder;
 import ir.asparsa.hobbytaste.ui.wrappers.WCameraPosition;
 import ir.asparsa.hobbytaste.ui.wrappers.WMap;
@@ -42,7 +42,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
     @Inject
     MapUtil mMapUtil;
 
-    private final FragmentHolder mFragment;
+    private final FragmentDelegate mFragment;
     private MainContentViewHolder mHolder;
     private ArrayList<StoreModel> mStores = new ArrayList<>();
     private List<Marker> mMarkers = new ArrayList<>();
@@ -51,7 +51,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
     private int mOffset;
 
     public StorePresenter(
-            FragmentHolder fragment
+            FragmentDelegate fragment
     ) {
         ApplicationLauncher.mainComponent().inject(this);
         this.mFragment = fragment;
@@ -215,7 +215,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
     public boolean onMarkerClick(Marker marker) {
         int index = mMarkers.indexOf(marker);
         if (index != -1) {
-            mFragment.onClick(MainContentFragment.EVENT_KEY_INSTANTIATE_STORE_DETAIL, mStores.get(index));
+            mFragment.onEvent(MainContentFragment.EVENT_KEY_INSTANTIATE_STORE_DETAIL, mStores.get(index));
             return true;
         }
         return false;

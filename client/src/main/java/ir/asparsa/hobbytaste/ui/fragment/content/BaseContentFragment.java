@@ -1,8 +1,11 @@
 package ir.asparsa.hobbytaste.ui.fragment.content;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,6 +76,40 @@ public abstract class BaseContentFragment extends BaseFragment {
     public enum BackState {
         CLOSE_APP,
         BACK_FRAGMENT
+    }
+
+    protected FragmentDelegate getDelegate() {
+        return new FragmentDelegate() {
+            @Override public Bundle getArguments() {
+                return BaseContentFragment.this.getArguments();
+            }
+
+            @Override public Context getContext() {
+                return BaseContentFragment.this.getContext();
+            }
+
+            @Override public String getString(@StringRes int res) {
+                return BaseContentFragment.this.getString(res);
+            }
+
+            @Override public FragmentManager getFragmentManager() {
+                return BaseContentFragment.this.getFragmentManager();
+            }
+
+            @Override public void onEvent(
+                    String event,
+                    Object... data
+            ) {
+                BaseContentFragment.this.onEvent(event, data);
+            }
+        };
+    }
+
+    protected void onEvent(
+            String event,
+            Object... data
+    ) {
+
     }
 
 }

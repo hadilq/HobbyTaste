@@ -1,13 +1,10 @@
 package ir.asparsa.hobbytaste.ui.fragment.content;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +15,6 @@ import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.mvp.holder.AddStoreViewHolder;
-import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.AddStorePresenter;
 
 /**
@@ -51,33 +47,7 @@ public class AddStoreContentFragment extends BaseContentFragment {
             @Nullable Bundle savedInstanceState
     ) {
         View view = inflater.inflate(R.layout.add_store_content_fragment, container, false);
-        mPresenter = new AddStorePresenter(new FragmentHolder() {
-            @Override public Bundle getArguments() {
-                return AddStoreContentFragment.this.getArguments();
-            }
-
-            @Override public Context getContext() {
-                return AddStoreContentFragment.this.getContext();
-            }
-
-            @Override public String getString(@StringRes int res) {
-                return AddStoreContentFragment.this.getString(res);
-            }
-
-            @Override public FragmentManager getFragmentManager() {
-                return AddStoreContentFragment.this.getFragmentManager();
-            }
-
-            @Override public void onClick(
-                    String event,
-                    Object... data
-            ) {
-                if (EVENT_KEY_START_NEXT.equals(event) && data != null && data.length == 1 &&
-                    data[0] instanceof StoreModel) {
-                    actionGoToNext((StoreModel) data[0]);
-                }
-            }
-        });
+        mPresenter = new AddStorePresenter(getDelegate());
         mHolder = new AddStoreViewHolder(view, mPresenter);
 
         return view;
@@ -114,6 +84,16 @@ public class AddStoreContentFragment extends BaseContentFragment {
 
     @Override public boolean hasHomeAsUp() {
         return true;
+    }
+
+    @Override protected void onEvent(
+            String event,
+            Object... data
+    ) {
+        if (EVENT_KEY_START_NEXT.equals(event) && data != null && data.length == 1 &&
+            data[0] instanceof StoreModel) {
+            actionGoToNext((StoreModel) data[0]);
+        }
     }
 
     private void actionGoToNext(

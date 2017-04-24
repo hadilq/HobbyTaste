@@ -1,12 +1,9 @@
 package ir.asparsa.hobbytaste.ui.fragment.content;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +14,6 @@ import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.mvp.holder.AddBannerViewHolder;
-import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.AddBannerPresenter;
 
 /**
@@ -58,42 +54,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
         View view = inflater.inflate(R.layout.add_banner_content_fragment, container, false);
         ButterKnife.bind(this, view);
 
-        mPresenter = new AddBannerPresenter(new FragmentHolder() {
-            @Override public Bundle getArguments() {
-                return AddBannerContentFragment.this.getArguments();
-            }
-
-            @Override public Context getContext() {
-                return AddBannerContentFragment.this.getContext();
-            }
-
-            @Override public String getString(@StringRes int res) {
-                return AddBannerContentFragment.this.getString(res);
-            }
-
-            @Override public FragmentManager getFragmentManager() {
-                return AddBannerContentFragment.this.getFragmentManager();
-            }
-
-            @Override public void onClick(
-                    String event,
-                    Object... data
-            ) {
-                if (EVENT_KEY_CHOOSE_IMAGE.equals(event) && data != null && data.length == 1 &&
-                    data[0] instanceof Intent) {
-                    startActivityForResult(
-                            Intent.createChooser((Intent) data[0], "Select Picture"), PICK_IMAGE_REQUEST);
-                } else if (EVENT_KEY_ADD_NEW_BANNER.equals(event) && data != null && data.length == 2 &&
-                           data[0] instanceof AddStoreContentFragment.StoreSaveResultEvent &&
-                           data[1] instanceof StoreModel) {
-                    NavigationUtil.startContentFragment(getFragmentManager(), AddBannerContentFragment
-                            .instantiate((AddStoreContentFragment.StoreSaveResultEvent) data[0], (StoreModel) data[1]));
-                } else if (EVENT_KEY_SEND_STORE.equals(event) && data != null && data.length == 1 &&
-                           data[0] instanceof StoreModel) {
-                    sendEvent((StoreModel) data[0]);
-                }
-            }
-        });
+        mPresenter = new AddBannerPresenter(getDelegate());
         mHolder = new AddBannerViewHolder(view, mPresenter);
         return view;
     }
@@ -137,6 +98,25 @@ public class AddBannerContentFragment extends BaseContentFragment {
 
     @Override protected String setHeaderTitle() {
         return getString(R.string.title_add_banner);
+    }
+
+    @Override protected void onEvent(
+            String event,
+            Object... data
+    ) {
+        if (EVENT_KEY_CHOOSE_IMAGE.equals(event) && data != null && data.length == 1 &&
+            data[0] instanceof Intent) {
+            startActivityForResult(
+                    Intent.createChooser((Intent) data[0], "Select Picture"), PICK_IMAGE_REQUEST);
+        } else if (EVENT_KEY_ADD_NEW_BANNER.equals(event) && data != null && data.length == 2 &&
+                   data[0] instanceof AddStoreContentFragment.StoreSaveResultEvent &&
+                   data[1] instanceof StoreModel) {
+            NavigationUtil.startContentFragment(getFragmentManager(), AddBannerContentFragment
+                    .instantiate((AddStoreContentFragment.StoreSaveResultEvent) data[0], (StoreModel) data[1]));
+        } else if (EVENT_KEY_SEND_STORE.equals(event) && data != null && data.length == 1 &&
+                   data[0] instanceof StoreModel) {
+            sendEvent((StoreModel) data[0]);
+        }
     }
 
     private void sendEvent(StoreModel storeModel) {

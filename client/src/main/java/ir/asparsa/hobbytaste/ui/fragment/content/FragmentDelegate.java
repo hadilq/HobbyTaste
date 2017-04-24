@@ -1,4 +1,4 @@
-package ir.asparsa.hobbytaste.ui.mvp.holder;
+package ir.asparsa.hobbytaste.ui.fragment.content;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentManager;
  * @author hadi
  * @since 4/18/2017 AD.
  */
-public interface FragmentHolder {
+public interface FragmentDelegate {
     Bundle getArguments();
 
     Context getContext();
@@ -18,7 +18,7 @@ public interface FragmentHolder {
 
     FragmentManager getFragmentManager();
 
-    void onClick(
+    void onEvent(
             String event,
             Object... data
     );

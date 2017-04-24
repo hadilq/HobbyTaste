@@ -19,7 +19,7 @@ import ir.asparsa.hobbytaste.net.BannerService;
 import ir.asparsa.hobbytaste.ui.fragment.content.AddBannerContentFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.AddStoreContentFragment;
 import ir.asparsa.hobbytaste.ui.mvp.holder.AddBannerViewHolder;
-import ir.asparsa.hobbytaste.ui.mvp.holder.FragmentHolder;
+import ir.asparsa.hobbytaste.ui.fragment.content.FragmentDelegate;
 import okhttp3.MultipartBody;
 import rx.Observable;
 import rx.Observer;
@@ -42,7 +42,7 @@ public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
     public static final String BUNDLE_KEY_BITMAP_FILE_PATH = "BUNDLE_KEY_BITMAP_FILE_PATH";
     public static final String BUNDLE_KEY_BANNER = "BUNDLE_KEY_BANNER";
 
-    private final FragmentHolder mFragment;
+    private final FragmentDelegate mFragment;
     private final CompositeSubscription mSubscription = new CompositeSubscription();
 
     @Inject
@@ -55,7 +55,7 @@ public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
     private BannerModel mBanner;
     private AddBannerViewHolder mHolder;
 
-    public AddBannerPresenter(FragmentHolder fragment) {
+    public AddBannerPresenter(FragmentDelegate fragment) {
         ApplicationLauncher.mainComponent().inject(this);
         mFragment = fragment;
     }
@@ -109,7 +109,7 @@ public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        mFragment.onClick(AddBannerContentFragment.EVENT_KEY_CHOOSE_IMAGE, intent);
+        mFragment.onEvent(AddBannerContentFragment.EVENT_KEY_CHOOSE_IMAGE, intent);
     }
 
     private DialogControlLayout.OnControlListener getControllerListener() {
@@ -137,7 +137,7 @@ public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
                 AddStoreContentFragment.StoreSaveResultEvent
                         event = mFragment.getArguments()
                                          .getParcelable(AddBannerContentFragment.BUNDLE_KEY_DIALOG_RESULT_EVENT);
-                mFragment.onClick(AddBannerContentFragment.EVENT_KEY_ADD_NEW_BANNER, event, mStore);
+                mFragment.onEvent(AddBannerContentFragment.EVENT_KEY_ADD_NEW_BANNER, event, mStore);
             }
 
             @Override public void onCancel() {
@@ -180,7 +180,7 @@ public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
 
             @Override public void onNext(StoreModel storeModel) {
                 L.i(AddBannerContentFragment.class, "Store is saved" + storeModel);
-                mFragment.onClick(AddBannerContentFragment.EVENT_KEY_SEND_STORE, mStore);
+                mFragment.onEvent(AddBannerContentFragment.EVENT_KEY_SEND_STORE, mStore);
                 if (mHolder == null) {
                     return;
                 }
