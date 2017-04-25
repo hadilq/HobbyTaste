@@ -8,7 +8,7 @@ import ir.asparsa.hobbytaste.core.retrofit.RetrofitException;
 import ir.asparsa.hobbytaste.ui.activity.BaseActivity;
 import ir.asparsa.hobbytaste.ui.activity.CrashReportActivity;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
-import ir.asparsa.hobbytaste.ui.fragment.content.AddBannerContentFragment;
+import ir.asparsa.hobbytaste.ui.fragment.ContainerFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.StoreDetailsContentFragment;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.CommentDialogFragment;
@@ -66,4 +66,6 @@ public interface MainComponent {
     void inject(StoreMapViewHolder storeMapViewHolder);
 
     void inject(AddBannerPresenter addBannerPresenter);
+
+    void inject(ContainerFragment containerFragment);
 }
