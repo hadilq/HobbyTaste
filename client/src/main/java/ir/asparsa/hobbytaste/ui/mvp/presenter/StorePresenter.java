@@ -12,12 +12,11 @@ import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
-import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.FragmentDelegate;
+import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
 import ir.asparsa.hobbytaste.ui.mvp.holder.MainContentViewHolder;
 import ir.asparsa.hobbytaste.ui.wrappers.WCameraPosition;
 import ir.asparsa.hobbytaste.ui.wrappers.WMap;
-import junit.framework.Assert;
 import rx.Observer;
 import rx.subscriptions.CompositeSubscription;
 
@@ -49,6 +48,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
     private CompositeSubscription mSubscription = new CompositeSubscription();
     private boolean mTryAgainLater = true;
     private int mOffset;
+    private boolean mOnMapReady = false;
 
     public StorePresenter(
             FragmentDelegate fragment
@@ -115,6 +115,10 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
         }
 
         WMap map = mHolder.getMap();
+        if (mOnMapReady && mCameraPosition != null && map != null) {
+            mOnMapReady = false;
+            map.moveCamera(mCameraPosition.getRealCameraPosition());
+        }
         if (map != null && mStores.size() != 0) {
 
             mHolder.removeMarkers(mMarkers);
@@ -140,11 +144,8 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
 
     public void onMapReady() {
         L.d(getClass(), "on map ready gets called.");
-        Assert.assertNotNull(mHolder);
-        Assert.assertNotNull(mHolder.getMap());
-        if (mCameraPosition != null) {
-            mHolder.getMap().moveCamera(mCameraPosition.getRealCameraPosition());
-        }
+        mOnMapReady = true;
+        publish();
     }
 
     private Observer<StoresManager.SoresResult> getStoreObserver(final StoresManager.Constraint constraint) {

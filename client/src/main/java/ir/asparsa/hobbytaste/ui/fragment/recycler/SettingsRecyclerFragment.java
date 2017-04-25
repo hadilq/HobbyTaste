@@ -14,7 +14,6 @@ import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 import ir.asparsa.hobbytaste.core.util.LanguageUtil;
-import ir.asparsa.hobbytaste.core.util.LaunchUtil;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.LanguageDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.SetUsernameDialogFragment;
@@ -145,8 +144,8 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
                     ((LanguageDialogFragment.OnChangeLanguageDialogResultEvent) event).getLanguage())) {
 
                 L.i(getClass(), "Language about to change");
-                getActivity().finish();
-                LaunchUtil.launch(getContext(), LaunchActivity.class);
+                getActivity().getIntent().putExtra(LaunchActivity.BUNDLE_KEY_CONFIGURATION_CHANGED, 100);
+                getActivity().recreate();
             }
         }
     }

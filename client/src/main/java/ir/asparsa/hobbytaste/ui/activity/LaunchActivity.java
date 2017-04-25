@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class LaunchActivity extends BaseActivity implements FragmentManager.OnBackStackChangedListener {
 
-    private static final String BUNDLE_KEY_CONFIGURATION_CHANGED = "BUNDLE_KEY_CONFIGURATION_CHANGED";
+    public static final String BUNDLE_KEY_CONFIGURATION_CHANGED = "BUNDLE_KEY_CONFIGURATION_CHANGED";
 
     @Inject
     RouteFactory mRouteFactory;
