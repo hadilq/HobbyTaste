@@ -14,7 +14,6 @@ import rx.Subscriber;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.sql.SQLDataException;
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -32,30 +31,6 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
     @Override protected Class<StoreModel> getModel() {
         return StoreModel.class;
     }
-
-    public Observable<List<StoreModel>> queryAllStores(final BannerDao bannerDao) {
-        return Observable.create(new Observable.OnSubscribe<List<StoreModel>>() {
-            @Override public void call(Subscriber<? super List<StoreModel>> subscriber) {
-                try {
-                    List<StoreModel> models = getDao().queryForAll();
-                    for (StoreModel model : models) {
-                        model.setBanners(bannerDao.getDao().query(
-                                bannerDao.getDao()
-                                         .queryBuilder()
-                                         .where()
-                                         .eq(Banner.Columns.STORE, model.getId())
-                                         .prepare()));
-
-                    }
-                    subscriber.onNext(models);
-                    subscriber.onCompleted();
-                } catch (Exception e) {
-                    subscriber.onError(e);
-                }
-            }
-        });
-    }
-
 
     public Observable<Stores> queryStores(
             final double latitude,
@@ -105,22 +80,6 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
                     subscriber.onNext(new Stores(models, countOf));
                     subscriber.onCompleted();
                 } catch (Exception e) {
-                    subscriber.onError(e);
-                }
-            }
-        });
-    }
-
-    public Observable<StoreModel> findStore(final Long hashCode) {
-        return Observable.create(new Observable.OnSubscribe<StoreModel>() {
-            @Override public void call(Subscriber<? super StoreModel> subscriber) {
-                try {
-                    getDao().query(
-                            getDao().queryBuilder()
-                                    .where()
-                                    .eq(Store.Columns.HASH_CODE, hashCode)
-                                    .prepare());
-                } catch (SQLException e) {
                     subscriber.onError(e);
                 }
             }

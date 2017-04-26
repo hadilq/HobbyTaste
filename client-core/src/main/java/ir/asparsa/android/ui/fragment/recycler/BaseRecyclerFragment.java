@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import ir.asparsa.android.R;
@@ -53,8 +54,9 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
     private final Handler mHandler = new Handler();
     private int mLimit = LIMIT_DEFAULT;
     private long mNextOffset = 0;
+    private long mLastTriedOffset = -1;
+    private long mInitialSize = 0;
     private boolean mLoading = true;
-    private boolean mTriedInThisInterval = false;
     private int mScrollPosition;
 
     @BindView(R2.id.list)
@@ -136,8 +138,16 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
     }
 
     private void provideData() {
-        mProvider.provideData(mNextOffset, mLimit);
-        mTriedInThisInterval = true;
+        if (mLastTriedOffset == mNextOffset) {
+            mLoading = true;
+            return;
+        }
+        mLastTriedOffset = mNextOffset;
+        mHandler.post(new Runnable() {
+            @Override public void run() {
+                mProvider.provideData(mNextOffset, mLimit);
+            }
+        });
     }
 
     @Nullable
@@ -170,11 +180,15 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
     }
 
     private void checkIfReadyToProvide() {
+        if (!mLoading) {
+            return;
+        }
+
         int totalItemCount = mLayoutManager.getItemCount();
         int visibleItemCount = mLayoutManager.getChildCount();
         int pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
 
-        if (mLoading && (visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+        if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
             mLoading = false;
             provideData();
         }
@@ -193,7 +207,6 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
             if (!list.isEmpty() && list.get(list.size() - 1).getViewType() == TryAgainData.VIEW_TYPE) {
                 list.remove(list.size() - 1);
             }
-            final List<BaseRecyclerData> clonedList = new ArrayList<>(list);
             final Deque<BaseRecyclerData> deque = new ArrayDeque<>();
 
             dataObserver.setDeque(deque);
@@ -209,24 +222,16 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
             list.clear();
             list.addAll(deque);
 
-            boolean endOfList = true;
-            if (clonedList.size() == list.size()) {
-                for (BaseRecyclerData data : clonedList) {
-                    int position = clonedList.indexOf(data);
-                    if (!data.equals(list.get(position))) {
-                        endOfList = false;
-                        break;
-                    }
-                }
-            } else {
-                endOfList = false;
+            boolean endOfList = dataObserver.getTotalElements() <= list.size() - mInitialSize;
+
+            mLoading = !endOfList;
+
+            if (mInitialSize <= 0) {
+                mInitialSize = list.size();
             }
 
-            mLoading = !endOfList || !mTriedInThisInterval;
-
-            if (list.size() >= mNextOffset + mLimit) {
+            if (list.size() >= mNextOffset + mLimit + mInitialSize) {
                 mNextOffset += mLimit;
-                mTriedInThisInterval = false;
                 mLoading = true;
             }
 
@@ -270,6 +275,8 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
                 if (data instanceof TryAgainData) {
                     TryAgainData tryAgainData = (TryAgainData) data;
                     tryAgainData.setErrorMessage(message);
+                } else {
+                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
                 }
             }
         }

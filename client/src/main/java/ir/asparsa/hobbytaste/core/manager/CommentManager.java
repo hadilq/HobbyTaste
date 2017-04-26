@@ -74,7 +74,7 @@ public class CommentManager {
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private Observable<List<CommentModel>> getLoadCommentsObservable(Constraint constraint) {
+    private Observable<CommentDao.Comments> getLoadCommentsObservable(Constraint constraint) {
         return mCommentDao
                 .queryComments(constraint.getOffset(), (long) constraint.getLimit(),
                                constraint.getStore().getId())
@@ -88,13 +88,9 @@ public class CommentManager {
                           .observeOn(AndroidSchedulers.mainThread());
     }
 
-    private Observable<Long> getCountCommentsObservable(StoreModel store) {
-        return mCommentDao.countOf(store.getId());
-    }
-
-    private Observable<Collection<CommentModel>> getLoadErrorObservable(final Throwable e) {
-        return Observable.create(new Observable.OnSubscribe<Collection<CommentModel>>() {
-            @Override public void call(Subscriber<? super Collection<CommentModel>> subscriber) {
+    private Observable<CommentsResult> getLoadErrorObservable(final Throwable e) {
+        return Observable.create(new Observable.OnSubscribe<CommentsResult>() {
+            @Override public void call(Subscriber<? super CommentsResult> subscriber) {
                 subscriber.onError(e);
             }
         }).observeOn(AndroidSchedulers.mainThread());
@@ -118,14 +114,14 @@ public class CommentManager {
 
     private void requestServer(
             Constraint constraint,
-            Observer<Collection<CommentModel>> observer
+            Observer<CommentsResult> observer
     ) {
         getLoadServiceObservable(constraint).subscribe(onLoadObserver(constraint, observer));
     }
 
     private void loadFromDatabase(
             Constraint constraint,
-            final Observer<Collection<CommentModel>> observer
+            final Observer<CommentsResult> observer
     ) {
         getLoadCommentsObservable(constraint).subscribe(onLoadFromDatabaseObserver(observer));
     }
@@ -146,14 +142,15 @@ public class CommentManager {
 
     public Subscription loadComments(
             final CommentManager.Constraint constraint,
-            final Observer<Collection<CommentModel>> observer
+            final Observer<CommentsResult> observer
     ) {
-        Subject<Collection<CommentModel>, Collection<CommentModel>> subject = new SerializedSubject<>(
-                PublishSubject.<Collection<CommentModel>>create());
+        Subject<CommentsResult, CommentsResult> subject = new SerializedSubject<>(
+                PublishSubject.<CommentsResult>create());
         Subscription subscription = subject.subscribe(observer);
 
-        getCountCommentsObservable(constraint.getStore())
-                .subscribe(onCountCommentsObserver(constraint, subject));
+        loadFromDatabase(constraint, observer);
+
+        requestServer(constraint, observer);
 
         return subscription;
     }
@@ -206,7 +203,7 @@ public class CommentManager {
 
     private Observer<CommentProto.Comments> onLoadObserver(
             final Constraint constraint,
-            final Observer<Collection<CommentModel>> observer
+            final Observer<CommentsResult> observer
     ) {
         return new Observer<CommentProto.Comments>() {
             @Override public void onCompleted() {
@@ -217,7 +214,10 @@ public class CommentManager {
             }
 
             @Override public void onNext(CommentProto.Comments comments) {
-                L.i(CommentManager.class, "Loaded comments from server: " + comments);
+                L.i(
+                        CommentManager.class,
+                        "Loaded comments from server for these constraints: " + constraint.getOffset() + ", " +
+                        constraint.getLimit() + ":\n" + comments);
                 List<CommentModel> list = new ArrayList<>();
                 for (CommentProto.Comment storeCommentDto : comments.getCommentList()) {
                     if (constraint.getStore().getHashCode() != storeCommentDto.getStoreHashCode()) {
@@ -228,15 +228,15 @@ public class CommentManager {
                     list.add(CommentModel.newInstance(constraint.getStore().getId(), storeCommentDto));
                 }
                 mCommentDao.createAll(list)
-                           .subscribe(onFinishLoadObserver(constraint, comments.getTotalElements(), observer));
+                           .observeOn(AndroidSchedulers.mainThread())
+                           .subscribe(onFinishLoadObserver(comments.getTotalElements(), observer));
             }
         };
     }
 
     private Observer<? super Collection<CommentModel>> onFinishLoadObserver(
-            final Constraint constraint,
             final long totalElements,
-            final Observer<Collection<CommentModel>> observer
+            final Observer<CommentsResult> observer
     ) {
         return new Observer<Collection<CommentModel>>() {
             @Override public void onCompleted() {
@@ -244,22 +244,18 @@ public class CommentManager {
 
             @Override public void onError(Throwable e) {
                 L.i(CommentManager.class, "Comments cannot finish action", e);
-                getLoadErrorObservable(e).subscribe(observer);
+                observer.onError(e);
             }
 
             @Override public void onNext(Collection<CommentModel> comments) {
                 L.i(CommentManager.class, "Comments completely saved");
-                loadFromDatabase(constraint, observer);
-
-                mCommentDao.countOf(constraint.getStore().getId())
-                           .subscribe(onCheckTotalCountObserver(constraint, totalElements, observer));
-
+                observer.onNext(new CommentsResult(comments, totalElements));
             }
         };
     }
 
-    private Observer<List<CommentModel>> onLoadFromDatabaseObserver(final Observer<Collection<CommentModel>> observer) {
-        return new Observer<List<CommentModel>>() {
+    private Observer<CommentDao.Comments> onLoadFromDatabaseObserver(final Observer<CommentsResult> observer) {
+        return new Observer<CommentDao.Comments>() {
             @Override public void onCompleted() {
                 // Don't call observer's on completed method
             }
@@ -268,33 +264,8 @@ public class CommentManager {
                 observer.onError(e);
             }
 
-            @Override public void onNext(List<CommentModel> commentModels) {
-                observer.onNext(commentModels);
-            }
-        };
-    }
-
-    private Observer<Long> onCheckTotalCountObserver(
-            final Constraint constraint,
-            final long totalElements,
-            final Observer<Collection<CommentModel>> observer
-    ) {
-        return new Observer<Long>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-                getLoadErrorObservable(e).subscribe(observer);
-            }
-
-            @Override public void onNext(Long count) {
-                L.i(CommentManager.class, "Check for total count: " + count + " " + totalElements);
-                if (count < totalElements) {
-                    requestServer(new Constraint(constraint.getStore(), constraint.getOffset() + constraint.getLimit(),
-                                                 constraint.getLimit()), observer);
-                } else if (totalElements < count) {
-                    // TODO handle this exception
-                }
+            @Override public void onNext(CommentDao.Comments comments) {
+                observer.onNext(new CommentsResult(comments.getComments(), comments.getTotalElements()));
             }
         };
     }
@@ -397,33 +368,6 @@ public class CommentManager {
         };
     }
 
-    private Observer<Long> onCountCommentsObserver(
-            final Constraint constraint,
-            final Observer<Collection<CommentModel>> observer
-    ) {
-        return new Observer<Long>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-                L.e(CommentManager.class, "Cannot count comments for: " + constraint.getStore(), e);
-                getLoadErrorObservable(e).subscribe(observer);
-            }
-
-            @Override public void onNext(Long count) {
-                L.i(
-                        CommentManager.class,
-                        "Count comments: " + count + ", " + constraint.getOffset() + ", " + constraint.getLimit()
-                );
-                if (count < constraint.getOffset() + constraint.getLimit()) {
-                    requestServer(constraint, observer);
-                }
-
-                loadFromDatabase(constraint, observer);
-            }
-        };
-    }
-
     public static class Constraint {
         private StoreModel store;
         private long offset;
@@ -449,6 +393,27 @@ public class CommentManager {
 
         public int getLimit() {
             return limit;
+        }
+    }
+
+    public static class CommentsResult {
+        private Collection<CommentModel> comments;
+        private long totalElements;
+
+        public CommentsResult(
+                Collection<CommentModel> comments,
+                long totalElement
+        ) {
+            this.comments = comments;
+            this.totalElements = totalElement;
+        }
+
+        public Collection<CommentModel> getComments() {
+            return comments;
+        }
+
+        public long getTotalElements() {
+            return totalElements;
         }
     }
 }
