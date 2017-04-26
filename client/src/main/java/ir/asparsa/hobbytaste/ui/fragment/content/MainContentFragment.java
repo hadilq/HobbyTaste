@@ -13,7 +13,7 @@ import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.mvp.holder.MainContentViewHolder;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.StorePresenter;
-import ir.asparsa.hobbytaste.ui.wrappers.WMap;
+import ir.asparsa.hobbytaste.ui.wrapper.WMap;
 
 /**
  * @author hadi

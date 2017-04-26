@@ -16,7 +16,7 @@ import com.google.android.gms.maps.model.*;
 import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.AddStorePresenter;
-import ir.asparsa.hobbytaste.ui.wrappers.WMap;
+import ir.asparsa.hobbytaste.ui.wrapper.WMap;
 import junit.framework.Assert;
 
 /**

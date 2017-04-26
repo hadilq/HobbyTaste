@@ -1,4 +1,4 @@
-package ir.asparsa.hobbytaste.ui.wrappers;
+package ir.asparsa.hobbytaste.ui.wrapper;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;

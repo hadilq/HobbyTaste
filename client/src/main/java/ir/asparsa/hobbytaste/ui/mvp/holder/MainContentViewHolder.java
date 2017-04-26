@@ -6,7 +6,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.*;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.StorePresenter;
-import ir.asparsa.hobbytaste.ui.wrappers.WMap;
+import ir.asparsa.hobbytaste.ui.wrapper.WMap;
 
 import java.util.Collection;
 

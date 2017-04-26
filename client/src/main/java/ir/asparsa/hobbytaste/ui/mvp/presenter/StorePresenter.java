@@ -15,8 +15,8 @@ import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.fragment.content.FragmentDelegate;
 import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
 import ir.asparsa.hobbytaste.ui.mvp.holder.MainContentViewHolder;
-import ir.asparsa.hobbytaste.ui.wrappers.WCameraPosition;
-import ir.asparsa.hobbytaste.ui.wrappers.WMap;
+import ir.asparsa.hobbytaste.ui.wrapper.WCameraPosition;
+import ir.asparsa.hobbytaste.ui.wrapper.WMap;
 import rx.Observer;
 import rx.subscriptions.CompositeSubscription;
 
