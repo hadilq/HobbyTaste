@@ -134,6 +134,8 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         provideData();
         if (mAdapter.isEmpty()) {
             mTryAgainView.start();
+        } else {
+            mTryAgainView.finish();
         }
     }
 
