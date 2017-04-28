@@ -223,7 +223,10 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
         }
     }
 
-    public Observable<StoreModel> findByHashCode(final long storeHashCode) {
+    public Observable<StoreModel> findByHashCode(
+            @NonNull final BannerDao bannerDao,
+            final long storeHashCode
+    ) {
         return Observable.create(new Observable.OnSubscribe<StoreModel>() {
             @Override public void call(Subscriber<? super StoreModel> subscriber) {
                 try {
@@ -232,7 +235,19 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
                                     .where()
                                     .eq(Store.Columns.HASH_CODE, storeHashCode)
                                     .prepare());
-                    subscriber.onNext(stores.size() > 0 ? stores.get(0) : null);
+                    if (stores.size() == 0) {
+                        subscriber.onNext(null);
+                        subscriber.onCompleted();
+                        return;
+                    }
+                    StoreModel store = stores.get(0);
+
+                    store.setBanners(bannerDao.getDao().query(
+                            bannerDao.getDao().queryBuilder()
+                                     .where()
+                                     .eq(Banner.Columns.STORE, store.getId())
+                                     .prepare()));
+                    subscriber.onNext(store);
                     subscriber.onCompleted();
                 } catch (SQLException e) {
                     subscriber.onError(e);

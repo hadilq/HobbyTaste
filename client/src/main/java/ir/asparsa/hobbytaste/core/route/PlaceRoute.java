@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
+import ir.asparsa.hobbytaste.database.dao.BannerDao;
 import ir.asparsa.hobbytaste.database.dao.StoreDao;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.fragment.content.BaseContentFragment;
@@ -26,6 +27,8 @@ public class PlaceRoute implements Route {
 
     @Inject
     StoreDao mStoreDao;
+    @Inject
+    BannerDao mBannerDao;
 
     private final String mSegment;
     private StoreModel mStoreModel;
@@ -47,7 +50,7 @@ public class PlaceRoute implements Route {
         } catch (NumberFormatException e) {
             return null;
         }
-        mStoreDao.findByHashCode(storeHashCode)
+        mStoreDao.findByHashCode(mBannerDao, storeHashCode)
                  .toBlocking()
                  .subscribe(new Observer<StoreModel>() {
                      @Override public void onCompleted() {
@@ -73,6 +76,7 @@ public class PlaceRoute implements Route {
 
     @NonNull @Override public BaseContentFragment getFragment() {
         Assert.assertNotNull(mStoreModel);
+        L.i(getClass(), "Store model: " + mStoreModel);
         return StoreDetailsContentFragment.instantiate(mStoreModel);
     }
 
