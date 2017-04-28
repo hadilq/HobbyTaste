@@ -34,6 +34,16 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data
+                        android:scheme="free"
+                        android:host="map"/>
+            </intent-filter>
         </activity>
         <activity
                 android:name=".ui.activity.SplashActivity"

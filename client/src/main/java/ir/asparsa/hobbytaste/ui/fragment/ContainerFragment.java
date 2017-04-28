@@ -1,6 +1,7 @@
 package ir.asparsa.hobbytaste.ui.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -82,30 +83,37 @@ public class ContainerFragment extends BaseFragment {
             NavigationUtil.startContentFragment(fragmentManager, contentFragment);
         } else {
             if (route.isAlwaysBellow()) {
-                BaseContentFragment baseContentFragment = null;
-                List<Fragment> fragments = fragmentManager.getFragments();
-                for (int i = fragments.size() - 1; i >= 0; i--) {
-                    if (fragments.get(i) instanceof BaseContentFragment) {
-                        BaseContentFragment content = (BaseContentFragment) fragments.get(i);
-                        if (content.getTagName().equals(contentFragment.getTagName())) {
-                            baseContentFragment = content;
-                            break;
-                        } else {
-                            try {
-                                fragmentManager
-                                        .popBackStack(content.getTag(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                            } catch (Exception e) {
-                                L.e(UiUtil.class.getClass(), "Pop problem!", e);
-                            }
-                        }
-                    }
-                }
-                if (baseContentFragment == null) {
+                if (findOrPopBaseContentFragment(fragmentManager, contentFragment) == null) {
                     NavigationUtil.startContentFragment(fragmentManager, contentFragment);
                 }
             } else if (!fragment.getTagName().equals(contentFragment.getTagName())) {
                 NavigationUtil.startContentFragment(fragmentManager, contentFragment);
             }
         }
+    }
+
+    @Nullable
+    private BaseContentFragment findOrPopBaseContentFragment(
+            @NonNull FragmentManager fragmentManager,
+            @NonNull BaseContentFragment contentFragment
+    ) {
+        BaseContentFragment baseContentFragment = null;
+        List<Fragment> fragments = fragmentManager.getFragments();
+        for (int i = fragments.size() - 1; i >= 0; i--) {
+            if (fragments.get(i) instanceof BaseContentFragment) {
+                BaseContentFragment content = (BaseContentFragment) fragments.get(i);
+                if (content.getTagName().equals(contentFragment.getTagName())) {
+                    baseContentFragment = content;
+                    break;
+                } else {
+                    try {
+                        fragmentManager.popBackStack(content.getTag(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    } catch (Exception e) {
+                        L.e(UiUtil.class.getClass(), "Pop problem!", e);
+                    }
+                }
+            }
+        }
+        return baseContentFragment;
     }
 }

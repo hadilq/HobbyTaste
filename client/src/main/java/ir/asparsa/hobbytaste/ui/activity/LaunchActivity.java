@@ -108,19 +108,21 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         }
 
         Intent intent = getIntent();
-        if (!intent.hasExtra(BUNDLE_KEY_CONFIGURATION_CHANGED)) {
-            mConfigurationChanged = false;
-            LaunchUtil.launch(this, SplashActivity.class);
-        } else {
-            mConfigurationChanged = true;
-            intent.removeExtra(BUNDLE_KEY_CONFIGURATION_CHANGED);
+        boolean handled = mRouteFactory.handleIntent(intent, mViewPager);
+        if (!handled) {
+            if (!intent.hasExtra(BUNDLE_KEY_CONFIGURATION_CHANGED)) {
+                mConfigurationChanged = false;
+                LaunchUtil.launch(this, SplashActivity.class);
+            } else {
+                mConfigurationChanged = true;
+                intent.removeExtra(BUNDLE_KEY_CONFIGURATION_CHANGED);
+            }
         }
-        mRouteFactory.handleIntent(intent);
     }
 
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        mRouteFactory.handleIntent(intent);
+        mRouteFactory.handleIntent(intent, mViewPager);
     }
 
     @Override

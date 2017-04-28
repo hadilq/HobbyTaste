@@ -14,7 +14,7 @@ public class SettingsRoute implements Route {
     public static final int PAGE = 1;
 
     @Override public boolean shouldFire(AnalysedUri uri) {
-        return uri.getLowerCasePathSegments().size() > 1 && uri.getLowerCasePathSegments().get(0).equals(PATH_SEGMENT);
+        return uri.getLowerCasePathSegments().size() >= 1 && uri.getLowerCasePathSegments().get(0).equals(PATH_SEGMENT);
     }
 
     @NonNull @Override public Route fire(AnalysedUri uri) {

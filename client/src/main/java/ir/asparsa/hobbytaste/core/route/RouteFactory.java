@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import ir.asparsa.hobbytaste.ui.adapter.NavigationAdapter;
 import ir.asparsa.hobbytaste.ui.fragment.ContainerFragment;
@@ -66,8 +67,9 @@ public class RouteFactory {
         return null;
     }
 
-    public void handleIntent(
-            Intent intent
+    public boolean handleIntent(
+            @NonNull Intent intent,
+            @NonNull ViewPager viewPager
     ) {
         // Refill routes in case of changing language
         mRoutes.clear();
@@ -82,7 +84,7 @@ public class RouteFactory {
             route = getRoute(uri, intent.getExtras());
         }
         if (route == null) {
-            return;
+            return false;
         }
         int pos = pageToPos(route.whichPage());
         ContainerFragment container = mContainers.get(pos).get();
@@ -91,6 +93,8 @@ public class RouteFactory {
         } else {
             container.launchRoute(pos, route);
         }
+        viewPager.setCurrentItem(pos);
+        return true;
     }
 
     @NonNull
@@ -123,6 +127,7 @@ public class RouteFactory {
         if (routes == null) {
             routes = new ArrayDeque<>();
             routes.add(new MainRoute());
+            routes.add(new SettingsRoute());
             mRouts = new WeakReference<>(routes);
         }
         return routes;
