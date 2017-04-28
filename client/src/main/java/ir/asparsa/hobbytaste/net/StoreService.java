@@ -14,6 +14,14 @@ public interface StoreService {
     @GET(StoreServicePath.SERVICE)
     Observable<StoreProto.Stores> loadStoreModels();
 
+    @POST(StoreServicePath.SERVICE)
+    Observable<StoreProto.Stores> loadStoreModels(
+            @Query("latitude") double latitude,
+            @Query("longitude") double longitude,
+            @Query("page") int page,
+            @Query("size") int size
+    );
+
     @PUT(StoreServicePath.SERVICE)
     Observable<StoreProto.Store> saveStore(@Body StoreProto.Store store);
 

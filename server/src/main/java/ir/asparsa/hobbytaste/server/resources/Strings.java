@@ -11,6 +11,7 @@ public interface Strings {
     String STORE_NOT_FOUND = "exception.store_not_found";
     String ACCOUNT_NOT_FOUND = "exception.account_not_found";
     String USERNAME_IS_EMPTY = "exception.username_is_empty";
+    String USERNAME_IS_REPEATED= "exception.username_is_repeated";
     String JWT_TOKEN_NOT_VALID = "exception.jwt_token_not_valid";
     String NO_JWT_HEADER_FOUND = "exception.jwt_no_token_found";
     String EMPTY_FILE = "exception.empty_file";

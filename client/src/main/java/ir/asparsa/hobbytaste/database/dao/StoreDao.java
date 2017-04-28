@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import ir.asparsa.common.database.model.Banner;
 import ir.asparsa.common.database.model.Store;
+import ir.asparsa.common.util.MapUtil;
 import ir.asparsa.hobbytaste.database.DatabaseHelper;
 import ir.asparsa.hobbytaste.database.model.BannerModel;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
@@ -14,9 +15,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author hadi
@@ -34,39 +33,54 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
         return StoreModel.class;
     }
 
-    public Observable<List<StoreModel>> queryAllStores(final BannerDao bannerDao) {
-        return Observable.create(new Observable.OnSubscribe<List<StoreModel>>() {
-            @Override public void call(Subscriber<? super List<StoreModel>> subscriber) {
+    public Observable<Stores> queryStores(
+            final double latitude,
+            final double longitude,
+            final int offset,
+            final int limit,
+            final BannerDao bannerDao
+    ) {
+        return Observable.create(new Observable.OnSubscribe<Stores>() {
+            @Override public void call(Subscriber<? super Stores> subscriber) {
                 try {
-                    List<StoreModel> models = getDao().queryForAll();
-                    for (StoreModel model : models) {
-                        model.setBanners(bannerDao.getDao().query(
+
+                    long countOf = getDao().countOf();
+                    if (countOf < offset) {
+                        subscriber.onNext(new Stores(new ArrayList<StoreModel>(), countOf));
+                        subscriber.onCompleted();
+                        return;
+                    }
+
+                    List<StoreHolder> holders = new ArrayList<>();
+                    for (StoreModel model : getDao()) {
+                        float distance = MapUtil.distFrom(latitude, longitude, model.getLat(), model.getLon());
+                        holders.add(new StoreHolder(model, distance));
+                    }
+
+                    Collections.sort(holders, new Comparator<StoreHolder>() {
+                        @Override public int compare(
+                                StoreHolder o1,
+                                StoreHolder o2
+                        ) {
+                            return o1.distance == o2.distance ? 0 : (o1.distance > o2.distance ? 1 : -1);
+                        }
+                    });
+
+                    List<StoreModel> models = new ArrayList<>();
+                    for (StoreHolder holder : holders.subList(offset, Math.min(offset + limit, holders.size()))) {
+                        holder.storeModel.setBanners(bannerDao.getDao().query(
                                 bannerDao.getDao()
                                          .queryBuilder()
                                          .where()
-                                         .eq(Banner.Columns.STORE, model.getId())
+                                         .eq(Banner.Columns.STORE, holder.storeModel.getId())
                                          .prepare()));
 
+                        models.add(holder.storeModel);
                     }
-                    subscriber.onNext(models);
+
+                    subscriber.onNext(new Stores(models, countOf));
                     subscriber.onCompleted();
                 } catch (Exception e) {
-                    subscriber.onError(e);
-                }
-            }
-        });
-    }
-
-    public Observable<StoreModel> findStore(final Long hashCode) {
-        return Observable.create(new Observable.OnSubscribe<StoreModel>() {
-            @Override public void call(Subscriber<? super StoreModel> subscriber) {
-                try {
-                    getDao().query(
-                            getDao().queryBuilder()
-                                    .where()
-                                    .eq(Store.Columns.HASH_CODE, hashCode)
-                                    .prepare());
-                } catch (SQLException e) {
                     subscriber.onError(e);
                 }
             }
@@ -208,4 +222,72 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
             }
         }
     }
+
+    public Observable<StoreModel> findByHashCode(
+            @NonNull final BannerDao bannerDao,
+            final long storeHashCode
+    ) {
+        return Observable.create(new Observable.OnSubscribe<StoreModel>() {
+            @Override public void call(Subscriber<? super StoreModel> subscriber) {
+                try {
+                    List<StoreModel> stores = getDao().query(
+                            getDao().queryBuilder()
+                                    .where()
+                                    .eq(Store.Columns.HASH_CODE, storeHashCode)
+                                    .prepare());
+                    if (stores.size() == 0) {
+                        subscriber.onNext(null);
+                        subscriber.onCompleted();
+                        return;
+                    }
+                    StoreModel store = stores.get(0);
+
+                    store.setBanners(bannerDao.getDao().query(
+                            bannerDao.getDao().queryBuilder()
+                                     .where()
+                                     .eq(Banner.Columns.STORE, store.getId())
+                                     .prepare()));
+                    subscriber.onNext(store);
+                    subscriber.onCompleted();
+                } catch (SQLException e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
+    }
+
+    private static class StoreHolder {
+        StoreModel storeModel;
+        float distance;
+
+        StoreHolder(
+                StoreModel storeModel,
+                float distance
+        ) {
+            this.storeModel = storeModel;
+            this.distance = distance;
+        }
+    }
+
+    public static class Stores {
+        private List<StoreModel> stores;
+        private long totalElements;
+
+        Stores(
+                List<StoreModel> stores,
+                long totalElement
+        ) {
+            this.stores = stores;
+            this.totalElements = totalElement;
+        }
+
+        public List<StoreModel> getStores() {
+            return stores;
+        }
+
+        public long getTotalElements() {
+            return totalElements;
+        }
+    }
+
 }

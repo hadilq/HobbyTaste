@@ -51,7 +51,8 @@ public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessi
         locale = StringUtils.isEmpty(locale) ? Strings.DEFAULT_LOCALE : locale;
         if (authToken == null) {
             throw new JwtTokenMissingException(
-                    "No JWT token found in request headers", Strings.NO_JWT_HEADER_FOUND, locale);
+                    "No JWT token found in request headers. " + request.getRequestURI(), Strings.NO_JWT_HEADER_FOUND,
+                    locale);
         }
 
         JwtAuthenticationToken authRequest = new JwtAuthenticationToken(

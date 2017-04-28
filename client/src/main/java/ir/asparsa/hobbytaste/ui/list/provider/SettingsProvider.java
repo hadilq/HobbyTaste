@@ -15,6 +15,8 @@ import ir.asparsa.hobbytaste.ui.list.data.LanguageData;
 import ir.asparsa.hobbytaste.ui.list.data.UsernameData;
 
 import javax.inject.Inject;
+import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Locale;
 
 /**
@@ -42,17 +44,21 @@ public class SettingsProvider extends AbsListProvider {
             int limit
     ) {
         L.i(getClass(), "New data needed: " + offset + " " + limit);
-        mOnInsertData.OnDataInserted(new DataObserver() {
+        final Collection<BaseRecyclerData> collection = new ArrayDeque<>();
+        collection.add(new UsernameData(mAuthorizationManager.getUsername()));
+        collection.add(new LanguageData(
+                LanguageUtil.getLanguageTitle(mContext.getResources()),
+                Locale.getDefault().getLanguage()));
+        collection.add(new AboutUsData());
+
+        mOnInsertData.OnDataInserted(new DataObserver(collection.size()) {
             @Override public void onCompleted() {
-                deque.add(new UsernameData(mAuthorizationManager.getUsername()));
-                deque.add(new LanguageData(
-                        LanguageUtil.getLanguageTitle(mContext.getResources()),
-                        Locale.getDefault().getLanguage()));
-                deque.add(new AboutUsData());
+                for (BaseRecyclerData data : collection) {
+                    deque.add(data);
+                }
             }
 
             @Override public void onNext(BaseRecyclerData baseRecyclerData) {
-
             }
         });
     }

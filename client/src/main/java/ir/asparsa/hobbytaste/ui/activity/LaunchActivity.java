@@ -9,6 +9,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
@@ -16,17 +17,20 @@ import android.view.MenuItem;
 import android.view.View;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
+import ir.asparsa.hobbytaste.core.route.MainRoute;
+import ir.asparsa.hobbytaste.core.route.RouteFactory;
 import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import ir.asparsa.hobbytaste.core.util.LaunchUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.core.util.UncaughtExceptionHandler;
 import ir.asparsa.hobbytaste.ui.adapter.NavigationAdapter;
 import ir.asparsa.hobbytaste.ui.behavior.ShrinkBehavior;
-import ir.asparsa.hobbytaste.ui.fragment.container.BaseContainerFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.BaseContentFragment;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +40,10 @@ import java.util.List;
  */
 public class LaunchActivity extends BaseActivity implements FragmentManager.OnBackStackChangedListener {
 
-    private static final String BUNDLE_KEY_CONFIGURATION_CHANGED = "BUNDLE_KEY_CONFIGURATION_CHANGED";
-    private final BaseContainerFragment[] mContainers = new BaseContainerFragment[NavigationAdapter.PAGE_COUNT];
+    public static final String BUNDLE_KEY_CONFIGURATION_CHANGED = "BUNDLE_KEY_CONFIGURATION_CHANGED";
+
+    @Inject
+    RouteFactory mRouteFactory;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -66,7 +72,7 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         setSupportActionBar(mToolbar);
         mPagerAdapter = new NavigationAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.setCurrentItem(mPagerAdapter.pageToPos(NavigationAdapter.PAGE_MAIN));
+        mViewPager.setCurrentItem(mRouteFactory.pageToPos(MainRoute.PAGE));
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override public void onPageScrolled(
                     int position,
@@ -89,7 +95,7 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                         for (Integer action : actionList) {
                             if (action == item.getItemId()) {
-                                mViewPager.setCurrentItem(mPagerAdapter.pageToPos(actionList.indexOf(action)));
+                                mViewPager.setCurrentItem(mRouteFactory.pageToPos(actionList.indexOf(action)));
                             }
                         }
                         return true;
@@ -103,17 +109,22 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
             throw new RuntimeException("Test");
         }
 
-        if (!getIntent().hasExtra(BUNDLE_KEY_CONFIGURATION_CHANGED)) {
-            mConfigurationChanged = false;
-            LaunchUtil.launch(this, SplashActivity.class);
-        } else {
-            mConfigurationChanged = true;
-            getIntent().removeExtra(BUNDLE_KEY_CONFIGURATION_CHANGED);
+        Intent intent = getIntent();
+        boolean handled = mRouteFactory.handleIntent(getResources(), intent, mViewPager);
+        if (!handled) {
+            if (!intent.hasExtra(BUNDLE_KEY_CONFIGURATION_CHANGED)) {
+                mConfigurationChanged = false;
+                LaunchUtil.launch(this, SplashActivity.class);
+            } else {
+                mConfigurationChanged = true;
+                intent.removeExtra(BUNDLE_KEY_CONFIGURATION_CHANGED);
+            }
         }
     }
 
-    @Override protected void onDestroy() {
-        super.onDestroy();
+    @Override protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        mRouteFactory.handleIntent(getResources(), intent, mViewPager);
     }
 
     @Override
@@ -129,8 +140,12 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
     }
 
     @Override public void onBackPressed() {
-        FragmentManager activeFragmentManager = getActiveFragmentManager();
-        BaseContentFragment fragment = NavigationUtil.findTopFragment(activeFragmentManager);
+        int pos = mViewPager.getCurrentItem();
+        FragmentManager fragmentManager = mRouteFactory.getFragmentManager(pos);
+        if (fragmentManager == null) {
+            return;
+        }
+        BaseContentFragment fragment = NavigationUtil.findTopFragment(fragmentManager);
         if (fragment != null) {
             BaseContentFragment.BackState state = fragment.onBackPressed();
             switch (state) {
@@ -138,7 +153,12 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                     finish();
                     break;
                 case BACK_FRAGMENT:
-                    NavigationUtil.popBackStack(activeFragmentManager);
+                    List<Fragment> fragments = fragmentManager.getFragments();
+                    NavigationUtil.popBackStack(fragmentManager);
+                    L.i(getClass(), "Fragments: " + fragments);
+                    if (fragments == null || fragments.size() <= 1) {
+                        mRouteFactory.launchRoute(getResources(), pos);
+                    }
                     break;
             }
         }
@@ -150,15 +170,23 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
             Intent data
     ) {
         super.onActivityResult(requestCode, resultCode, data);
-        FragmentManager activeFragmentManager = getActiveFragmentManager();
-        BaseContentFragment fragment = NavigationUtil.findTopFragment(activeFragmentManager);
+        FragmentManager fragmentManager = mRouteFactory.getFragmentManager(mViewPager.getCurrentItem());
+        if (fragmentManager == null) {
+            return;
+        }
+        BaseContentFragment fragment = NavigationUtil.findTopFragment(fragmentManager);
         if (fragment != null) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
     }
 
     @Override public void onBackStackChanged() {
-        BaseContentFragment fragment = NavigationUtil.findTopFragment(getActiveFragmentManager());
+        FragmentManager fragmentManager = mRouteFactory.getFragmentManager(mViewPager.getCurrentItem());
+        if (fragmentManager == null) {
+            return;
+        }
+        BaseContentFragment fragment = NavigationUtil
+                .findTopFragment(fragmentManager);
         if (fragment != null) {
             mToolbar.setTitle(fragment.getHeaderTitle());
 
@@ -201,18 +229,6 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                 getSupportActionBar().setDisplayShowHomeEnabled(false);
             }
         }
-    }
-
-    private FragmentManager getActiveFragmentManager() {
-        return mContainers[mViewPager.getCurrentItem()].getChildFragmentManager();
-    }
-
-    public void addContainer(
-            @NonNull BaseContainerFragment fragment,
-            int pos
-    ) {
-        mContainers[pos] = fragment;
-        fragment.getChildFragmentManager().addOnBackStackChangedListener(this);
     }
 
     public boolean isConfigurationChanged() {

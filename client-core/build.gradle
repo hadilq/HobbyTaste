@@ -3,13 +3,6 @@ apply plugin: 'com.jakewharton.butterknife'
 
 android {
     publishNonDefault true
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
 }
 
 dependencies {
@@ -18,7 +11,7 @@ dependencies {
     compile "com.android.support:design:$global_designVersion"
     compile "com.android.support:support-v4:$global_supportVersion"
     // Dagger
-    provided "com.google.dagger:dagger-compiler:$global_daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$global_daggerVersion"
     compile "com.google.dagger:dagger:$global_daggerVersion"
     provided 'javax.annotation:jsr250-api:1.0'
     // Butter Knife

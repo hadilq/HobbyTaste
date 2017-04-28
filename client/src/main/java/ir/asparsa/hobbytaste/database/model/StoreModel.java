@@ -35,6 +35,8 @@ public class StoreModel extends BaseModel implements Parcelable {
     private long hashCode;
     @DatabaseField(columnName = Store.Columns.CREATED, canBeNull = false)
     private long created;
+    @DatabaseField(columnName = Store.Columns.CREATOR)
+    private String creator;
     @DatabaseField(columnName = Store.Columns.RATE, canBeNull = false)
     private long rate;
     @DatabaseField(columnName = Store.Columns.VIEWED, canBeNull = false)
@@ -77,6 +79,7 @@ public class StoreModel extends BaseModel implements Parcelable {
         storeModel.description = storeDto.getDescription();
         storeModel.hashCode = storeDto.getHashCode();
         storeModel.created = storeDto.getCreated();
+        storeModel.creator = storeDto.getCreator();
         List<BannerModel> banners = new ArrayList<>();
         if (storeDto.getBannerCount() != 0) {
             for (StoreProto.Banner bannerDto : storeDto.getBannerList()) {
@@ -136,6 +139,10 @@ public class StoreModel extends BaseModel implements Parcelable {
         return created;
     }
 
+    public String getCreator() {
+        return creator;
+    }
+
     public long getRate() {
         return rate;
     }
@@ -180,12 +187,16 @@ public class StoreModel extends BaseModel implements Parcelable {
                ", lon=" + lon +
                ", title='" + title + '\'' +
                ", description='" + description + '\'' +
+               ", hashCode=" + hashCode +
+               ", created=" + created +
+               ", creator='" + creator + '\'' +
                ", rate=" + rate +
                ", viewed=" + viewed +
                ", liked=" + liked +
                ", banners=" + banners +
                '}';
     }
+
 
     @Override public int describeContents() {
         return 0;
@@ -200,9 +211,13 @@ public class StoreModel extends BaseModel implements Parcelable {
         dest.writeDouble(this.lon);
         dest.writeString(this.title);
         dest.writeString(this.description);
-        dest.writeValue(this.rate);
-        dest.writeValue(this.viewed);
+        dest.writeLong(this.hashCode);
+        dest.writeLong(this.created);
+        dest.writeString(this.creator);
+        dest.writeLong(this.rate);
+        dest.writeLong(this.viewed);
         dest.writeByte(this.liked ? (byte) 1 : (byte) 0);
+        dest.writeTypedList(this.banners);
     }
 
     protected StoreModel(Parcel in) {
@@ -211,9 +226,13 @@ public class StoreModel extends BaseModel implements Parcelable {
         this.lon = in.readDouble();
         this.title = in.readString();
         this.description = in.readString();
-        this.rate = (Long) in.readValue(Long.class.getClassLoader());
-        this.viewed = (Long) in.readValue(Long.class.getClassLoader());
+        this.hashCode = in.readLong();
+        this.created = in.readLong();
+        this.creator = in.readString();
+        this.rate = in.readLong();
+        this.viewed = in.readLong();
         this.liked = in.readByte() != 0;
+        this.banners = in.createTypedArrayList(BannerModel.CREATOR);
     }
 
     public static final Creator<StoreModel> CREATOR = new Creator<StoreModel>() {

@@ -64,35 +64,6 @@ public class BannerModel extends BaseModel implements Parcelable {
         this.storeId = storeId;
     }
 
-    @Override public int describeContents() {
-        return 0;
-    }
-
-    @Override public void writeToParcel(
-            Parcel dest,
-            int flags
-    ) {
-        dest.writeValue(this.id);
-        dest.writeString(this.mainUrl);
-        dest.writeString(this.thumbnailUrl);
-    }
-
-    protected BannerModel(Parcel in) {
-        this.id = (Long) in.readValue(Long.class.getClassLoader());
-        this.mainUrl = in.readString();
-        this.thumbnailUrl = in.readString();
-    }
-
-    public static final Creator<BannerModel> CREATOR = new Creator<BannerModel>() {
-        @Override public BannerModel createFromParcel(Parcel source) {
-            return new BannerModel(source);
-        }
-
-        @Override public BannerModel[] newArray(int size) {
-            return new BannerModel[size];
-        }
-    };
-
     @Override
     public boolean equals(final Object otherObj) {
         if ((otherObj == null) || !(otherObj instanceof BannerModel)) {
@@ -119,4 +90,36 @@ public class BannerModel extends BaseModel implements Parcelable {
                ", thumbnailUrl='" + thumbnailUrl + '\'' +
                '}';
     }
+
+
+    @Override public int describeContents() {
+        return 0;
+    }
+
+    @Override public void writeToParcel(
+            Parcel dest,
+            int flags
+    ) {
+        dest.writeLong(this.id);
+        dest.writeString(this.mainUrl);
+        dest.writeString(this.thumbnailUrl);
+        dest.writeValue(this.storeId);
+    }
+
+    protected BannerModel(Parcel in) {
+        this.id = in.readLong();
+        this.mainUrl = in.readString();
+        this.thumbnailUrl = in.readString();
+        this.storeId = (Long) in.readValue(Long.class.getClassLoader());
+    }
+
+    public static final Creator<BannerModel> CREATOR = new Creator<BannerModel>() {
+        @Override public BannerModel createFromParcel(Parcel source) {
+            return new BannerModel(source);
+        }
+
+        @Override public BannerModel[] newArray(int size) {
+            return new BannerModel[size];
+        }
+    };
 }

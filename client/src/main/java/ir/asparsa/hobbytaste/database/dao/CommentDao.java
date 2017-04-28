@@ -1,6 +1,5 @@
 package ir.asparsa.hobbytaste.database.dao;
 
-import com.j256.ormlite.dao.Dao;
 import ir.asparsa.common.database.model.Comment;
 import ir.asparsa.hobbytaste.database.DatabaseHelper;
 import ir.asparsa.hobbytaste.database.model.CommentModel;
@@ -29,64 +28,23 @@ public class CommentDao extends AbsDao<CommentModel, Integer> {
         return CommentModel.class;
     }
 
-    public Observable<List<CommentModel>> queryComments(
+    public Observable<Comments> queryComments(
             final long offset,
             final long limit,
             final long storeId
     ) {
-        return Observable.create(new Observable.OnSubscribe<List<CommentModel>>() {
-            @Override public void call(final Subscriber<? super List<CommentModel>> subscriber) {
+        return Observable.create(new Observable.OnSubscribe<Comments>() {
+            @Override public void call(final Subscriber<? super Comments> subscriber) {
                 try {
-                    subscriber.onNext(
-                            getDao().query(
-                                    getDao().queryBuilder()
-                                            .offset(offset)
-                                            .limit(limit)
-                                            .orderBy(Comment.Columns.CREATED, false)
-                                            .where()
-                                            .eq(Comment.Columns.STORE, storeId)
-                                            .prepare()));
-
-                    subscriber.onCompleted();
-                } catch (Exception e) {
-                    subscriber.onError(e);
-                }
-            }
-        });
-    }
-
-    public Observable<List<CommentModel>> queryComments(
-            final long storeId
-    ) {
-        return Observable.create(new Observable.OnSubscribe<List<CommentModel>>() {
-            @Override public void call(final Subscriber<? super List<CommentModel>> subscriber) {
-                try {
-                    subscriber.onNext(
-                            getDao().query(
-                                    getDao().queryBuilder()
-                                            .orderBy(Comment.Columns.CREATED, false)
-                                            .where()
-                                            .eq(Comment.Columns.STORE, storeId)
-                                            .prepare()));
-
-                    subscriber.onCompleted();
-                } catch (Exception e) {
-                    subscriber.onError(e);
-                }
-            }
-        });
-    }
-
-    public Observable<Long> countOf(final long storeId) {
-        return Observable.create(new Observable.OnSubscribe<Long>() {
-            @Override public void call(Subscriber<? super Long> subscriber) {
-                try {
-                    subscriber.onNext(getDao().countOf(
+                    List<CommentModel> comments = getDao().query(
                             getDao().queryBuilder()
-                                    .setCountOf(true)
+                                    .offset(offset)
+                                    .limit(limit)
+                                    .orderBy(Comment.Columns.CREATED, false)
                                     .where()
                                     .eq(Comment.Columns.STORE, storeId)
-                                    .prepare()));
+                                    .prepare());
+                    subscriber.onNext(new Comments(comments, getDao().countOf()));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);
@@ -125,4 +83,27 @@ public class CommentDao extends AbsDao<CommentModel, Integer> {
             }
         });
     }
+
+
+    public static class Comments {
+        private List<CommentModel> comments;
+        private long totalElements;
+
+        Comments(
+                List<CommentModel> comments,
+                long totalElement
+        ) {
+            this.comments = comments;
+            this.totalElements = totalElement;
+        }
+
+        public List<CommentModel> getComments() {
+            return comments;
+        }
+
+        public long getTotalElements() {
+            return totalElements;
+        }
+    }
+
 }

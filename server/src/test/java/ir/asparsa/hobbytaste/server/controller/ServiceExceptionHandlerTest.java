@@ -62,7 +62,8 @@ public class ServiceExceptionHandlerTest extends BaseControllerTest {
                 .parseFrom(result.getResponse().getContentAsByteArray());
         logger.info("Error dto: " + error);
         assertThat(error.getStatus()).isEqualTo(ResponseProto.Response.StatusType.ERROR);
-        assertThat(error.getDetailMessage()).isEqualTo("No JWT token found in request headers");
+        assertThat(error.getDetailMessage())
+                .isEqualTo("No JWT token found in request headers. /api/v1/user/username/" + hashCode);
         assertThat(error.getLocalizedMessage()).isEqualTo("Token is not found");
     }
 

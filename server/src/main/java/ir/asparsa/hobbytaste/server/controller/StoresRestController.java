@@ -4,6 +4,7 @@ import ir.asparsa.common.database.model.Comment;
 import ir.asparsa.common.net.dto.CommentProto;
 import ir.asparsa.common.net.dto.StoreProto;
 import ir.asparsa.common.net.path.StoreServicePath;
+import ir.asparsa.common.util.MapUtil;
 import ir.asparsa.hobbytaste.server.database.model.*;
 import ir.asparsa.hobbytaste.server.database.repository.*;
 import ir.asparsa.hobbytaste.server.exception.CommentNotFoundException;
@@ -26,10 +27,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.schedulers.Schedulers;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author hadi
@@ -66,8 +64,9 @@ import java.util.Optional;
         List<StoreLikeModel> storeLikes = storeLikeRepository.findByAccount(user.getAccount());
 
         StoreProto.Stores.Builder builder = StoreProto.Stores.newBuilder();
-        builder.setTotalElements(0);
-        for (StoreModel storeModel : storeRepository.findAll()) {
+        List<StoreModel> all = storeRepository.findAll();
+        builder.setTotalElements(all.size());
+        for (StoreModel storeModel : all) {
             boolean like = false;
             for (StoreLikeModel storeLike : storeLikes) {
                 if (storeLike.getStore().equals(storeModel)) {
@@ -77,6 +76,50 @@ import java.util.Optional;
             }
             builder.addStore(storeModel.convertToDto(like, storageService));
         }
+        return builder.build();
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    StoreProto.Stores readStores(
+            @RequestParam("latitude") double latitude,
+            @RequestParam("longitude") double longitude,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size,
+            @RequestParam(value = "locale", defaultValue = Strings.DEFAULT_LOCALE) String locale,
+            @AuthenticationPrincipal AuthenticatedUser user
+    ) {
+        logger.info("read stores request");
+
+        List<StoreLikeModel> storeLikes = storeLikeRepository.findByAccount(user.getAccount());
+
+        StoreProto.Stores.Builder builder = StoreProto.Stores.newBuilder();
+        List<StoreModel> all = storeRepository.findAll();
+        builder.setTotalElements(all.size());
+
+        if (all.size() < page * size) {
+            logger.debug("size is less than offset");
+            return builder.build();
+        }
+
+        List<StoreHolder> holders = new ArrayList<>();
+        for (StoreModel model : all) {
+            float distance = MapUtil.distFrom(latitude, longitude, model.getLat(), model.getLon());
+            holders.add(new StoreHolder(model, distance));
+        }
+
+        holders.sort((o1, o2) -> o1.distance == o2.distance ? 0 : (o1.distance > o2.distance ? 1 : -1));
+
+        for (StoreHolder holder : holders.subList(page * size, Math.min((page + 1) * size, holders.size()))) {
+            boolean like = false;
+            for (StoreLikeModel storeLike : storeLikes) {
+                if (storeLike.getStore().equals(holder.storeModel)) {
+                    like = true;
+                    break;
+                }
+            }
+            builder.addStore(holder.storeModel.convertToDto(like, storageService));
+        }
+
         return builder.build();
     }
 
@@ -96,7 +139,7 @@ import java.util.Optional;
         }
 
         logger.info("Store model about to save");
-        StoreModel storeModel = storeRepository.save(StoreModel.newInstance(store));
+        StoreModel storeModel = storeRepository.save(StoreModel.newInstance(store, user.getUsername()));
         logger.info("Store model saved");
         Collection<BannerModel> banners = new ArrayDeque<>();
         if (store.getBannerCount() != 0) {
@@ -290,13 +333,15 @@ import java.util.Optional;
     }
 
     private Optional<CommentModel> getCommentModel(
-            @PathVariable("commentHashCode") Long hashCode,
+            Long hashCode,
             StoreModel storeModel,
             String locale
     ) {
         Optional<CommentModel> commentModel = storeCommentRepository.findByHashCodeAndStore(hashCode, storeModel);
         if (!commentModel.isPresent()) {
-            throw new CommentNotFoundException("Comment not found", Strings.COMMENT_NOT_FOUND, locale);
+            throw new CommentNotFoundException(
+                    "Comment is not found with hash code " + hashCode + " in store " + storeModel,
+                    Strings.COMMENT_NOT_FOUND, locale);
         }
         return commentModel;
     }
@@ -307,7 +352,8 @@ import java.util.Optional;
     ) {
         Optional<StoreModel> storeModel = storeRepository.findByHashCode(hashCode);
         if (!storeModel.isPresent()) {
-            throw new StoreNotFoundException("Store not found", Strings.STORE_NOT_FOUND, locale);
+            throw new StoreNotFoundException(
+                    "Store is not found with hash code: " + hashCode, Strings.STORE_NOT_FOUND, locale);
         }
         return storeModel;
     }
@@ -362,5 +408,18 @@ import java.util.Optional;
             }
         }
         return like;
+    }
+
+    private static class StoreHolder {
+        StoreModel storeModel;
+        float distance;
+
+        StoreHolder(
+                StoreModel storeModel,
+                float distance
+        ) {
+            this.storeModel = storeModel;
+            this.distance = distance;
+        }
     }
 }

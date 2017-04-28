@@ -6,6 +6,7 @@ import ir.asparsa.hobbytaste.server.database.model.AccountModel;
 import ir.asparsa.hobbytaste.server.database.repository.AccountRepository;
 import ir.asparsa.hobbytaste.server.exception.EmptyUsernameException;
 import ir.asparsa.hobbytaste.server.exception.HashCodeExpiredException;
+import ir.asparsa.hobbytaste.server.exception.RepeatedUsernameException;
 import ir.asparsa.hobbytaste.server.resources.Strings;
 import ir.asparsa.hobbytaste.server.security.config.WebSecurityConfig;
 import ir.asparsa.hobbytaste.server.security.model.AuthenticatedUser;
@@ -88,6 +89,11 @@ import java.util.Random;
             throw new EmptyUsernameException("Username is empty", Strings.USERNAME_IS_EMPTY, locale);
         }
         logger.debug("username: " + username);
+        Optional<AccountModel> foundAccount = accountRepository.findByUsername(username);
+        if (foundAccount.isPresent()) {
+            throw new RepeatedUsernameException("Username is repeated", Strings.USERNAME_IS_REPEATED, locale);
+        }
+
         AccountModel account = user.getAccount();
 
         account.setUsername(username);
@@ -101,33 +107,41 @@ import java.util.Random;
     }
 
     private String generateUsername() {
-        List<Integer> list = new ArrayList<>();
-        for (char ch = '0'; ch <= '9'; ++ch)
-            list.add((int) ch);
-        for (char ch = 'a'; ch <= 'z'; ++ch)
-            list.add((int) ch);
-        for (char ch = 'A'; ch <= 'Z'; ++ch)
-            list.add((int) ch);
-        list.add(0x1F600);
+        String username;
+        Optional<AccountModel> account;
+        do {
+            List<Integer> list = new ArrayList<>();
+            for (char ch = '0'; ch <= '9'; ++ch)
+                list.add((int) ch);
+            for (char ch = 'a'; ch <= 'z'; ++ch)
+                list.add((int) ch);
+            for (char ch = 'A'; ch <= 'Z'; ++ch)
+                list.add((int) ch);
+            list.add(0x1F600);
 
-        list.add(0x1F600);
-        list.add(0x1F601);
-        list.add(0x1F602);
-        list.add(0x1F603);
-        list.add(0x1F604);
-        list.add(0x1F606);
-        list.add(0x1F609);
-        list.add(0x1F60A);
-        list.add(0x1F60E);
-        list.add(0x1F913);
+            list.add(0x1F600);
+            list.add(0x1F601);
+            list.add(0x1F602);
+            list.add(0x1F603);
+            list.add(0x1F604);
+            list.add(0x1F606);
+            list.add(0x1F609);
+            list.add(0x1F60A);
+            list.add(0x1F60E);
+            list.add(0x1F913);
 
-        Random random = new Random();
-        StringBuilder tmp = new StringBuilder();
+            Random random = new Random();
+            StringBuilder tmp = new StringBuilder();
 
-        for (int idx = 0; idx < 8; ++idx)
-            tmp.appendCodePoint(list.get(random.nextInt(list.size())));
+            for (int idx = 0; idx < 8; ++idx)
+                tmp.appendCodePoint(list.get(random.nextInt(list.size())));
 
-        return tmp.toString();
+            username = tmp.toString();
+
+            account = accountRepository.findByUsername(username);
+        } while (account.isPresent());
+
+        return username;
     }
 
 

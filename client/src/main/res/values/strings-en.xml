@@ -24,6 +24,8 @@
     <string name="finish">Finish</string>
     <string name="send">send</string>
 
+    <string name="menu_share">Share</string>
+
     <string name="comment_title">Comment</string>
     <string name="comment_hint">Please insert your comment here</string>
     <string name="comment_is_empty">Comment is empty</string>

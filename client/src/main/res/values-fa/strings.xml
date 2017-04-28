@@ -23,6 +23,8 @@
     <string name="finish">اتمام</string>
     <string name="send">بفرست</string>
 
+    <string name="menu_share">اشتراک</string>
+
     <string name="comment_title">نظر</string>
     <string name="comment_hint">لطفا نظر خود را وارد نمایید</string>
     <string name="comment_is_empty">نظر شما خالی است</string>

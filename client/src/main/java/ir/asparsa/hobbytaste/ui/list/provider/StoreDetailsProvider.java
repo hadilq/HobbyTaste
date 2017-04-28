@@ -25,13 +25,13 @@ import java.util.*;
  * @author hadi
  * @since 12/7/2016 AD
  */
-public class StoreDetailsProvider extends AbsListProvider implements Observer<Collection<CommentModel>> {
+public class StoreDetailsProvider extends AbsListProvider implements Observer<CommentManager.CommentsResult> {
 
     @Inject
     CommentManager mCommentManager;
 
     private final StoreModel mStore;
-    private CompositeSubscription mSubscription = new CompositeSubscription();
+    private final CompositeSubscription mSubscription = new CompositeSubscription();
 
     public StoreDetailsProvider(
             @NonNull RecyclerListAdapter adapter,
@@ -48,8 +48,8 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
             headers.add(new GalleryData(mStore.getBanners()));
         }
         headers.add(new RatingData(mStore.getRate(), mStore.getViewed(), mStore.getDescription(),
-                                   mStore.isLiked()));
-        mOnInsertData.OnDataInserted(new DataObserver() {
+                                   mStore.isLiked(), mStore.getCreator()));
+        mOnInsertData.OnDataInserted(new DataObserver(headers.size()) {
             @Override public void onCompleted() {
                 for (; index < headers.size(); index++) {
                     deque.add(headers.get(index));
@@ -75,7 +75,6 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
     }
 
     @Override public void onCompleted() {
-
     }
 
     @Override public void onError(Throwable e) {
@@ -83,7 +82,8 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
         mOnInsertData.onError(e.getLocalizedMessage());
     }
 
-    @Override public void onNext(final Collection<CommentModel> collection) {
+    @Override public void onNext(final CommentManager.CommentsResult result) {
+        Collection<CommentModel> collection = result.getComments();
         L.i(getClass(), "Collection of comments" + collection);
         for (CommentModel commentModel : collection) {
             if (commentModel.getStoreId() != mStore.getId()) {
@@ -102,7 +102,7 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
             }
         });
 
-        final DataObserver dataHolder = new DataObserver() {
+        final DataObserver dataHolder = new DataObserver(result.getTotalElements()) {
             @Override public void onCompleted() {
                 for (; index < listModel.size(); index++) {
                     deque.add(new CommentData(listModel.get(index)));
@@ -148,7 +148,6 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
         };
 
         mOnInsertData.OnDataInserted(dataHolder);
-
     }
 
     public void addComment(CommentModel comment) {

@@ -21,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @author hadi
@@ -40,9 +39,9 @@ public class StoresManager {
     @Inject StoresManager() {
     }
 
-    private Observable<List<StoreModel>> getStoresObservable() {
+    private Observable<StoreDao.Stores> getStoresObservable(Constraint constraint) {
         return mStoreDao
-                .queryAllStores(mBannerDao)
+                .queryStores(constraint.latitude, constraint.longitude, constraint.offset, constraint.limit, mBannerDao)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -53,9 +52,11 @@ public class StoresManager {
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private Observable<StoreProto.Stores> getLoadServiceObservable() {
+    private Observable<StoreProto.Stores> getLoadServiceObservable(Constraint constraint) {
         return mStoreService
-                .loadStoreModels()
+                .loadStoreModels(
+                        constraint.latitude, constraint.longitude,
+                        (int) (constraint.getOffset() / constraint.getLimit()), constraint.getLimit())
                 .retry(5)
                 .subscribeOn(Schedulers.newThread());
     }
@@ -85,9 +86,9 @@ public class StoresManager {
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private Observable<Collection<StoreModel>> getLoadErrorObservable(final Throwable e) {
-        return Observable.create(new Observable.OnSubscribe<Collection<StoreModel>>() {
-            @Override public void call(Subscriber<? super Collection<StoreModel>> subscriber) {
+    private Observable<SoresResult> getLoadErrorObservable(final Throwable e) {
+        return Observable.create(new Observable.OnSubscribe<SoresResult>() {
+            @Override public void call(Subscriber<? super SoresResult> subscriber) {
                 subscriber.onError(e);
             }
         }).observeOn(AndroidSchedulers.mainThread());
@@ -102,24 +103,33 @@ public class StoresManager {
         }).observeOn(AndroidSchedulers.mainThread());
     }
 
-    private void requestServer(Observer<Collection<StoreModel>> observer) {
-        getLoadServiceObservable()
+    private void requestServer(
+            Constraint constraint,
+            Observer<SoresResult> observer
+    ) {
+        getLoadServiceObservable(constraint)
                 .subscribe(onLoadObserver(observer));
     }
 
-    private void loadFromDatabase(Observer<Collection<StoreModel>> observer) {
-        getStoresObservable()
+    private void loadFromDatabase(
+            Constraint constraint,
+            Observer<SoresResult> observer
+    ) {
+        getStoresObservable(constraint)
                 .subscribe(getLoadObserver(observer));
     }
 
-    public Subscription loadStores(Observer<Collection<StoreModel>> observer) {
-        Subject<Collection<StoreModel>, Collection<StoreModel>> subject = new SerializedSubject<>(
-                PublishSubject.<Collection<StoreModel>>create());
+    public Subscription loadStores(
+            Constraint constraint,
+            Observer<SoresResult> observer
+    ) {
+        Subject<SoresResult, SoresResult> subject = new SerializedSubject<>(
+                PublishSubject.<SoresResult>create());
         Subscription subscribe = subject.subscribe(observer);
 
-        loadFromDatabase(subject);
+        loadFromDatabase(constraint, subject);
 
-        requestServer(subject);
+        requestServer(constraint, subject);
 
         return subscribe;
     }
@@ -213,8 +223,8 @@ public class StoresManager {
         };
     }
 
-    private Observer<? super List<StoreModel>> getLoadObserver(final Observer<Collection<StoreModel>> observer) {
-        return new Observer<List<StoreModel>>() {
+    private Observer<? super StoreDao.Stores> getLoadObserver(final Observer<SoresResult> observer) {
+        return new Observer<StoreDao.Stores>() {
             @Override public void onCompleted() {
                 // Don't call observer's on completed method
             }
@@ -223,8 +233,8 @@ public class StoresManager {
                 observer.onError(e);
             }
 
-            @Override public void onNext(List<StoreModel> storeModels) {
-                observer.onNext(storeModels);
+            @Override public void onNext(StoreDao.Stores stores) {
+                observer.onNext(new SoresResult(stores.getStores(), stores.getTotalElements()));
             }
         };
     }
@@ -269,7 +279,7 @@ public class StoresManager {
     }
 
 
-    private Observer<StoreProto.Stores> onLoadObserver(final Observer<Collection<StoreModel>> observer) {
+    private Observer<StoreProto.Stores> onLoadObserver(final Observer<SoresResult> observer) {
         return new Observer<StoreProto.Stores>() {
             @Override public void onCompleted() {
                 L.i(StoresManager.class, "Refresh request gets completed");
@@ -291,13 +301,15 @@ public class StoresManager {
                 }
                 mStoreDao.createAll(mBannerDao, collection)
                          .subscribeOn(AndroidSchedulers.mainThread())
-                         .subscribe(onFinishObserver(observer));
+                         .subscribe(onFinishObserver(observer, collection, stores.getTotalElements()));
             }
         };
     }
 
     private Observer<? super Collection<StoreModel>> onFinishObserver(
-            final Observer<Collection<StoreModel>> observer
+            final Observer<SoresResult> observer,
+            final Collection<StoreModel> stores,
+            final long totalElements
     ) {
         return new Observer<Collection<StoreModel>>() {
             @Override public void onCompleted() {
@@ -310,10 +322,65 @@ public class StoresManager {
 
             @Override public void onNext(Collection<StoreModel> list) {
                 L.i(StoresManager.class, "Stores completely saved");
-                observer.onNext(list);
+                observer.onNext(new SoresResult(stores, totalElements));
             }
         };
     }
 
+    public static class Constraint {
+        private double latitude;
+        private double longitude;
+        private int offset;
+        private int limit;
+
+        public Constraint(
+                double latitude,
+                double longitude,
+                int offset,
+                int limit
+        ) {
+            this.latitude = latitude;
+            this.longitude = longitude;
+            this.offset = offset;
+            this.limit = limit;
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public long getOffset() {
+            return offset;
+        }
+
+        public int getLimit() {
+            return limit;
+        }
+    }
+
+    public static class SoresResult {
+        private Collection<StoreModel> stores;
+        private long totalElements;
+
+        SoresResult(
+                Collection<StoreModel> stores,
+                long totalElement
+        ) {
+            this.stores = stores;
+            this.totalElements = totalElement;
+        }
+
+        public Collection<StoreModel> getStores() {
+            return stores;
+        }
+
+        public long getTotalElements() {
+            return totalElements;
+        }
+    }
 
 }

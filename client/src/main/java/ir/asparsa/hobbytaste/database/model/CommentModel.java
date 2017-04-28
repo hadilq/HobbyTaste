@@ -168,20 +168,22 @@ public class CommentModel extends BaseModel implements Parcelable {
             Parcel dest,
             int flags
     ) {
-        dest.writeLong(this.id);
+        dest.writeValue(this.id);
         dest.writeString(this.description);
         dest.writeLong(this.rate);
         dest.writeByte(this.liked ? (byte) 1 : (byte) 0);
+        dest.writeString(this.creator);
         dest.writeLong(this.created);
         dest.writeLong(this.storeId);
         dest.writeLong(this.hashCode);
     }
 
     protected CommentModel(Parcel in) {
-        this.id = in.readLong();
+        this.id = (Long) in.readValue(Long.class.getClassLoader());
         this.description = in.readString();
         this.rate = in.readLong();
         this.liked = in.readByte() != 0;
+        this.creator = in.readString();
         this.created = in.readLong();
         this.storeId = in.readLong();
         this.hashCode = in.readLong();

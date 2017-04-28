@@ -4,60 +4,37 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
-import android.widget.TextView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.*;
+import com.google.android.gms.maps.model.CameraPosition;
 import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
-import ir.asparsa.android.ui.view.DialogControlLayout;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
+import ir.asparsa.hobbytaste.ui.mvp.holder.AddStoreViewHolder;
+import ir.asparsa.hobbytaste.ui.mvp.presenter.AddStorePresenter;
 
 /**
  * @author hadi
  * @since 1/15/2017 AD.
  */
-public class AddStoreContentFragment extends BaseContentFragment implements OnMapReadyCallback {
+public class AddStoreContentFragment extends BaseContentFragment {
 
     public static final String BUNDLE_KEY_DIALOG_RESULT_EVENT = "BUNDLE_KEY_DIALOG_RESULT_EVENT";
-    private static final String BUNDLE_KEY_STORE = "BUNDLE_KEY_STORE";
-    private static final String BUNDLE_KEY_LAT_LNG = "BUNDLE_KEY_LAT_LNG";
-    private static final String BUNDLE_KEY_CAMERA_POSITION = "BUNDLE_KEY_CAMERA_POSITION";
+    public static final String EVENT_KEY_START_NEXT = "EVENT_KEY_START_NEXT";
 
-    @BindView(R.id.input_layout_store_name)
-    TextInputLayout mStoreNameInputLayout;
-    @BindView(R.id.store_name)
-    EditText mStoreNameEditText;
-    @BindView(R.id.input_layout_store_description)
-    TextInputLayout mStoreDescriptionInputLayout;
-    @BindView(R.id.store_description)
-    EditText mStoreDescriptionEditText;
-    @BindView(R.id.controller)
-    DialogControlLayout mController;
-
-    private GoogleMap mMap;
-    private LatLng mLatlng;
+    private AddStoreViewHolder mHolder;
+    private AddStorePresenter mPresenter;
 
     public static AddStoreContentFragment instantiate(
             @NonNull CameraPosition cameraPosition,
             @NonNull StoreSaveResultEvent event
     ) {
         Bundle bundle = new Bundle();
-        bundle.putParcelable(BUNDLE_KEY_CAMERA_POSITION, cameraPosition);
+        bundle.putParcelable(AddStorePresenter.BUNDLE_KEY_CAMERA_POSITION, cameraPosition);
         bundle.putParcelable(BUNDLE_KEY_DIALOG_RESULT_EVENT, event);
         AddStoreContentFragment fragment = new AddStoreContentFragment();
         fragment.setArguments(bundle);
@@ -70,47 +47,8 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
             @Nullable Bundle savedInstanceState
     ) {
         View view = inflater.inflate(R.layout.add_store_content_fragment, container, false);
-        ButterKnife.bind(this, view);
-
-        StoreModel store = getArguments().getParcelable(BUNDLE_KEY_STORE);
-        if (store != null) {
-            mLatlng = new LatLng(store.getLat(), store.getLon());
-            setMarker(mLatlng);
-        }
-
-        mStoreDescriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(
-                    TextView v,
-                    int actionId,
-                    KeyEvent event
-            ) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    actionGoToNext(
-                            mLatlng,
-                            mStoreNameEditText.getText().toString(),
-                            mStoreDescriptionEditText.getText().toString());
-                }
-                return false;
-            }
-        });
-
-        mController.setCommitText(getString(R.string.next))
-                   .arrange();
-        mController.setOnControlListener(new DialogControlLayout.OnControlListener() {
-            @Override public void onCommit() {
-                actionGoToNext(
-                        mLatlng,
-                        mStoreNameEditText.getText().toString(),
-                        mStoreDescriptionEditText.getText().toString());
-            }
-
-            @Override public void onNeutral() {
-            }
-
-            @Override public void onCancel() {
-            }
-        });
+        mPresenter = new AddStorePresenter(getDelegate());
+        mHolder = new AddStoreViewHolder(view, mPresenter);
 
         return view;
     }
@@ -127,20 +65,16 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
                                      .replace(R.id.content_nested, mapFragment)
                                      .commit();
         }
-        mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync(mHolder);
     }
 
     @Override public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        LatLng latLng = getArguments().getParcelable(BUNDLE_KEY_LAT_LNG);
-        if (latLng != null) {
-            setMarker(latLng);
-        }
+        mPresenter.bindView(mHolder);
     }
 
     @Override public void onDestroyView() {
-        getArguments().putParcelable(BUNDLE_KEY_LAT_LNG, mLatlng);
-        getArguments().putParcelable(BUNDLE_KEY_CAMERA_POSITION, mMap.getCameraPosition());
+        mPresenter.unbindView();
         super.onDestroyView();
     }
 
@@ -148,57 +82,25 @@ public class AddStoreContentFragment extends BaseContentFragment implements OnMa
         return getString(R.string.title_add_store);
     }
 
-    @Override public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override public void onMapClick(LatLng latLng) {
-                setMarker(latLng);
-            }
-        });
-        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(
-                getArguments().<CameraPosition>getParcelable(BUNDLE_KEY_CAMERA_POSITION)));
+    @Override public boolean hasHomeAsUp() {
+        return true;
     }
 
-    private void setMarker(@NonNull LatLng latLng) {
-        mMap.clear();
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.placeholder);
-        mMap.addMarker(
-                new MarkerOptions()
-                        .position(latLng)
-                        .icon(icon));
-        mLatlng = latLng;
+    @Override protected void onEvent(
+            String event,
+            Object... data
+    ) {
+        if (EVENT_KEY_START_NEXT.equals(event) && data != null && data.length == 1 &&
+            data[0] instanceof StoreModel) {
+            actionGoToNext((StoreModel) data[0]);
+        }
     }
 
     private void actionGoToNext(
-            LatLng latLng,
-            String storeName,
-            String storeDescription
+            StoreModel store
     ) {
-        if (latLng == null) {
-            mStoreNameInputLayout.setError(getString(R.string.new_store_marker_empty));
-            return;
-        }
-        if (TextUtils.isEmpty(storeName)) {
-            mStoreNameInputLayout.setError(getString(R.string.new_store_name_empty));
-            return;
-        }
-        if (TextUtils.isEmpty(storeDescription)) {
-            mStoreDescriptionInputLayout.setError(getString(R.string.new_store_description_empty));
-            return;
-        }
-        mStoreNameInputLayout.setError("");
-        mStoreDescriptionInputLayout.setError("");
-        StoreModel store = new StoreModel(latLng.latitude, latLng.longitude, storeName, storeDescription);
-        getArguments().putParcelable(BUNDLE_KEY_STORE, store);
-
-        AddStoreContentFragment.StoreSaveResultEvent
-                event = getArguments().getParcelable(BUNDLE_KEY_DIALOG_RESULT_EVENT);
-        NavigationUtil.startContentFragment(getFragmentManager(), AddBannerContentFragment.instantiate(
-                event, store));
-    }
-
-    @Override public boolean hasHomeAsUp() {
-        return true;
+        StoreSaveResultEvent event = getArguments().getParcelable(BUNDLE_KEY_DIALOG_RESULT_EVENT);
+        NavigationUtil.startContentFragment(getFragmentManager(), AddBannerContentFragment.instantiate(event, store));
     }
 
     public static class StoreSaveResultEvent extends BaseDialogFragment.BaseOnDialogResultEvent {

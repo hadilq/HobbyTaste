@@ -12,17 +12,23 @@ import com.google.android.gms.maps.model.*;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.list.data.StoreMapData;
 import rx.functions.Action1;
 
+import javax.inject.Inject;
+
 /**
  * @author hadi
  * @since 12/7/2016 AD
  */
 public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements OnMapReadyCallback {
+
+    @Inject
+    MapUtil mMapUtil;
 
     @BindView(R.id.map)
     MapView mMapView;
@@ -38,6 +44,7 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
             Bundle savedInstanceState
     ) {
         super(itemView, observer, savedInstanceState);
+        ApplicationLauncher.mainComponent().inject(this);
         ButterKnife.bind(this, itemView);
 
         // TODO why savedInstanceState is not working here?
@@ -76,7 +83,7 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
             if (!mIsCameraMovedBefore) {
                 mIsCameraMovedBefore = true;
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                MapUtil.zoom(mMap, latLng);
+                mMapUtil.zoom(mMap, latLng);
             }
         }
     }

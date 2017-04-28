@@ -22,6 +22,8 @@ message Store {
      int64 created = 9;
 
      repeated Banner banner = 10;
+
+     string creator = 11;
 }
 
 message Banner {

@@ -30,6 +30,7 @@ public class StorageServiceTest {
         storagePropertiesMock = Mockito.mock(StorageProperties.class);
         when(storagePropertiesMock.getLocation()).thenReturn("/some-dir");
         when(storagePropertiesMock.getTmpLocation()).thenReturn("/some-tmp-dir");
+        when(storagePropertiesMock.getTrashLocation()).thenReturn("/some-trash-dir");
         when(serverPropertiesMock.getScheme()).thenReturn("http");
         when(serverPropertiesMock.getServerAddress()).thenReturn("domain.com");
         storageService = new FileSystemStorageService(serverPropertiesMock, storagePropertiesMock);

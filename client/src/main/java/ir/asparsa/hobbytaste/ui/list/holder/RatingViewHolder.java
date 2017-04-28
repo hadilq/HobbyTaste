@@ -39,6 +39,10 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
     ImageView mRateTailImageView;
     @BindView(R.id.viewed_tail)
     ImageView mViewedTailImageView;
+    @BindView(R.id.toggle)
+    ViewGroup mToogle;
+    @BindView(R.id.store_creator)
+    TextView mCreatorTextView;
 
     private final Drawable mUpArrow;
     private final Drawable mDownArrow;
@@ -80,13 +84,14 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
             }
         });
 
+        mDescriptionTextView.setText(data.getDescription());
+        mCreatorTextView.setText(data.getCreator());
         if (data.isShowDescription()) {
             mArrowImageView.setImageDrawable(mUpArrow);
-            mDescriptionTextView.setVisibility(View.VISIBLE);
-            mDescriptionTextView.setText(data.getDescription());
+            mToogle.setVisibility(View.VISIBLE);
         } else {
             mArrowImageView.setImageDrawable(mDownArrow);
-            mDescriptionTextView.setVisibility(View.GONE);
+            mToogle.setVisibility(View.GONE);
         }
         mDashboardView.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {

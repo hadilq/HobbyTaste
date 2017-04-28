@@ -33,6 +33,8 @@ public class StoreModel implements Serializable {
     private long hashCode;
     @Column(name = Store.Columns.CREATED)
     private long created;
+    @Column(name = Store.Columns.CREATOR)
+    private String creator;
     @Column(name = Store.Columns.VIEWED)
     private long viewed;
     @Column(name = Store.Columns.RATE)
@@ -46,7 +48,10 @@ public class StoreModel implements Serializable {
     StoreModel() {
     }
 
-    public static StoreModel newInstance(StoreProto.Store store) {
+    public static StoreModel newInstance(
+            StoreProto.Store store,
+            String creator
+    ) {
         StoreModel storeModel = new StoreModel();
         storeModel.lat = store.getLat();
         storeModel.lon = store.getLon();
@@ -54,6 +59,7 @@ public class StoreModel implements Serializable {
         storeModel.description = store.getDescription();
         storeModel.hashCode = store.getHashCode();
         storeModel.created = System.currentTimeMillis();
+        storeModel.creator = creator;
         return storeModel;
     }
 
@@ -71,7 +77,8 @@ public class StoreModel implements Serializable {
                 .setLike(like)
                 .setDescription(description)
                 .setHashCode(hashCode)
-                .setCreated(created);
+                .setCreated(created)
+                .setCreator(creator);
         if (this.banners != null && this.banners.size() != 0) {
             for (BannerModel banner : this.banners) {
                 builder.addBanner(StoreProto.Banner
@@ -110,6 +117,10 @@ public class StoreModel implements Serializable {
 
     public long getCreated() {
         return created;
+    }
+
+    public String getCreator() {
+        return creator;
     }
 
     public long getViewed() {
@@ -156,6 +167,10 @@ public class StoreModel implements Serializable {
                ", lon=" + lon +
                ", title='" + title + '\'' +
                ", description='" + description + '\'' +
+               ", hashCode=" + hashCode +
+               ", created=" + created +
+               ", creator='" + creator + '\'' +
+               ", viewed=" + viewed +
                ", rate=" + rate +
                ", banners=" + banners +
                '}';
