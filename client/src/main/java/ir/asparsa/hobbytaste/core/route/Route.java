@@ -1,5 +1,7 @@
 package ir.asparsa.hobbytaste.core.route;
 
+import android.content.res.Resources;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import ir.asparsa.hobbytaste.ui.fragment.content.BaseContentFragment;
@@ -21,4 +23,9 @@ public interface Route {
     BaseContentFragment getFragment();
 
     boolean isAlwaysBellow();
+
+    @NonNull Uri.Builder addPath(
+            @NonNull Uri.Builder builder,
+            @NonNull Resources resources
+    );
 }

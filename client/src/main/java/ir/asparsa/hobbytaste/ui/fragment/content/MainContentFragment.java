@@ -1,21 +1,29 @@
 package ir.asparsa.hobbytaste.ui.fragment.content;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import com.google.android.gms.maps.SupportMapFragment;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
+import ir.asparsa.hobbytaste.core.route.PlaceRoute;
+import ir.asparsa.hobbytaste.core.route.RouteFactory;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.mvp.holder.MainContentViewHolder;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.StorePresenter;
 import ir.asparsa.hobbytaste.ui.wrapper.WMap;
+
+import javax.inject.Inject;
 
 /**
  * @author hadi
@@ -24,6 +32,9 @@ import ir.asparsa.hobbytaste.ui.wrapper.WMap;
 public class MainContentFragment extends BaseContentFragment {
 
     public static final String EVENT_KEY_INSTANTIATE_STORE_DETAIL = "EVENT_KEY_INSTANTIATE_STORE_DETAIL";
+
+    @Inject
+    RouteFactory mRouteFactory;
 
     private MainContentViewHolder mHolder;
     private StorePresenter mPresenter;
@@ -37,6 +48,7 @@ public class MainContentFragment extends BaseContentFragment {
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
+        setHasOptionsMenu(true);
         mPresenter = new StorePresenter(getDelegate());
         mHolder = new MainContentViewHolder(mPresenter);
     }
@@ -64,6 +76,32 @@ public class MainContentFragment extends BaseContentFragment {
     @Override public void onDestroyView() {
         mPresenter.unbindView();
         super.onDestroyView();
+    }
+
+    @Override public void onCreateOptionsMenu(
+            Menu menu,
+            MenuInflater inflater
+    ) {
+        inflater.inflate(R.menu.menu_share, menu);
+        MenuItem share = menu.findItem(R.id.share);
+        share.getIcon().mutate()
+             .setColorFilter(getResources().getColor(R.color.background), PorterDuff.Mode.SRC_ATOP);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.share:
+                Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                sendIntent.putExtra(
+                        Intent.EXTRA_TEXT,
+                        getString(R.string.share_link)
+                );
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override protected String setHeaderTitle() {
@@ -107,11 +145,13 @@ public class MainContentFragment extends BaseContentFragment {
     }
 
     private void instantiateStoreDetail(@NonNull StoreModel storeModel) {
-        getActivity().startActivity(new Intent(Intent.ACTION_VIEW, new Uri.Builder()
-                .scheme(getString(R.string.scheme_free))
-                .authority(getString(R.string.host_map))
-                .appendPath(getString(R.string.path_segment_place))
-                .appendPath(Long.toString(storeModel.getHashCode()))
-                .build()));
+        Uri.Builder uriBuilder = mRouteFactory.getInternalUriBuilder(getResources(), PlaceRoute.class);
+        if (uriBuilder == null) {
+            return;
+        }
+        startActivity(new Intent(
+                Intent.ACTION_VIEW,
+                uriBuilder.appendPath(Long.toString(storeModel.getHashCode())).build()
+        ));
     }
 }

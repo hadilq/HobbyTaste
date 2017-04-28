@@ -7,10 +7,16 @@
     <string name="english"
             translatable="false">English</string>
 
+    <string name="share_link"
+            translatable="false">https://play.google.com/store/apps/details?id=ir.asparsa.hobbytaste</string>
     <string name="scheme_free"
             translatable="false">free</string>
     <string name="host_map"
             translatable="false">map</string>
+    <string name="scheme_http"
+            translatable="false">http</string>
+    <string name="host_free_map"
+            translatable="false">free-map</string>
     <string name="path_segment_main"
             translatable="false">main</string>
     <string name="path_segment_settings"

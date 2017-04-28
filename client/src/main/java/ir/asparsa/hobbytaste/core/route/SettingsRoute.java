@@ -1,6 +1,7 @@
 package ir.asparsa.hobbytaste.core.route;
 
 import android.content.res.Resources;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import ir.asparsa.hobbytaste.R;
@@ -39,5 +40,12 @@ public class SettingsRoute implements Route {
 
     @Override public boolean isAlwaysBellow() {
         return true;
+    }
+
+    @NonNull @Override public Uri.Builder addPath(
+            @NonNull Uri.Builder builder,
+            @NonNull Resources resources
+    ) {
+        return builder.appendPath(resources.getString(R.string.path_segment_settings));
     }
 }

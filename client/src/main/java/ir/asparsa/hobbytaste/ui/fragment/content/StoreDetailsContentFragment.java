@@ -1,23 +1,36 @@
 package ir.asparsa.hobbytaste.ui.fragment.content;
 
+import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
+import ir.asparsa.hobbytaste.core.route.PlaceRoute;
+import ir.asparsa.hobbytaste.core.route.RouteFactory;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.CommentDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.StoreDetailsRecyclerFragment;
+
+import javax.inject.Inject;
 
 /**
  * @author hadi
  * @since 12/2/2016 AD
  */
 public class StoreDetailsContentFragment extends BaseContentFragment {
+
+    @Inject
+    RouteFactory mRouteFactory;
 
     public static StoreDetailsContentFragment instantiate(StoreModel store) {
 
@@ -28,9 +41,11 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
         return fragment;
     }
 
+
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
+        setHasOptionsMenu(true);
     }
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -44,6 +59,37 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
                     StoreDetailsRecyclerFragment.instantiate(new Bundle(getArguments()))
             );
         }
+    }
+
+    @Override public void onCreateOptionsMenu(
+            Menu menu,
+            MenuInflater inflater
+    ) {
+        inflater.inflate(R.menu.menu_share, menu);
+        MenuItem share = menu.findItem(R.id.share);
+        share.getIcon().mutate()
+             .setColorFilter(getResources().getColor(R.color.background), PorterDuff.Mode.SRC_ATOP);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.share:
+                Uri.Builder uriBuilder = mRouteFactory.getShareUriBuilder(getResources(), PlaceRoute.class);
+                StoreModel store = getArguments().getParcelable(StoreDetailsRecyclerFragment.BUNDLE_KEY_STORE);
+                if (uriBuilder == null || store == null) {
+                    return true;
+                }
+                Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                sendIntent.putExtra(
+                        Intent.EXTRA_TEXT,
+                        uriBuilder.appendPath(Long.toString(store.getHashCode())).build().toString()
+                );
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override protected String setHeaderTitle() {

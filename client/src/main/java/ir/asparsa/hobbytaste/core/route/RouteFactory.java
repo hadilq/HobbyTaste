@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
+import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import ir.asparsa.hobbytaste.ui.adapter.NavigationAdapter;
 import ir.asparsa.hobbytaste.ui.fragment.ContainerFragment;
@@ -151,6 +152,40 @@ public class RouteFactory {
             mRouts = new WeakReference<>(routes);
         }
         return routes;
+    }
+
+    @Nullable
+    public Uri.Builder getInternalUriBuilder(
+            @NonNull Resources resources,
+            @NonNull Class<? extends Route> clazz
+    ) {
+        return completeUri(resources, clazz, new Uri.Builder()
+                .scheme(resources.getString(R.string.scheme_free))
+                .authority(resources.getString(R.string.host_map)));
+    }
+
+    @Nullable
+    public Uri.Builder getShareUriBuilder(
+            @NonNull Resources resources,
+            @NonNull Class<? extends Route> clazz
+    ) {
+        return completeUri(resources, clazz, new Uri.Builder()
+                .scheme(resources.getString(R.string.scheme_http))
+                .authority(resources.getString(R.string.host_free_map)));
+    }
+
+    @Nullable
+    private Uri.Builder completeUri(
+            @NonNull Resources resources,
+            @NonNull Class<? extends Route> clazz,
+            @NonNull Uri.Builder uriBuilder
+    ) {
+        for (Route route : generateRoutes(resources)) {
+            if (clazz.equals(route.getClass())) {
+                return route.addPath(uriBuilder, resources);
+            }
+        }
+        return null;
     }
 
     public int pageToPos(int page) {

@@ -42,8 +42,11 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
 
                 <data
-                        android:scheme="free"
-                        android:host="map"/>
+                        android:scheme="@string/scheme_free"
+                        android:host="@string/host_map"/>
+                <data
+                        android:scheme="@string/scheme_http"
+                        android:host="@string/host_free_map"/>
             </intent-filter>
         </activity>
         <activity
