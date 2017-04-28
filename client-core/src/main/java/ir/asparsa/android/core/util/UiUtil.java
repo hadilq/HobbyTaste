@@ -35,7 +35,7 @@ public class UiUtil {
                 L.i(UiUtil.class, "Find base fragment to send event: " + fragment.getClass().getName());
                 ((BaseFragment) fragment).onEvent(event);
                 break;
-            } else if (popBackStack) {
+            } else if (popBackStack && fragment != null) {
                 try {
                     fragmentManager.popBackStack(fragment.getTag(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 } catch (Exception e) {
