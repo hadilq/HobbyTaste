@@ -89,7 +89,10 @@
     <RelativeLayout
             android:id="@+id/toggle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/horizontal_margin"
+            android:layout_marginEnd="@dimen/horizontal_margin"
+            android:layout_marginBottom="@dimen/vertical_margin">
 
         <TextView
                 android:id="@+id/store_creator"
@@ -97,9 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentStart="true"
-                android:layout_marginStart="@dimen/horizontal_margin"
-                android:layout_marginEnd="@dimen/horizontal_margin"
-                android:layout_marginBottom="@dimen/vertical_margin"
+                android:layout_marginBottom="@dimen/vertical_margin_quarter"
                 android:textColor="@color/text_hint"
                 android:textSize="@dimen/font_size_small"/>
 
@@ -109,9 +110,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/store_creator"
                 android:layout_alignParentStart="true"
-                android:layout_marginStart="@dimen/horizontal_margin"
-                android:layout_marginEnd="@dimen/horizontal_margin"
-                android:layout_marginBottom="@dimen/vertical_margin"
                 android:textColor="@color/text"
                 android:textSize="@dimen/font_size_small"/>
     </RelativeLayout>
