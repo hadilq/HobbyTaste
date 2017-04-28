@@ -39,8 +39,7 @@ android {
             signingConfig signingConfigs.config
         }
         release {
-            multiDexEnabled true
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }
@@ -69,11 +68,11 @@ android {
     }
 }
 
-android.variantFilter { variant ->
-    if (variant.buildType.name == 'release' && variant.getFlavors().get(0).name == 'develop') {
-        variant.setIgnore(true)
-    }
-}
+//android.variantFilter { variant ->
+//    if (variant.buildType.name == 'release' && variant.getFlavors().get(0).name == 'develop') {
+//        variant.setIgnore(true)
+//    }
+//}
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
