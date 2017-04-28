@@ -139,7 +139,7 @@ import java.util.*;
         }
 
         logger.info("Store model about to save");
-        StoreModel storeModel = storeRepository.save(StoreModel.newInstance(store));
+        StoreModel storeModel = storeRepository.save(StoreModel.newInstance(store, user.getUsername()));
         logger.info("Store model saved");
         Collection<BannerModel> banners = new ArrayDeque<>();
         if (store.getBannerCount() != 0) {

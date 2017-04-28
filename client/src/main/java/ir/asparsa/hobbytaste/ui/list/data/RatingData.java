@@ -14,20 +14,23 @@ public class RatingData extends BaseRecyclerData {
 
     private long mRate;
     private long mViewed;
-    private String description;
+    private String mDescription;
     private boolean mLike;
-    private boolean showDescription = false;
+    private boolean mShowDescription = false;
+    private String mCreator;
 
     public RatingData(
-            long mRate,
-            long mViewed,
+            long rate,
+            long viewed,
             String description,
-            boolean mLike
+            boolean like,
+            String creator
     ) {
-        this.mRate = mRate;
-        this.mViewed = mViewed;
-        this.description = description;
-        this.mLike = mLike;
+        this.mRate = rate;
+        this.mViewed = viewed;
+        this.mDescription = description;
+        this.mLike = like;
+        this.mCreator = creator;
     }
 
     @Override public int getViewType() {
@@ -59,15 +62,19 @@ public class RatingData extends BaseRecyclerData {
     }
 
     public String getDescription() {
-        return description;
+        return mDescription;
     }
 
     public boolean isShowDescription() {
-        return showDescription;
+        return mShowDescription;
     }
 
     public void setShowDescription(boolean showDescription) {
-        this.showDescription = showDescription;
+        this.mShowDescription = showDescription;
+    }
+
+    public String getCreator() {
+        return mCreator;
     }
 
     @Override public boolean equals(Object otherObj) {
@@ -77,7 +84,6 @@ public class RatingData extends BaseRecyclerData {
         final RatingData other = (RatingData) otherObj;
         return getRate() == other.getRate();
     }
-
 
     @Override public int describeContents() {
         return 0;
@@ -89,17 +95,19 @@ public class RatingData extends BaseRecyclerData {
     ) {
         dest.writeLong(this.mRate);
         dest.writeLong(this.mViewed);
-        dest.writeString(this.description);
+        dest.writeString(this.mDescription);
         dest.writeByte(this.mLike ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.showDescription ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.mShowDescription ? (byte) 1 : (byte) 0);
+        dest.writeString(this.mCreator);
     }
 
     protected RatingData(Parcel in) {
         this.mRate = in.readLong();
         this.mViewed = in.readLong();
-        this.description = in.readString();
+        this.mDescription = in.readString();
         this.mLike = in.readByte() != 0;
-        this.showDescription = in.readByte() != 0;
+        this.mShowDescription = in.readByte() != 0;
+        this.mCreator = in.readString();
     }
 
     public static final Creator<RatingData> CREATOR = new Creator<RatingData>() {

@@ -98,7 +98,7 @@ public class StoresRestControllerTest extends BaseControllerTest {
                 .setDescription("sdfvsdfv")
                 .setHashCode(2345345L)
                 .build();
-        models.add(StoreModel.newInstance(store));
+        models.add(StoreModel.newInstance(store, ""));
         given(storeRepository.findAll())
                 .willReturn(models);
         given(storeLikeRepository.findByAccount(accountModel))
@@ -141,7 +141,7 @@ public class StoresRestControllerTest extends BaseControllerTest {
                 .setDescription("sdfvsdfv")
                 .setHashCode(2345345L)
                 .build();
-        StoreModel storeModel = StoreModel.newInstance(store);
+        StoreModel storeModel = StoreModel.newInstance(store, "");
         models.add(storeModel);
 
         given(storeRepository.findAll())
@@ -221,7 +221,7 @@ public class StoresRestControllerTest extends BaseControllerTest {
                 .setDescription("sdfvsdfv")
                 .setHashCode(2345345L)
                 .build();
-        models.add(StoreModel.newInstance(store));
+        models.add(StoreModel.newInstance(store, ""));
         given(storeRepository.findAll())
                 .willReturn(models);
         given(storeLikeRepository.findByAccount(accountModel))
@@ -269,7 +269,7 @@ public class StoresRestControllerTest extends BaseControllerTest {
                 .setDescription("sdfvsdfv")
                 .setHashCode(2345345L)
                 .build();
-        StoreModel storeModel = StoreModel.newInstance(store);
+        StoreModel storeModel = StoreModel.newInstance(store, "");
         models.add(storeModel);
 
         given(storeRepository.findAll())
@@ -315,6 +315,7 @@ public class StoresRestControllerTest extends BaseControllerTest {
 
         ArrayList<StoreModel> models = new ArrayList<>();
         Random random = new Random();
+        String creator = "sjcj vlskdf";
         for (int i = 0; i < 50; i++) {
             StoreProto.Store store = StoreProto.Store
                     .newBuilder()
@@ -324,7 +325,8 @@ public class StoresRestControllerTest extends BaseControllerTest {
                     .setDescription(UUID.randomUUID().toString())
                     .setHashCode(random.nextLong())
                     .build();
-            models.add(StoreModel.newInstance(store));
+
+            models.add(StoreModel.newInstance(store, creator));
         }
         given(storeRepository.findAll())
                 .willReturn(models);
@@ -353,7 +355,7 @@ public class StoresRestControllerTest extends BaseControllerTest {
         assertThat(stores.getStoreCount()).isEqualTo(size);
         assertThat(stores.getTotalElements()).isEqualTo(models.size());
         for (StoreProto.Store store : stores.getStoreList()) {
-            StoreModel storeModel = StoreModel.newInstance(store);
+            StoreModel storeModel = StoreModel.newInstance(store, creator);
             for (StoreModel model : models) {
                 if (model.equals(storeModel)) {
                     assertThat(model.getLat()).isEqualTo(store.getLat());
@@ -361,6 +363,7 @@ public class StoresRestControllerTest extends BaseControllerTest {
                     assertThat(model.getTitle()).isEqualTo(store.getTitle());
                     assertThat(model.getDescription()).isEqualTo(store.getDescription());
                     assertThat(model.getHashCode()).isEqualTo(store.getHashCode());
+                    assertThat(model.getCreator()).isEqualTo(store.getCreator());
                     assertThat(false).isEqualTo(store.getLike());
                     break;
                 }
@@ -402,7 +405,7 @@ public class StoresRestControllerTest extends BaseControllerTest {
         given(storeRepository.findByHashCode(eq(hashCode)))
                 .willReturn(Optional.empty());
         given(storeRepository.save(any(StoreModel.class)))
-                .willReturn(StoreModel.newInstance(store));
+                .willReturn(StoreModel.newInstance(store, ""));
 
         MvcResult result = this.mockMvc.perform(
                 put(WebSecurityConfig.ENTRY_POINT_API + "/" + StoreServicePath.SERVICE)
@@ -444,7 +447,7 @@ public class StoresRestControllerTest extends BaseControllerTest {
                 .build();
 
         given(storeRepository.findByHashCode(eq(hashCode)))
-                .willReturn(Optional.of(StoreModel.newInstance(store)));
+                .willReturn(Optional.of(StoreModel.newInstance(store, "")));
 
         given(storeLikeRepository.findByAccount(accountModel))
                 .willReturn(new ArrayList<>());
@@ -488,7 +491,7 @@ public class StoresRestControllerTest extends BaseControllerTest {
                 .setHashCode(hashCode)
                 .build();
 
-        StoreModel storeModel = StoreModel.newInstance(store);
+        StoreModel storeModel = StoreModel.newInstance(store, "");
         given(storeRepository.findByHashCode(eq(hashCode)))
                 .willReturn(Optional.of(storeModel));
 

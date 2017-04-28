@@ -45,7 +45,7 @@ public class CommentLikeRepositoryTest {
                                      .setTitle("sdfv")
                                      .setDescription("sdfvzxcv")
                                      .setHashCode(2934756L)
-                                     .build());
+                                     .build(), "");
         entityManager.persist(storeModel);
         entityManager.persist(new BannerModel("test", "thumbnailTest", storeModel));
 

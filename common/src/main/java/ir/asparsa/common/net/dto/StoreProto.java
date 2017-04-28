@@ -898,6 +898,16 @@ public final class StoreProto {
      */
     ir.asparsa.common.net.dto.StoreProto.BannerOrBuilder getBannerOrBuilder(
         int index);
+
+    /**
+     * <code>string creator = 11;</code>
+     */
+    java.lang.String getCreator();
+    /**
+     * <code>string creator = 11;</code>
+     */
+    com.google.protobuf.ByteString
+        getCreatorBytes();
   }
   /**
    * Protobuf type {@code ir.asparsa.common.net.dto.Store}
@@ -921,6 +931,7 @@ public final class StoreProto {
       like_ = false;
       created_ = 0L;
       banner_ = java.util.Collections.emptyList();
+      creator_ = "";
     }
 
     @java.lang.Override
@@ -1002,6 +1013,12 @@ public final class StoreProto {
               }
               banner_.add(
                   input.readMessage(ir.asparsa.common.net.dto.StoreProto.Banner.parser(), extensionRegistry));
+              break;
+            }
+            case 90: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              creator_ = s;
               break;
             }
           }
@@ -1197,6 +1214,40 @@ public final class StoreProto {
       return banner_.get(index);
     }
 
+    public static final int CREATOR_FIELD_NUMBER = 11;
+    private volatile java.lang.Object creator_;
+    /**
+     * <code>string creator = 11;</code>
+     */
+    public java.lang.String getCreator() {
+      java.lang.Object ref = creator_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        creator_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string creator = 11;</code>
+     */
+    public com.google.protobuf.ByteString
+        getCreatorBytes() {
+      java.lang.Object ref = creator_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        creator_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1238,6 +1289,9 @@ public final class StoreProto {
       }
       for (int i = 0; i < banner_.size(); i++) {
         output.writeMessage(10, banner_.get(i));
+      }
+      if (!getCreatorBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 11, creator_);
       }
     }
 
@@ -1284,6 +1338,9 @@ public final class StoreProto {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(10, banner_.get(i));
       }
+      if (!getCreatorBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(11, creator_);
+      }
       memoizedSize = size;
       return size;
     }
@@ -1324,6 +1381,8 @@ public final class StoreProto {
           == other.getCreated());
       result = result && getBannerList()
           .equals(other.getBannerList());
+      result = result && getCreator()
+          .equals(other.getCreator());
       return result;
     }
 
@@ -1363,6 +1422,8 @@ public final class StoreProto {
         hash = (37 * hash) + BANNER_FIELD_NUMBER;
         hash = (53 * hash) + getBannerList().hashCode();
       }
+      hash = (37 * hash) + CREATOR_FIELD_NUMBER;
+      hash = (53 * hash) + getCreator().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1506,6 +1567,8 @@ public final class StoreProto {
         } else {
           bannerBuilder_.clear();
         }
+        creator_ = "";
+
         return this;
       }
 
@@ -1548,6 +1611,7 @@ public final class StoreProto {
         } else {
           result.banner_ = bannerBuilder_.build();
         }
+        result.creator_ = creator_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1644,6 +1708,10 @@ public final class StoreProto {
               bannerBuilder_.addAllMessages(other.banner_);
             }
           }
+        }
+        if (!other.getCreator().isEmpty()) {
+          creator_ = other.creator_;
+          onChanged();
         }
         onChanged();
         return this;
@@ -2230,6 +2298,75 @@ public final class StoreProto {
           banner_ = null;
         }
         return bannerBuilder_;
+      }
+
+      private java.lang.Object creator_ = "";
+      /**
+       * <code>string creator = 11;</code>
+       */
+      public java.lang.String getCreator() {
+        java.lang.Object ref = creator_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          creator_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string creator = 11;</code>
+       */
+      public com.google.protobuf.ByteString
+          getCreatorBytes() {
+        java.lang.Object ref = creator_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          creator_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string creator = 11;</code>
+       */
+      public Builder setCreator(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        creator_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string creator = 11;</code>
+       */
+      public Builder clearCreator() {
+        
+        creator_ = getDefaultInstance().getCreator();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string creator = 11;</code>
+       */
+      public Builder setCreatorBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        creator_ = value;
+        onChanged();
+        return this;
       }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -2947,13 +3084,14 @@ public final class StoreProto {
       "\n\013store.proto\022\031ir.asparsa.common.net.dto" +
       "\"P\n\006Stores\022/\n\005store\030\001 \003(\0132 .ir.asparsa.c" +
       "ommon.net.dto.Store\022\025\n\rtotalElements\030\002 \001" +
-      "(\003\"\310\001\n\005Store\022\013\n\003lat\030\001 \001(\001\022\013\n\003lon\030\002 \001(\001\022\r" +
+      "(\003\"\331\001\n\005Store\022\013\n\003lat\030\001 \001(\001\022\013\n\003lon\030\002 \001(\001\022\r" +
       "\n\005title\030\003 \001(\t\022\023\n\013description\030\007 \001(\t\022\021\n\tha" +
       "sh_code\030\010 \001(\003\022\016\n\006viewed\030\004 \001(\003\022\014\n\004rate\030\005 " +
       "\001(\003\022\014\n\004like\030\006 \001(\010\022\017\n\007created\030\t \001(\003\0221\n\006ba" +
       "nner\030\n \003(\0132!.ir.asparsa.common.net.dto.B" +
-      "anner\"1\n\006Banner\022\020\n\010main_url\030\001 \001(\t\022\025\n\rthu" +
-      "mbnail_url\030\002 \001(\tB\014B\nStoreProtob\006proto3"
+      "anner\022\017\n\007creator\030\013 \001(\t\"1\n\006Banner\022\020\n\010main" +
+      "_url\030\001 \001(\t\022\025\n\rthumbnail_url\030\002 \001(\tB\014B\nSto",
+      "reProtob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2978,7 +3116,7 @@ public final class StoreProto {
     internal_static_ir_asparsa_common_net_dto_Store_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_ir_asparsa_common_net_dto_Store_descriptor,
-        new java.lang.String[] { "Lat", "Lon", "Title", "Description", "HashCode", "Viewed", "Rate", "Like", "Created", "Banner", });
+        new java.lang.String[] { "Lat", "Lon", "Title", "Description", "HashCode", "Viewed", "Rate", "Like", "Created", "Banner", "Creator", });
     internal_static_ir_asparsa_common_net_dto_Banner_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_ir_asparsa_common_net_dto_Banner_fieldAccessorTable = new

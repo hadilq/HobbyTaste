@@ -14,6 +14,7 @@ public interface Store {
         String DESCRIPTION = "description";
         String HASH_CODE = "hashCode";
         String CREATED = "created";
+        String CREATOR = "creator";
         String VIEWED = "viewed";
         String RATE = "rate";
         String BANNERS = "banners";

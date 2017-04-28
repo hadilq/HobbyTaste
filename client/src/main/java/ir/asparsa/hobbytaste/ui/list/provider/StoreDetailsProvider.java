@@ -48,7 +48,7 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
             headers.add(new GalleryData(mStore.getBanners()));
         }
         headers.add(new RatingData(mStore.getRate(), mStore.getViewed(), mStore.getDescription(),
-                                   mStore.isLiked()));
+                                   mStore.isLiked(), mStore.getCreator()));
         mOnInsertData.OnDataInserted(new DataObserver(headers.size()) {
             @Override public void onCompleted() {
                 for (; index < headers.size(); index++) {
