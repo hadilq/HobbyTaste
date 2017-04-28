@@ -69,11 +69,10 @@ public class ContainerFragment extends BaseFragment {
             Assert.fail("No other activity than LaunchActivity is allowed");
         }
 
-        launchRoute(pos, mRouteFactory.getContainerRoute(pos));
+        launchRoute(mRouteFactory.getContainerRoute(pos));
     }
 
     public void launchRoute(
-            int pos,
             Route route
     ) {
         FragmentManager fragmentManager = getChildFragmentManager();
@@ -99,6 +98,9 @@ public class ContainerFragment extends BaseFragment {
     ) {
         BaseContentFragment baseContentFragment = null;
         List<Fragment> fragments = fragmentManager.getFragments();
+        if (fragments == null) {
+            return null;
+        }
         for (int i = fragments.size() - 1; i >= 0; i--) {
             if (fragments.get(i) instanceof BaseContentFragment) {
                 BaseContentFragment content = (BaseContentFragment) fragments.get(i);

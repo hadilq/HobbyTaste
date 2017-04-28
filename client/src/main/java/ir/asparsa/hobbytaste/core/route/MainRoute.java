@@ -1,6 +1,9 @@
 package ir.asparsa.hobbytaste.core.route;
 
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.fragment.content.BaseContentFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
 
@@ -10,16 +13,22 @@ import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
  */
 public class MainRoute implements Route {
 
-    public static final String PATH_SEGMENT = "main";
     public static final int PAGE = 0;
 
-    @Override public boolean shouldFire(AnalysedUri uri) {
-        return uri.getLowerCasePathSegments().size() >= 1 && uri.getLowerCasePathSegments().get(0).equals(PATH_SEGMENT);
+    private final String mSegment;
+
+    MainRoute(Resources resources) {
+        mSegment = resources.getString(R.string.path_segment_main);
     }
 
-    @Override public Route fire(AnalysedUri uri) {
+    @Override public boolean shouldFire(AnalysedUri uri) {
+        return uri.getLowerCasePathSegments().size() > 0 && uri.getLowerCasePathSegments().get(0).equals(mSegment);
+    }
+
+    @Nullable @Override public Route fire(AnalysedUri uri) {
         return this;
     }
+
 
     @Override public int whichPage() {
         return PAGE;

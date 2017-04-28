@@ -77,6 +77,9 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
         return new FloatingActionButtonObserver() {
             @Override public void onNext(View view) {
                 StoreModel store = getArguments().getParcelable(StoreDetailsRecyclerFragment.BUNDLE_KEY_STORE);
+                if (store == null) {
+                    return;
+                }
                 CommentDialogFragment
                         .instantiate(store, new CommentDialogFragment.CommentDialogResultEvent(getTagName()))
                         .show(getFragmentManager());

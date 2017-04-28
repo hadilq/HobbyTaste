@@ -1,6 +1,7 @@
 package ir.asparsa.hobbytaste.core.route;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import ir.asparsa.hobbytaste.ui.fragment.content.BaseContentFragment;
 
 /**
@@ -11,7 +12,7 @@ public interface Route {
 
     boolean shouldFire(AnalysedUri uri);
 
-    @NonNull
+    @Nullable
     Route fire(AnalysedUri uri);
 
     int whichPage();

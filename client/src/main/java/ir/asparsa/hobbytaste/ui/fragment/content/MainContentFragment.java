@@ -1,5 +1,7 @@
 package ir.asparsa.hobbytaste.ui.fragment.content;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -105,9 +107,11 @@ public class MainContentFragment extends BaseContentFragment {
     }
 
     private void instantiateStoreDetail(@NonNull StoreModel storeModel) {
-        NavigationUtil.startContentFragment(
-                getFragmentManager(),
-                StoreDetailsContentFragment.instantiate(storeModel)
-        );
+        getActivity().startActivity(new Intent(Intent.ACTION_VIEW, new Uri.Builder()
+                .scheme(getString(R.string.scheme_free))
+                .authority(getString(R.string.host_map))
+                .appendPath(getString(R.string.path_segment_place))
+                .appendPath(Long.toString(storeModel.getHashCode()))
+                .build()));
     }
 }

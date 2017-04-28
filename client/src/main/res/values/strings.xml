@@ -7,4 +7,15 @@
     <string name="english"
             translatable="false">English</string>
 
+    <string name="scheme_free"
+            translatable="false">free</string>
+    <string name="host_map"
+            translatable="false">map</string>
+    <string name="path_segment_main"
+            translatable="false">main</string>
+    <string name="path_segment_settings"
+            translatable="false">settings</string>
+    <string name="path_segment_place"
+            translatable="false">place</string>
+
 </resources>

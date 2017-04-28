@@ -5,6 +5,7 @@ import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.retrofit.AdditionalKeyStoresSSLSocketFactory;
 import ir.asparsa.hobbytaste.core.retrofit.AuthorizationFactory;
 import ir.asparsa.hobbytaste.core.retrofit.RetrofitException;
+import ir.asparsa.hobbytaste.core.route.PlaceRoute;
 import ir.asparsa.hobbytaste.ui.activity.BaseActivity;
 import ir.asparsa.hobbytaste.ui.activity.CrashReportActivity;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
@@ -68,4 +69,6 @@ public interface MainComponent {
     void inject(AddBannerPresenter addBannerPresenter);
 
     void inject(ContainerFragment containerFragment);
+
+    void inject(PlaceRoute placeRoute);
 }

@@ -1,6 +1,9 @@
 package ir.asparsa.hobbytaste.core.route;
 
+import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.fragment.content.BaseContentFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.SettingsContentFragment;
 
@@ -10,14 +13,19 @@ import ir.asparsa.hobbytaste.ui.fragment.content.SettingsContentFragment;
  */
 public class SettingsRoute implements Route {
 
-    public static final String PATH_SEGMENT = "settings";
     public static final int PAGE = 1;
 
-    @Override public boolean shouldFire(AnalysedUri uri) {
-        return uri.getLowerCasePathSegments().size() >= 1 && uri.getLowerCasePathSegments().get(0).equals(PATH_SEGMENT);
+    private final String mSegment;
+
+    SettingsRoute(Resources resources) {
+        mSegment = resources.getString(R.string.path_segment_settings);
     }
 
-    @NonNull @Override public Route fire(AnalysedUri uri) {
+    @Override public boolean shouldFire(AnalysedUri uri) {
+        return uri.getLowerCasePathSegments().size() > 0 && uri.getLowerCasePathSegments().get(0).equals(mSegment);
+    }
+
+    @Nullable @Override public Route fire(AnalysedUri uri) {
         return this;
     }
 

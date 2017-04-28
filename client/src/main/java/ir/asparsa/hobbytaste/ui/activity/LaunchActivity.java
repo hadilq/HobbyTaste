@@ -9,6 +9,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
@@ -16,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.route.MainRoute;
@@ -108,7 +110,7 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         }
 
         Intent intent = getIntent();
-        boolean handled = mRouteFactory.handleIntent(intent, mViewPager);
+        boolean handled = mRouteFactory.handleIntent(getResources(), intent, mViewPager);
         if (!handled) {
             if (!intent.hasExtra(BUNDLE_KEY_CONFIGURATION_CHANGED)) {
                 mConfigurationChanged = false;
@@ -122,7 +124,7 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
 
     @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        mRouteFactory.handleIntent(intent, mViewPager);
+        mRouteFactory.handleIntent(getResources(), intent, mViewPager);
     }
 
     @Override
@@ -138,7 +140,8 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
     }
 
     @Override public void onBackPressed() {
-        FragmentManager fragmentManager = mRouteFactory.getFragmentManager(mViewPager.getCurrentItem());
+        int pos = mViewPager.getCurrentItem();
+        FragmentManager fragmentManager = mRouteFactory.getFragmentManager(pos);
         if (fragmentManager == null) {
             return;
         }
@@ -150,7 +153,12 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                     finish();
                     break;
                 case BACK_FRAGMENT:
+                    List<Fragment> fragments = fragmentManager.getFragments();
                     NavigationUtil.popBackStack(fragmentManager);
+                    L.i(getClass(), "Fragments: " + fragments);
+                    if (fragments == null || fragments.size() <= 1) {
+                        mRouteFactory.launchRoute(getResources(), pos);
+                    }
                     break;
             }
         }

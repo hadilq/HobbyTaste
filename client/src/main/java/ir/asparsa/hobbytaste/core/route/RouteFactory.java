@@ -1,6 +1,7 @@
 package ir.asparsa.hobbytaste.core.route;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -40,25 +41,29 @@ public class RouteFactory {
     }
 
     @NonNull
-    public Route getBellowRoute(int pos) {
+    public Route getBellowRoute(
+            Resources resources,
+            int pos
+    ) {
         int page = posToPage(pos);
         switch (page) {
             case MainRoute.PAGE:
-                return new MainRoute();
+                return new MainRoute(resources);
             case SettingsRoute.PAGE:
-                return new SettingsRoute();
+                return new SettingsRoute(resources);
         }
         Assert.fail("Shouldn't reach here");
-        return new MainRoute();
+        return new MainRoute(resources);
     }
 
     @Nullable
     private Route getRoute(
+            @NonNull Resources resources,
             @NonNull Uri uri,
             @NonNull Bundle bundle
     ) {
         AnalysedUri analysedUri = new AnalysedUri(uri, bundle);
-        for (Route route : generateRoutes()) {
+        for (Route route : generateRoutes(resources)) {
             if (route.shouldFire(analysedUri)) {
                 route.fire(analysedUri);
                 return route;
@@ -68,6 +73,7 @@ public class RouteFactory {
     }
 
     public boolean handleIntent(
+            @NonNull Resources resources,
             @NonNull Intent intent,
             @NonNull ViewPager viewPager
     ) {
@@ -75,26 +81,39 @@ public class RouteFactory {
         mRoutes.clear();
         for (int i = 0; i < NavigationAdapter.PAGE_COUNT; i++) {
             // Make them fixed size by not adding anything else
-            mRoutes.add(getBellowRoute(i));
+            mRoutes.add(getBellowRoute(resources, i));
         }
 
         Uri uri = intent.getData();
         Route route = null;
         if (uri != null) {
-            route = getRoute(uri, intent.getExtras());
+            route = getRoute(resources, uri, intent.getExtras());
         }
         if (route == null) {
             return false;
         }
         int pos = pageToPos(route.whichPage());
-        ContainerFragment container = mContainers.get(pos).get();
-        if (container == null) {
-            mRoutes.set(pos, route);
-        } else {
-            container.launchRoute(pos, route);
-        }
+        mRoutes.set(pos, route);
+        launchRoute(route, pos);
         viewPager.setCurrentItem(pos);
         return true;
+    }
+
+    public void launchRoute(
+            @NonNull Resources resources,
+            int pos
+    ) {
+        launchRoute(getBellowRoute(resources, pos), pos);
+    }
+
+    public void launchRoute(
+            Route route,
+            int pos
+    ) {
+        ContainerFragment container = mContainers.get(pos).get();
+        if (container != null) {
+            container.launchRoute(route);
+        }
     }
 
     @NonNull
@@ -121,13 +140,14 @@ public class RouteFactory {
     }
 
     @NonNull
-    private Collection<Route> generateRoutes() {
+    private Collection<Route> generateRoutes(@NonNull Resources resources) {
         Collection<Route> routes;
         routes = mRouts.get();
         if (routes == null) {
             routes = new ArrayDeque<>();
-            routes.add(new MainRoute());
-            routes.add(new SettingsRoute());
+            routes.add(new MainRoute(resources));
+            routes.add(new SettingsRoute(resources));
+            routes.add(new PlaceRoute(resources));
             mRouts = new WeakReference<>(routes);
         }
         return routes;

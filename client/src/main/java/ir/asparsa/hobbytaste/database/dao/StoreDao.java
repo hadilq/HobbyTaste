@@ -14,6 +14,7 @@ import rx.Subscriber;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.sql.SQLDataException;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -220,6 +221,24 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
                 }
             }
         }
+    }
+
+    public Observable<StoreModel> findByHashCode(final long storeHashCode) {
+        return Observable.create(new Observable.OnSubscribe<StoreModel>() {
+            @Override public void call(Subscriber<? super StoreModel> subscriber) {
+                try {
+                    List<StoreModel> stores = getDao().query(
+                            getDao().queryBuilder()
+                                    .where()
+                                    .eq(Store.Columns.HASH_CODE, storeHashCode)
+                                    .prepare());
+                    subscriber.onNext(stores.size() > 0 ? stores.get(0) : null);
+                    subscriber.onCompleted();
+                } catch (SQLException e) {
+                    subscriber.onError(e);
+                }
+            }
+        });
     }
 
     private static class StoreHolder {
