@@ -4,7 +4,7 @@ apply plugin: 'org.springframework.boot'
 
 jar {
     baseName = 'hobbytaste-server'
-    version = "${global_versionName}.0"
+    version = "${global_versionName}.1"
 }
 
 sourceCompatibility = 1.8

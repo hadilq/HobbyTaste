@@ -89,8 +89,8 @@ public class FileSystemStorageService implements StorageService {
 
     @Override public Stream<Path> loadAllTmp(String locale) {
         try {
-            return Files.walk(this.rootLocation, 1)
-                        .filter(path -> !path.equals(this.rootLocation));
+            return Files.walk(this.rootTmpLocation, 1)
+                        .filter(path -> !path.equals(this.rootTmpLocation));
         } catch (IOException e) {
             throw new StorageException("Failed to read stored files", e, Strings.CANNOT_READ_STORED_FILES, locale);
         }
