@@ -44,6 +44,8 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
 
     @Inject
     RouteFactory mRouteFactory;
+    @Inject
+    NavigationUtil mNavigationUtil;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -145,7 +147,7 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         if (fragmentManager == null) {
             return;
         }
-        BaseContentFragment fragment = NavigationUtil.findTopFragment(fragmentManager);
+        BaseContentFragment fragment = mNavigationUtil.findTopFragment(fragmentManager);
         if (fragment != null) {
             BaseContentFragment.BackState state = fragment.onBackPressed();
             switch (state) {
@@ -154,7 +156,7 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                     break;
                 case BACK_FRAGMENT:
                     List<Fragment> fragments = fragmentManager.getFragments();
-                    NavigationUtil.popBackStack(fragmentManager);
+                    mNavigationUtil.popBackStack(fragmentManager);
                     L.i(getClass(), "Fragments: " + fragments);
                     if (fragments == null || fragments.size() <= 1) {
                         mRouteFactory.launchRoute(getResources(), pos);
@@ -174,7 +176,7 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         if (fragmentManager == null) {
             return;
         }
-        BaseContentFragment fragment = NavigationUtil.findTopFragment(fragmentManager);
+        BaseContentFragment fragment = mNavigationUtil.findTopFragment(fragmentManager);
         if (fragment != null) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
@@ -185,8 +187,7 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         if (fragmentManager == null) {
             return;
         }
-        BaseContentFragment fragment = NavigationUtil
-                .findTopFragment(fragmentManager);
+        BaseContentFragment fragment = mNavigationUtil.findTopFragment(fragmentManager);
         if (fragment != null) {
             mToolbar.setTitle(fragment.getHeaderTitle());
 

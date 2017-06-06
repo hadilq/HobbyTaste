@@ -10,8 +10,7 @@ import ir.asparsa.hobbytaste.ui.activity.BaseActivity;
 import ir.asparsa.hobbytaste.ui.activity.CrashReportActivity;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
 import ir.asparsa.hobbytaste.ui.fragment.ContainerFragment;
-import ir.asparsa.hobbytaste.ui.fragment.content.MainContentFragment;
-import ir.asparsa.hobbytaste.ui.fragment.content.StoreDetailsContentFragment;
+import ir.asparsa.hobbytaste.ui.fragment.content.*;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.CommentDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.SetUsernameDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.SettingsRecyclerFragment;
@@ -71,4 +70,10 @@ public interface MainComponent {
     void inject(ContainerFragment containerFragment);
 
     void inject(PlaceRoute placeRoute);
+
+    void inject(SettingsContentFragment settingsContentFragment);
+
+    void inject(AddStoreContentFragment addStoreContentFragment);
+
+    void inject(AddBannerContentFragment addBannerContentFragment);
 }

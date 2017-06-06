@@ -11,11 +11,14 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.mvp.holder.AddStoreViewHolder;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.AddStorePresenter;
+
+import javax.inject.Inject;
 
 /**
  * @author hadi
@@ -25,6 +28,9 @@ public class AddStoreContentFragment extends BaseContentFragment {
 
     public static final String BUNDLE_KEY_DIALOG_RESULT_EVENT = "BUNDLE_KEY_DIALOG_RESULT_EVENT";
     public static final String EVENT_KEY_START_NEXT = "EVENT_KEY_START_NEXT";
+
+    @Inject
+    NavigationUtil mNavigationUtil;
 
     private AddStoreViewHolder mHolder;
     private AddStorePresenter mPresenter;
@@ -41,6 +47,11 @@ public class AddStoreContentFragment extends BaseContentFragment {
         return fragment;
     }
 
+    @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ApplicationLauncher.mainComponent().inject(this);
+    }
+
     @Nullable @Override public View onCreateView(
             LayoutInflater inflater,
             @Nullable ViewGroup container,
@@ -55,7 +66,7 @@ public class AddStoreContentFragment extends BaseContentFragment {
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
+        Fragment fragment = mNavigationUtil.getActiveFragment(getChildFragmentManager());
         SupportMapFragment mapFragment;
         if (fragment instanceof SupportMapFragment) {
             mapFragment = (SupportMapFragment) fragment;
@@ -100,7 +111,7 @@ public class AddStoreContentFragment extends BaseContentFragment {
             StoreModel store
     ) {
         StoreSaveResultEvent event = getArguments().getParcelable(BUNDLE_KEY_DIALOG_RESULT_EVENT);
-        NavigationUtil.startContentFragment(getFragmentManager(), AddBannerContentFragment.instantiate(event, store));
+        mNavigationUtil.startContentFragment(getFragmentManager(), AddBannerContentFragment.instantiate(event, store));
     }
 
     public static class StoreSaveResultEvent extends BaseDialogFragment.BaseOnDialogResultEvent {

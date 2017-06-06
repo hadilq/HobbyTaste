@@ -34,6 +34,8 @@ public class ContainerFragment extends BaseFragment {
 
     @Inject
     RouteFactory mRouteFactory;
+    @Inject
+    NavigationUtil mNavigationUtil;
 
     public static ContainerFragment instantiate(int pos) {
 
@@ -76,17 +78,17 @@ public class ContainerFragment extends BaseFragment {
             Route route
     ) {
         FragmentManager fragmentManager = getChildFragmentManager();
-        BaseContentFragment fragment = NavigationUtil.getActiveContentFragment(fragmentManager);
+        BaseContentFragment fragment = mNavigationUtil.getActiveContentFragment(fragmentManager);
         BaseContentFragment contentFragment = route.getFragment();
         if (fragment == null) {
-            NavigationUtil.startContentFragment(fragmentManager, contentFragment);
+            mNavigationUtil.startContentFragment(fragmentManager, contentFragment);
         } else {
             if (route.isAlwaysBellow()) {
                 if (findOrPopBaseContentFragment(fragmentManager, contentFragment) == null) {
-                    NavigationUtil.startContentFragment(fragmentManager, contentFragment);
+                    mNavigationUtil.startContentFragment(fragmentManager, contentFragment);
                 }
             } else if (!fragment.getTagName().equals(contentFragment.getTagName())) {
-                NavigationUtil.startContentFragment(fragmentManager, contentFragment);
+                mNavigationUtil.startContentFragment(fragmentManager, contentFragment);
             }
         }
     }

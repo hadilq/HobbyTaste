@@ -10,13 +10,21 @@ import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.fragment.content.BaseContentFragment;
 import junit.framework.Assert;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * @author hadi
  * @since 6/23/2016 AD
  */
+@Singleton
 public class NavigationUtil {
 
-    public static void startContentFragment(
+    @Inject
+    public NavigationUtil() {
+    }
+
+    public void startContentFragment(
             @NonNull FragmentManager fragmentManager,
             @NonNull BaseContentFragment fragment
     ) {
@@ -32,7 +40,7 @@ public class NavigationUtil {
         }
     }
 
-    public static void startNestedFragment(
+    public void startNestedFragment(
             @NonNull FragmentManager fragmentManager,
             @NonNull BaseFragment fragment
     ) {
@@ -46,7 +54,7 @@ public class NavigationUtil {
         }
     }
 
-    public static void popBackStack(@NonNull FragmentManager activeFragmentManager) {
+    public void popBackStack(@NonNull FragmentManager activeFragmentManager) {
         try {
             activeFragmentManager.popBackStack();
         } catch (Exception e) {
@@ -55,7 +63,7 @@ public class NavigationUtil {
     }
 
     @Nullable
-    public static BaseContentFragment findTopFragment(
+    public BaseContentFragment findTopFragment(
             @NonNull FragmentManager fragmentManager
     ) {
 
@@ -69,11 +77,11 @@ public class NavigationUtil {
         return null;
     }
 
-    public static Fragment getActiveFragment(@NonNull FragmentManager fragmentManager) {
+    public Fragment getActiveFragment(@NonNull FragmentManager fragmentManager) {
         return fragmentManager.findFragmentById(R.id.content_nested);
     }
 
-    public static BaseContentFragment getActiveContentFragment(@NonNull FragmentManager fragmentManager) {
+    public BaseContentFragment getActiveContentFragment(@NonNull FragmentManager fragmentManager) {
         Fragment fragment = fragmentManager.findFragmentById(R.id.content);
         if (fragment instanceof BaseContentFragment) {
             return (BaseContentFragment) fragment;

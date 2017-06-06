@@ -31,6 +31,8 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
 
     @Inject
     RouteFactory mRouteFactory;
+    @Inject
+    NavigationUtil mNavigationUtil;
 
     public static StoreDetailsContentFragment instantiate(StoreModel store) {
 
@@ -51,10 +53,10 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
+        Fragment fragment = mNavigationUtil.getActiveFragment(getChildFragmentManager());
         if (!(fragment instanceof StoreDetailsRecyclerFragment)) {
 
-            NavigationUtil.startNestedFragment(
+            mNavigationUtil.startNestedFragment(
                     getChildFragmentManager(),
                     StoreDetailsRecyclerFragment.instantiate(new Bundle(getArguments()))
             );
@@ -112,7 +114,7 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
             CommentDialogFragment.CommentDialogResultEvent commentEvent
                     = (CommentDialogFragment.CommentDialogResultEvent) event;
 
-            Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
+            Fragment fragment = mNavigationUtil.getActiveFragment(getChildFragmentManager());
             if (fragment instanceof StoreDetailsRecyclerFragment) {
                 ((StoreDetailsRecyclerFragment) fragment).addComment(commentEvent.getComment());
             }

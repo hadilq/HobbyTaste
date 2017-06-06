@@ -35,6 +35,8 @@ public class MainContentFragment extends BaseContentFragment {
 
     @Inject
     RouteFactory mRouteFactory;
+    @Inject
+    NavigationUtil mNavigationUtil;
 
     private MainContentViewHolder mHolder;
     private StorePresenter mPresenter;
@@ -55,7 +57,7 @@ public class MainContentFragment extends BaseContentFragment {
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
+        Fragment fragment = mNavigationUtil.getActiveFragment(getChildFragmentManager());
         SupportMapFragment mapFragment;
         if (fragment instanceof SupportMapFragment) {
             mapFragment = (SupportMapFragment) fragment;
@@ -119,7 +121,7 @@ public class MainContentFragment extends BaseContentFragment {
                 if (map == null) {
                     return;
                 }
-                NavigationUtil.startContentFragment(
+                mNavigationUtil.startContentFragment(
                         getFragmentManager(), AddStoreContentFragment.instantiate(
                                 map.getCameraPosition().getRealCameraPosition(),
                                 new AddStoreContentFragment.StoreSaveResultEvent(getTagName())));
