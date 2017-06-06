@@ -27,8 +27,6 @@ public class LanguageUtil {
     private static final String COUNTRY_IR = "IR";
     private static final String COUNTRY_US = "US";
 
-    private static final Object sSync = new Object();
-
     private static final Map<String, String> COUNTRY_MAP = new HashMap<String, String>() {{
         put(LANGUAGE_FA, COUNTRY_IR);
         put(LANGUAGE_EN, COUNTRY_US);
@@ -45,7 +43,7 @@ public class LanguageUtil {
 
     @NonNull
     public static Locale getLocale(@NonNull PreferencesManager preferencesManager) {
-        synchronized (sSync) {
+        synchronized (LanguageUtil.class) {
             loadDefaultLanguage(preferencesManager);
             String country = COUNTRY_MAP.get(sDefaultLanguage);
             if (sLocale == null) {
@@ -104,7 +102,7 @@ public class LanguageUtil {
             @NonNull PreferencesManager preferencesManager,
             @Language String language
     ) {
-        synchronized (sSync) {
+        synchronized (LanguageUtil.class) {
             if (!sDefaultLanguage.equals(language)) {
                 sDefaultLanguage = language;
                 preferencesManager.put(PreferencesManager.KEY_DEFAULT_LANGUAGE, language);
@@ -121,7 +119,7 @@ public class LanguageUtil {
     }
 
     public static boolean isRTL() {
-        synchronized (sSync) {
+        synchronized (LanguageUtil.class) {
             return LANGUAGE_FA.equals(sDefaultLanguage);
         }
     }
