@@ -48,12 +48,12 @@ public class MainContentViewHolder implements ViewHolder, OnMapReadyCallback, Go
         return mMap;
     }
 
-    public void removeMarkers(Collection<Marker> mMarkers) {
-        if (mMarkers.size() != 0) {
-            for (Marker marker : mMarkers) {
+    public void removeMarkers(Collection<Marker> markers) {
+        if (markers.size() != 0) {
+            for (Marker marker : markers) {
                 marker.remove();
             }
-            mMarkers.clear();
+            markers.clear();
         }
     }
 

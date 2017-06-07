@@ -88,6 +88,11 @@ public class MainContentFragment extends BaseContentFragment {
         MenuItem share = menu.findItem(R.id.share);
         share.getIcon().mutate()
              .setColorFilter(getResources().getColor(R.color.background), PorterDuff.Mode.SRC_ATOP);
+
+        inflater.inflate(R.menu.menu_refresh, menu);
+        MenuItem refresh = menu.findItem(R.id.share);
+        refresh.getIcon().mutate()
+               .setColorFilter(getResources().getColor(R.color.background), PorterDuff.Mode.SRC_ATOP);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -101,6 +106,9 @@ public class MainContentFragment extends BaseContentFragment {
                 );
                 sendIntent.setType("text/plain");
                 startActivity(sendIntent);
+                return true;
+            case R.id.refresh:
+                mPresenter.onRefreshStores();
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -75,9 +75,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
             mTryAgainLater = false;
 
             mOffset = mFragment.getArguments().getInt(BUNDLE_KEY_OFFSET, 0);
-            StoresManager.Constraint constraint = new StoresManager.Constraint(
-                    lat, lng, mOffset, STORES_LIMIT);
-            mSubscription.add(mStoresManager.loadStores(constraint, getStoreObserver(constraint)));
+            startLoading(lat, lng, mOffset);
         } else {
             publish();
         }
@@ -142,6 +140,15 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
         }
     }
 
+    private void startLoading(
+            double lat,
+            double lng,
+            int offset
+    ) {
+        StoresManager.Constraint constraint = new StoresManager.Constraint(lat, lng, offset, STORES_LIMIT);
+        mSubscription.add(mStoresManager.loadStores(constraint, getStoreObserver(constraint)));
+    }
+
     public void onMapReady() {
         L.d(getClass(), "on map ready gets called.");
         mOnMapReady = true;
@@ -168,7 +175,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
                 if (mOffset + STORES_LIMIT < result.getTotalElements()) {
                     mOffset += STORES_LIMIT;
                     double lat = constraint.getLatitude();
-                    double lng = constraint.getLatitude();
+                    double lng = constraint.getLongitude();
                     if (mHolder.getMap() != null) {
                         ArrayList<StoreModel> list = new ArrayList<>(result.getStores());
                         StoreModel lastModel = list.get(list.size() - 1);
@@ -176,14 +183,13 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
                                 .contains(new LatLng(lastModel.getLat(), lastModel.getLon()))) {
                             mCameraPosition = mHolder.getMap().getCameraPosition();
                             if (mCameraPosition != null && mCameraPosition.getTarget() != null) {
+                                mOffset = 0;
                                 lat = mCameraPosition.getTarget().getLatitude();
                                 lng = mCameraPosition.getTarget().getLongitude();
                             }
                         }
                     }
-                    StoresManager.Constraint newConstraint = new StoresManager.Constraint(
-                            lat, lng, mOffset, STORES_LIMIT);
-                    mSubscription.add(mStoresManager.loadStores(newConstraint, getStoreObserver(newConstraint)));
+                    startLoading(lat, lng, mOffset);
                 }
                 onSuccessfullyReceived(result.getStores());
             }
@@ -227,6 +233,19 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
             mStores.add(storeModel);
         } else {
             mTryAgainLater = true;
+        }
+    }
+
+    public void onRefreshStores() {
+        if (mHolder.getMap() != null) {
+            mCameraPosition = mHolder.getMap().getCameraPosition();
+            if (mCameraPosition != null && mCameraPosition.getTarget() != null) {
+                mStores.clear();
+                mOffset = 0;
+                double lat = mCameraPosition.getTarget().getLatitude();
+                double lng = mCameraPosition.getTarget().getLongitude();
+                startLoading(lat, lng, mOffset);
+            }
         }
     }
 }

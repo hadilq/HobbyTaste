@@ -89,4 +89,45 @@ public class StorePresenterTest extends BasePresenterTest {
 
         verify(mainContentViewHolder, times(2)).getMap();
     }
+
+    @Test
+    public void onRefreshStoresTest() {
+        when(preferencesManager.getFloat(anyString(), anyFloat()))
+                .thenReturn(0f);
+
+        when(preferencesManager.getFloat(anyString(), anyFloat()))
+                .thenReturn(0f);
+        when(storesManager.loadStores(any(StoresManager.Constraint.class), any(Observer.class)))
+                .thenReturn(subscription);
+        when(fragmentDelegate.getArguments())
+                .thenReturn(bundle);
+
+        StorePresenter presenter = new StorePresenter(fragmentDelegate);
+        presenter.bindView(mainContentViewHolder);
+
+        verify(fragmentDelegate, times(2)).getArguments();
+        verify(bundle, times(1)).getParcelableArrayList(anyString());
+        verify(bundle, times(1)).getInt(anyString(), anyInt());
+        verify(storesManager, times(1)).loadStores(any(StoresManager.Constraint.class), any(Observer.class));
+
+        WMap map = Mockito.mock(WMap.class);
+        WCameraPosition position = Mockito.mock(WCameraPosition.class);
+        WLatLng target = Mockito.mock(WLatLng.class);
+        when(mainContentViewHolder.getMap())
+                .thenReturn(map);
+        when(map.getCameraPosition())
+                .thenReturn(position);
+        when(position.getTarget())
+                .thenReturn(target);
+        when(target.getLatitude())
+                .thenReturn(38.343d);
+        when(target.getLongitude())
+                .thenReturn(34.12d);
+
+        presenter.onRefreshStores();
+
+        verify(target, times(1)).getLatitude();
+        verify(target, times(1)).getLongitude();
+        verify(storesManager, times(2)).loadStores(any(StoresManager.Constraint.class), any(Observer.class));
+    }
 }
