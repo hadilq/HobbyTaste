@@ -58,10 +58,6 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
             }
 
             @Override public void onNext(BaseRecyclerData baseRecyclerData) {
-                if (headers.contains(baseRecyclerData)) {
-                    index = headers.size();
-                }
-                deque.add(baseRecyclerData);
             }
         });
     }
