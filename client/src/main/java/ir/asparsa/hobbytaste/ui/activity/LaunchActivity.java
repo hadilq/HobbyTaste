@@ -200,8 +200,11 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                         fabObserver.onNext(v);
                     }
                 });
+                mShrinkBehavior.setShowFloatingActionButton(true);
             } else {
                 mFloatingActionButton.hide();
+                mFloatingActionButton.setOnClickListener(null);
+                mShrinkBehavior.setShowFloatingActionButton(false);
             }
 
             boolean scrollToolbar = fragment.scrollToolbar();
