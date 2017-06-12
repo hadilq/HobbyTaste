@@ -6,8 +6,6 @@ import android.support.v4.app.FragmentManager;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.BaseFragment;
 
-import java.util.List;
-
 /**
  * @author hadi
  * @since 3/12/2017 AD.
@@ -27,9 +25,9 @@ public class UiUtil {
             @NonNull FragmentManager fragmentManager,
             boolean popBackStack
     ) {
-        List<Fragment> fragments = fragmentManager.getFragments();
-        for (int i = fragments.size() - 1; i >= 0; i--) {
-            Fragment fragment = fragments.get(i);
+        for (int i = fragmentManager.getBackStackEntryCount() - 1; i >= 0; i--) {
+            FragmentManager.BackStackEntry backStack = fragmentManager.getBackStackEntryAt(i);
+            Fragment fragment = fragmentManager.findFragmentByTag(backStack.getName());
             if (fragment instanceof BaseFragment &&
                 event.getSourceTag().equals(((BaseFragment) fragment).getTagName())) {
                 L.i(UiUtil.class, "Find base fragment to send event: " + fragment.getClass().getName());
