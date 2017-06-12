@@ -136,6 +136,10 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
             mTryAgainView.start();
         } else {
             mTryAgainView.finish();
+            ArrayList<BaseRecyclerData> list = mAdapter.getList();
+            if (!list.isEmpty() && list.get(list.size() - 1).getViewType() == TryAgainData.VIEW_TYPE) {
+                list.remove(list.size() - 1);
+            }
         }
     }
 
@@ -191,7 +195,6 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         int pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
 
         if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
-            mLoading = false;
             provideData();
         }
     }
