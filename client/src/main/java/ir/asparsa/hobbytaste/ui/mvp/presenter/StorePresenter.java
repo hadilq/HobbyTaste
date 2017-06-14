@@ -1,6 +1,7 @@
 package ir.asparsa.hobbytaste.ui.mvp.presenter;
 
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -155,8 +156,8 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
         publish();
     }
 
-    private Observer<StoresManager.SoresResult> getStoreObserver(final StoresManager.Constraint constraint) {
-        return new Observer<StoresManager.SoresResult>() {
+    private Observer<StoresManager.StoresResult> getStoreObserver(final StoresManager.Constraint constraint) {
+        return new Observer<StoresManager.StoresResult>() {
             @Override public void onCompleted() {
                 L.i(MainContentFragment.class, "Refresh request gets completed");
             }
@@ -167,7 +168,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
                 mTryAgainLater = true;
             }
 
-            @Override public void onNext(StoresManager.SoresResult result) {
+            @Override public void onNext(StoresManager.StoresResult result) {
                 if (result.getStores() == null || result.getStores().size() == 0) {
                     return;
                 }
@@ -247,5 +248,18 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
                 startLoading(lat, lng, mOffset);
             }
         }
+    }
+
+    public Pair<Double, Double> getPosition() {
+        double lat = mPreferencesManager.getFloat(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LATITUDE, 0f);
+        double lng = mPreferencesManager.getFloat(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LONGITUDE, 0f);
+        if (mHolder.getMap() != null) {
+            mCameraPosition = mHolder.getMap().getCameraPosition();
+            if (mCameraPosition != null && mCameraPosition.getTarget() != null) {
+                lat = mCameraPosition.getTarget().getLatitude();
+                lng = mCameraPosition.getTarget().getLongitude();
+            }
+        }
+        return new Pair<>(lat, lng);
     }
 }

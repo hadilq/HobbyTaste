@@ -99,7 +99,7 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
         if (store != null) {
             return store.getTitle();
         }
-        return getString(R.string.title_store_details);
+        return getString(R.string.title_place);
     }
 
     @Override public void onEvent(BaseEvent event) {

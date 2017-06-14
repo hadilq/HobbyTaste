@@ -13,7 +13,6 @@ import ir.asparsa.android.core.util.UiUtil;
 
 /**
  * @author hadi
- * @since 12/15/2016 AD.
  */
 public abstract class BaseBottomDialogFragment extends BottomSheetDialogFragment implements IDialogFragment {
 
@@ -39,7 +38,7 @@ public abstract class BaseBottomDialogFragment extends BottomSheetDialogFragment
 
     protected void sendEvent() {
         BaseOnDialogResultEvent event = getOnDialogResultEvent();
-        UiUtil.invokeEventReceiver(event, getFragmentManager());
+        UiUtil.invokeDialogEventReceiver(event, getFragmentManager());
     }
 
     @Override public void onCancel(DialogInterface dialog) {

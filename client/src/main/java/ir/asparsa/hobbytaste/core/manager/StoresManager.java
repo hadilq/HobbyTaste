@@ -86,9 +86,9 @@ public class StoresManager {
                 .subscribeOn(Schedulers.newThread());
     }
 
-    private Observable<SoresResult> getLoadErrorObservable(final Throwable e) {
-        return Observable.create(new Observable.OnSubscribe<SoresResult>() {
-            @Override public void call(Subscriber<? super SoresResult> subscriber) {
+    private Observable<StoresResult> getLoadErrorObservable(final Throwable e) {
+        return Observable.create(new Observable.OnSubscribe<StoresResult>() {
+            @Override public void call(Subscriber<? super StoresResult> subscriber) {
                 subscriber.onError(e);
             }
         }).observeOn(AndroidSchedulers.mainThread());
@@ -105,7 +105,7 @@ public class StoresManager {
 
     private void requestServer(
             Constraint constraint,
-            Observer<SoresResult> observer
+            Observer<StoresResult> observer
     ) {
         getLoadServiceObservable(constraint)
                 .subscribe(onLoadObserver(observer));
@@ -113,7 +113,7 @@ public class StoresManager {
 
     private void loadFromDatabase(
             Constraint constraint,
-            Observer<SoresResult> observer
+            Observer<StoresResult> observer
     ) {
         getStoresObservable(constraint)
                 .subscribe(getLoadObserver(observer));
@@ -121,10 +121,10 @@ public class StoresManager {
 
     public Subscription loadStores(
             Constraint constraint,
-            Observer<SoresResult> observer
+            Observer<StoresResult> observer
     ) {
-        Subject<SoresResult, SoresResult> subject = new SerializedSubject<>(
-                PublishSubject.<SoresResult>create());
+        Subject<StoresResult, StoresResult> subject = new SerializedSubject<>(
+                PublishSubject.<StoresResult>create());
         Subscription subscribe = subject.subscribe(observer);
 
         loadFromDatabase(constraint, subject);
@@ -223,7 +223,7 @@ public class StoresManager {
         };
     }
 
-    private Observer<? super StoreDao.Stores> getLoadObserver(final Observer<SoresResult> observer) {
+    private Observer<? super StoreDao.Stores> getLoadObserver(final Observer<StoresResult> observer) {
         return new Observer<StoreDao.Stores>() {
             @Override public void onCompleted() {
                 // Don't call observer's on completed method
@@ -234,7 +234,7 @@ public class StoresManager {
             }
 
             @Override public void onNext(StoreDao.Stores stores) {
-                observer.onNext(new SoresResult(stores.getStores(), stores.getTotalElements()));
+                observer.onNext(new StoresResult(stores.getStores(), stores.getTotalElements()));
             }
         };
     }
@@ -279,7 +279,7 @@ public class StoresManager {
     }
 
 
-    private Observer<StoreProto.Stores> onLoadObserver(final Observer<SoresResult> observer) {
+    private Observer<StoreProto.Stores> onLoadObserver(final Observer<StoresResult> observer) {
         return new Observer<StoreProto.Stores>() {
             @Override public void onCompleted() {
                 L.i(StoresManager.class, "Refresh request gets completed");
@@ -307,7 +307,7 @@ public class StoresManager {
     }
 
     private Observer<? super Collection<StoreModel>> onFinishObserver(
-            final Observer<SoresResult> observer,
+            final Observer<StoresResult> observer,
             final Collection<StoreModel> stores,
             final long totalElements
     ) {
@@ -322,7 +322,7 @@ public class StoresManager {
 
             @Override public void onNext(Collection<StoreModel> list) {
                 L.i(StoresManager.class, "Stores completely saved");
-                observer.onNext(new SoresResult(stores, totalElements));
+                observer.onNext(new StoresResult(stores, totalElements));
             }
         };
     }
@@ -362,11 +362,11 @@ public class StoresManager {
         }
     }
 
-    public static class SoresResult {
+    public static class StoresResult {
         private Collection<StoreModel> stores;
         private long totalElements;
 
-        SoresResult(
+        StoresResult(
                 Collection<StoreModel> stores,
                 long totalElement
         ) {

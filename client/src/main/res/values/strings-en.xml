@@ -2,10 +2,11 @@
 
     <string name="title_main">Main</string>
     <string name="title_settings">Settings</string>
-    <string name="title_store_details">Place</string>
+    <string name="title_place">Place</string>
     <string name="title_add_banner">Adding picture</string>
     <string name="title_add_store">Adding place</string>
     <string name="title_about_us">About Us</string>
+    <string name="title_places">Places</string>
 
     <string name="connection_error">Connection problem</string>
 
@@ -26,6 +27,7 @@
 
     <string name="menu_share">Share</string>
     <string name="menu_refresh">Refresh</string>
+    <string name="menu_list">List</string>
 
     <string name="comment_title">Comment</string>
     <string name="comment_hint">Please insert your comment here</string>

@@ -6,6 +6,7 @@ import ir.asparsa.hobbytaste.core.retrofit.AdditionalKeyStoresSSLSocketFactory;
 import ir.asparsa.hobbytaste.core.retrofit.AuthorizationFactory;
 import ir.asparsa.hobbytaste.core.retrofit.RetrofitException;
 import ir.asparsa.hobbytaste.core.route.PlaceRoute;
+import ir.asparsa.hobbytaste.core.route.PlacesRoute;
 import ir.asparsa.hobbytaste.ui.activity.BaseActivity;
 import ir.asparsa.hobbytaste.ui.activity.CrashReportActivity;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
@@ -13,9 +14,12 @@ import ir.asparsa.hobbytaste.ui.fragment.ContainerFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.*;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.CommentDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.SetUsernameDialogFragment;
+import ir.asparsa.hobbytaste.ui.fragment.recycler.PlacesRecyclerFragment;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.SettingsRecyclerFragment;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.StoreDetailsRecyclerFragment;
+import ir.asparsa.hobbytaste.ui.list.holder.PlaceViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.StoreMapViewHolder;
+import ir.asparsa.hobbytaste.ui.list.provider.PlacesProvider;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.AddBannerPresenter;
@@ -76,4 +80,14 @@ public interface MainComponent {
     void inject(AddStoreContentFragment addStoreContentFragment);
 
     void inject(AddBannerContentFragment addBannerContentFragment);
+
+    void inject(PlacesContentFragment placesContentFragment);
+
+    void inject(PlacesRecyclerFragment placesRecyclerFragment);
+
+    void inject(PlacesProvider placesProvider);
+
+    void inject(PlacesRoute placesRoute);
+
+    void inject(PlaceViewHolder placeViewHolder);
 }

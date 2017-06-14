@@ -1,10 +1,11 @@
 <resources>
     <string name="title_main">اصلی</string>
     <string name="title_settings">تنظیمات</string>
-    <string name="title_store_details">مکان</string>
+    <string name="title_place">مکان</string>
     <string name="title_add_banner">اضافه‌کردن تصویر</string>
     <string name="title_add_store">اضافه‌کردن مکان</string>
     <string name="title_about_us">درباره ما</string>
+    <string name="title_places">مکان‌ها</string>
 
     <string name="connection_error">مشکلی در برقراری ارتباط بوجود آمده‌است</string>
 
@@ -25,6 +26,7 @@
 
     <string name="menu_share">اشتراک</string>
     <string name="menu_refresh">بارگذاری</string>
+    <string name="menu_list">لیست</string>
 
     <string name="comment_title">نظر</string>
     <string name="comment_hint">لطفا نظر خود را وارد نمایید</string>

@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentManager;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.BaseFragment;
 
+import java.util.List;
+
 /**
  * @author hadi
  * @since 3/12/2017 AD.
@@ -19,15 +21,46 @@ public class UiUtil {
         invokeEventReceiver(event, fragmentManager, false);
     }
 
-
     public static void invokeEventReceiver(
             @NonNull BaseFragment.BaseEvent event,
             @NonNull FragmentManager fragmentManager,
             boolean popBackStack
     ) {
+        boolean reachTheTarget = false;
         for (int i = fragmentManager.getBackStackEntryCount() - 1; i >= 0; i--) {
             FragmentManager.BackStackEntry backStack = fragmentManager.getBackStackEntryAt(i);
             Fragment fragment = fragmentManager.findFragmentByTag(backStack.getName());
+            if (fragment instanceof BaseFragment) {
+                L.i(UiUtil.class, "Find base fragment to send event: " + fragment.getClass().getName());
+                ((BaseFragment) fragment).onEvent(event);
+                if (event.getSourceTag().equals(((BaseFragment) fragment).getTagName())) {
+                    reachTheTarget = true;
+                } else if (popBackStack && !reachTheTarget) {
+                    try {
+                        fragmentManager.popBackStack(fragment.getTag(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                    } catch (Exception e) {
+                        L.e(UiUtil.class.getClass(), "Back problem!", e);
+                    }
+                }
+            }
+        }
+    }
+
+    public static void invokeDialogEventReceiver(
+            @NonNull BaseFragment.BaseEvent event,
+            @NonNull FragmentManager fragmentManager
+    ) {
+        invokeDialogEventReceiver(event, fragmentManager, false);
+    }
+
+    public static void invokeDialogEventReceiver(
+            @NonNull BaseFragment.BaseEvent event,
+            @NonNull FragmentManager fragmentManager,
+            boolean popBackStack
+    ) {
+        List<Fragment> fragments = fragmentManager.getFragments();
+        for (int i = fragments.size() - 1; i >= 0; i--) {
+            Fragment fragment = fragments.get(i);
             if (fragment instanceof BaseFragment &&
                 event.getSourceTag().equals(((BaseFragment) fragment).getTagName())) {
                 L.i(UiUtil.class, "Find base fragment to send event: " + fragment.getClass().getName());
@@ -42,5 +75,4 @@ public class UiUtil {
             }
         }
     }
-
 }

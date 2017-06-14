@@ -9,7 +9,7 @@ import android.view.*;
 import ir.asparsa.android.core.util.UiUtil;
 
 /**
- * Created by hadi on 12/15/2016 AD.
+ * @author hadi
  */
 public abstract class BaseDialogFragment extends DialogFragment implements IDialogFragment {
 
@@ -36,7 +36,7 @@ public abstract class BaseDialogFragment extends DialogFragment implements IDial
 
     protected void sendEvent() {
         BaseOnDialogResultEvent event = getOnDialogResultEvent();
-        UiUtil.invokeEventReceiver(event, getFragmentManager());
+        UiUtil.invokeDialogEventReceiver(event, getFragmentManager());
     }
 
     @Override public void onCancel(DialogInterface dialog) {

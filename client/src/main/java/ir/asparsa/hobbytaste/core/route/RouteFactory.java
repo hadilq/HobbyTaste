@@ -149,6 +149,7 @@ public class RouteFactory {
             routes.add(new MainRoute(resources));
             routes.add(new SettingsRoute(resources));
             routes.add(new PlaceRoute(resources));
+            routes.add(new PlacesRoute(resources));
             mRouts = new WeakReference<>(routes);
         }
         return routes;
