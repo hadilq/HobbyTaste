@@ -88,6 +88,6 @@ public class PlaceRoute implements Route {
             @NonNull Uri.Builder builder,
             @NonNull Resources resources
     ) {
-        return builder.appendPath(resources.getString(R.string.path_segment_place));
+        return builder.appendPath(mSegment);
     }
 }
