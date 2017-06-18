@@ -72,7 +72,6 @@ public class AddBannerViewHolder implements ViewHolder {
             mController.setNeutralText(mView.getContext().getString(R.string.next));
         }
 
-        mController.setCancelText(mView.getContext().getString(R.string.send));
         mController.arrange();
         mController.setOnControlListener(listener);
     }

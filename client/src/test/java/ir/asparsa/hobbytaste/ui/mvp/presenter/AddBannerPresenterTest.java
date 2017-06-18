@@ -50,7 +50,6 @@ public class AddBannerPresenterTest extends BasePresenterTest {
 
         verify(bundle, times(1)).getParcelable(eq(AddBannerContentFragment.BUNDLE_KEY_STORE));
         verify(bundle, times(1)).getString(eq(AddBannerPresenter.BUNDLE_KEY_BITMAP_FILE_PATH));
-        verify(bundle, times(1)).getParcelable(eq(AddBannerPresenter.BUNDLE_KEY_BANNER));
         verify(addBannerViewHolder, times(1))
                 .setupControllerButtons(anyBoolean(), anyBoolean(), any(DialogControlLayout.OnControlListener.class));
 
@@ -81,7 +80,6 @@ public class AddBannerPresenterTest extends BasePresenterTest {
 
         verify(bundle, times(1)).getParcelable(eq(AddBannerContentFragment.BUNDLE_KEY_STORE));
         verify(bundle, times(1)).getString(eq(AddBannerPresenter.BUNDLE_KEY_BITMAP_FILE_PATH));
-        verify(bundle, times(1)).getParcelable(eq(AddBannerPresenter.BUNDLE_KEY_BANNER));
         verify(addBannerViewHolder, times(1))
                 .setupControllerButtons(anyBoolean(), anyBoolean(), any(DialogControlLayout.OnControlListener.class));
         verify(addBannerViewHolder, times(1)).setImageBitmap(eq(filePath));
@@ -101,32 +99,22 @@ public class AddBannerPresenterTest extends BasePresenterTest {
                 .thenReturn(string);
 
         StoreModel store = Mockito.mock(StoreModel.class);
-        ArrayList<BannerModel> banners = new ArrayList<>();
-        BannerModel banner = Mockito.mock(BannerModel.class);
-        banners.add(banner);
-        when(store.getBanners())
-                .thenReturn(banners);
         when(bundle.getParcelable(eq(AddBannerContentFragment.BUNDLE_KEY_STORE)))
                 .thenReturn(store);
         String filePath = "Some path";
         when(bundle.getString(eq(AddBannerPresenter.BUNDLE_KEY_BITMAP_FILE_PATH)))
                 .thenReturn(filePath);
-        when(bundle.getParcelable(eq(AddBannerPresenter.BUNDLE_KEY_BANNER)))
-                .thenReturn(banner);
 
         presenter.bindView(addBannerViewHolder);
 
         verify(bundle, times(1)).getParcelable(eq(AddBannerContentFragment.BUNDLE_KEY_STORE));
         verify(bundle, times(1)).getString(eq(AddBannerPresenter.BUNDLE_KEY_BITMAP_FILE_PATH));
-        verify(bundle, times(1)).getParcelable(eq(AddBannerPresenter.BUNDLE_KEY_BANNER));
         verify(addBannerViewHolder, times(1))
                 .setupControllerButtons(anyBoolean(), anyBoolean(), any(DialogControlLayout.OnControlListener.class));
         verify(addBannerViewHolder, times(1)).setImageBitmap(eq(filePath));
-        verify(addBannerViewHolder, times(2)).setHintText(eq(string));
+        verify(addBannerViewHolder, times(1)).setHintText(eq(string));
         verify(addBannerViewHolder, times(1)).dismissProgressDialog();
         verify(addBannerViewHolder, times(1)).dismissLoadingProgressDialog();
-
-        Assert.assertFalse(banners.contains(banner));
 
     }
 
@@ -138,7 +126,6 @@ public class AddBannerPresenterTest extends BasePresenterTest {
 
         verify(bundle, times(0)).getParcelable(eq(AddBannerContentFragment.BUNDLE_KEY_STORE));
         verify(bundle, times(0)).getString(eq(AddBannerPresenter.BUNDLE_KEY_BITMAP_FILE_PATH));
-        verify(bundle, times(0)).getParcelable(eq(AddBannerPresenter.BUNDLE_KEY_BANNER));
         verify(addBannerViewHolder, times(0))
                 .setupControllerButtons(anyBoolean(), anyBoolean(), any(DialogControlLayout.OnControlListener.class));
         verify(addBannerViewHolder, times(0)).dismissProgressDialog();

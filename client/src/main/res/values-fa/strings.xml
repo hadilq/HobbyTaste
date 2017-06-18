@@ -40,8 +40,6 @@
     <string name="new_store_description_empty">لطفا توضیحاتی را اضافه نمایید</string>
     <string name="new_store_at_least_banner">حداقل سه تصویر لازم است. تصویر را انتخاب کنید</string>
     <string name="new_store_banner_is_empty">تصویری انتخاب نشده‌است یا تصویر آماده‌نشده‌است</string>
-    <string name="new_store_banner_is_not_sent">تصویر فرستاده نشده‌است</string>
-    <string name="new_store_banner_successfully_sent">تصویر با موفقیت فرستاده‌شده</string>
     <string name="new_store_banner_successfully_prepared">تصویر با موفقیت آماده شده</string>
     <string name="new_store_banner_choose_banner">تصویر را انتخاب کنید</string>
     <string name="new_store_banner_error_prepared">تصویر آماده نشده‌است! لطفا دوباره تلاش نمایید</string>
