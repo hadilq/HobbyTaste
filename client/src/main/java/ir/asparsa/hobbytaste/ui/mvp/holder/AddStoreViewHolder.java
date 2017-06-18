@@ -13,11 +13,15 @@ import butterknife.ButterKnife;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.*;
+import ir.asparsa.android.core.util.UiUtil;
 import ir.asparsa.android.ui.view.DialogControlLayout;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.AddStorePresenter;
 import ir.asparsa.hobbytaste.ui.wrapper.WMap;
 import junit.framework.Assert;
+
+import javax.inject.Inject;
 
 /**
  * @author hadi
@@ -27,6 +31,9 @@ public class AddStoreViewHolder implements ViewHolder, OnMapReadyCallback, Googl
 
     private final View mView;
     private final AddStorePresenter mPresenter;
+
+    @Inject
+    UiUtil mUiUtil;
 
     @BindView(R.id.input_layout_store_name)
     TextInputLayout mStoreNameInputLayout;
@@ -48,6 +55,7 @@ public class AddStoreViewHolder implements ViewHolder, OnMapReadyCallback, Googl
     ) {
         mView = view;
         mPresenter = presenter;
+        ApplicationLauncher.mainComponent().inject(this);
         ButterKnife.bind(this, view);
 
         mStoreDescriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -89,7 +97,7 @@ public class AddStoreViewHolder implements ViewHolder, OnMapReadyCallback, Googl
     }
 
     @Override public void onMapReady(GoogleMap googleMap) {
-        mIcon = BitmapDescriptorFactory.fromResource(R.drawable.placeholder);
+        mIcon = BitmapDescriptorFactory.fromBitmap(mUiUtil.getBitmapFromVectorDrawable(R.drawable.ic_placeholder));
         mMap = new WMap(googleMap);
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override public void onMapClick(LatLng latLng) {

@@ -1,5 +1,6 @@
 package ir.asparsa.hobbytaste.ui.list.holder;
 
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -112,6 +113,9 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
         ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+
+            mTryAgain.getDrawable().mutate()
+                     .setColorFilter(itemView.getResources().getColor(R.color.refresh), PorterDuff.Mode.SRC_IN);
         }
 
         void onBindView(final BannerModel banner) {

@@ -23,7 +23,7 @@
             android:paddingEnd="@dimen/horizontal_margin_double"
             android:scaleType="fitStart"
             android:adjustViewBounds="true"
-            android:src="@drawable/refresh"
+            android:src="@drawable/ic_refresh"
             android:visibility="gone"/>
 
     <ProgressBar

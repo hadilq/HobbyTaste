@@ -1,6 +1,7 @@
 package ir.asparsa.android.ui.view;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -37,7 +38,10 @@ public class TryAgainView extends RelativeLayout {
         initiate();
     }
 
-    public TryAgainView(Context context, @Nullable AttributeSet attrs) {
+    public TryAgainView(
+            Context context,
+            @Nullable AttributeSet attrs
+    ) {
         super(context, attrs);
         initiate();
     }
@@ -47,6 +51,8 @@ public class TryAgainView extends RelativeLayout {
 
         ButterKnife.bind(this);
 
+        mTryButton.getDrawable().mutate().setColorFilter(
+                getContext().getResources().getColor(R.color.refresh), PorterDuff.Mode.SRC_IN);
         mTryButton.setOnClickListener(new OnClickListener() {
             @Override public void onClick(View v) {
                 start();
@@ -57,7 +63,7 @@ public class TryAgainView extends RelativeLayout {
         });
 
         mProgressBar.getIndeterminateDrawable().setColorFilter(
-                getContext().getResources().getColor(R.color.progress_bar), android.graphics.PorterDuff.Mode.SRC_IN);
+                getContext().getResources().getColor(R.color.progress_bar), PorterDuff.Mode.SRC_IN);
     }
 
     public void start() {

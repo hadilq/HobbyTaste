@@ -22,6 +22,8 @@ import ir.asparsa.hobbytaste.ui.list.holder.StoreMapViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.PlacesProvider;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
+import ir.asparsa.hobbytaste.ui.mvp.holder.AddStoreViewHolder;
+import ir.asparsa.hobbytaste.ui.mvp.holder.MainContentViewHolder;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.AddBannerPresenter;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.StorePresenter;
 
@@ -90,4 +92,8 @@ public interface MainComponent {
     void inject(PlacesRoute placesRoute);
 
     void inject(PlaceViewHolder placeViewHolder);
+
+    void inject(MainContentViewHolder mainContentViewHolder);
+
+    void inject(AddStoreViewHolder addStoreViewHolder);
 }

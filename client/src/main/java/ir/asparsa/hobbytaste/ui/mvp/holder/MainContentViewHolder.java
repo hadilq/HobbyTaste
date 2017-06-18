@@ -4,10 +4,13 @@ import android.support.annotation.Nullable;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.*;
+import ir.asparsa.android.core.util.UiUtil;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.StorePresenter;
 import ir.asparsa.hobbytaste.ui.wrapper.WMap;
 
+import javax.inject.Inject;
 import java.util.Collection;
 
 /**
@@ -16,12 +19,16 @@ import java.util.Collection;
  */
 public class MainContentViewHolder implements ViewHolder, OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
+    @Inject
+    UiUtil mUiUtil;
+
     private final StorePresenter mPresenter;
     private BitmapDescriptor mIcon;
     private WMap mMap;
 
     public MainContentViewHolder(StorePresenter presenter) {
         this.mPresenter = presenter;
+        ApplicationLauncher.mainComponent().inject(this);
     }
 
     @Override public boolean onMarkerClick(Marker marker) {
@@ -38,7 +45,7 @@ public class MainContentViewHolder implements ViewHolder, OnMapReadyCallback, Go
      * installed Google Play services and returned to the app.
      */
     @Override public void onMapReady(GoogleMap googleMap) {
-        mIcon = BitmapDescriptorFactory.fromResource(R.drawable.placeholder);
+        mIcon = BitmapDescriptorFactory.fromBitmap(mUiUtil.getBitmapFromVectorDrawable(R.drawable.ic_placeholder));
         mMap = new WMap(googleMap);
         mPresenter.onMapReady();
     }

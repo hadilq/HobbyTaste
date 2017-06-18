@@ -77,9 +77,9 @@ subprojects {
     ext.global_productServerRealAddress = "hobbytaste.asparsa.ir"
     ext.global_productServerRealScheme = "https"
 
-    ext.global_jwtHeader= "Authorization"
-    ext.global_maxFileSize= "10MB"
-    ext.global_hashCodeExpirationTime= "30000"
+    ext.global_jwtHeader = "Authorization"
+    ext.global_maxFileSize = "10MB"
+    ext.global_hashCodeExpirationTime = "30000"
 
     afterEvaluate { project ->
         if (project.hasProperty("android")) {
@@ -92,6 +92,7 @@ subprojects {
                     targetSdkVersion global_targetSdkVersion
                     versionCode global_versionCode
                     versionName global_versionName
+                    vectorDrawables.useSupportLibrary = true
                 }
             }
         }

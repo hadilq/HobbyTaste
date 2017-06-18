@@ -11,6 +11,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.*;
 import ir.asparsa.android.core.logger.L;
+import ir.asparsa.android.core.util.UiUtil;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
@@ -29,6 +30,8 @@ public class PlaceViewHolder extends BaseViewHolder<PlaceData> implements OnMapR
 
     @Inject
     MapUtil mMapUtil;
+    @Inject
+    UiUtil mUiUtil;
 
     @BindView(R.id.map)
     MapView mMapView;
@@ -76,7 +79,8 @@ public class PlaceViewHolder extends BaseViewHolder<PlaceData> implements OnMapR
     private void publish() {
         if (mMap != null && mStore != null) {
             LatLng latLng = new LatLng(mStore.getLat(), mStore.getLon());
-            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.placeholder);
+            BitmapDescriptor icon = BitmapDescriptorFactory
+                    .fromBitmap(mUiUtil.getBitmapFromVectorDrawable(R.drawable.ic_placeholder));
 
             mMarker = mMap.addMarker(
                     new MarkerOptions()

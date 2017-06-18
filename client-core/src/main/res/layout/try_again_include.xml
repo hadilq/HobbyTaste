@@ -28,7 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/try_again_message"
-                android:src="@drawable/refresh"/>
+                android:src="@drawable/ic_refresh"/>
 
     </RelativeLayout>
 

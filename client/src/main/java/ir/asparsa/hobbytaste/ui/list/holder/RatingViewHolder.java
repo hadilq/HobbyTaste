@@ -55,8 +55,10 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
         super(itemView, observer, savedInstanceState);
         ButterKnife.bind(this, itemView);
 
-        mUpArrow = itemView.getContext().getResources().getDrawable(R.drawable.up_arrow).mutate();
-        mDownArrow = itemView.getContext().getResources().getDrawable(R.drawable.down_arrow).mutate();
+        mUpArrow = itemView.getContext().getResources().getDrawable(R.drawable.ic_arrow_drop_up);
+        mDownArrow = itemView.getContext().getResources().getDrawable(R.drawable.ic_arrow_drop_down);
+        mUpArrow.mutate().setColorFilter(itemView.getResources().getColor(R.color.refresh), PorterDuff.Mode.SRC_IN);
+        mDownArrow.mutate().setColorFilter(itemView.getResources().getColor(R.color.refresh), PorterDuff.Mode.SRC_IN);
         mUpArrow.setColorFilter(itemView.getResources().getColor(R.color.dark_background), PorterDuff.Mode.SRC_ATOP);
         mDownArrow.setColorFilter(itemView.getResources().getColor(R.color.dark_background), PorterDuff.Mode.SRC_ATOP);
 

@@ -224,9 +224,9 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowHomeEnabled(true);
                 if (LanguageUtil.isRTL()) {
-                    mToolbar.setNavigationIcon(R.drawable.home_as_up_rtl);
+                    mToolbar.setNavigationIcon(R.drawable.ic_rtl_arrow);
                 } else {
-                    mToolbar.setNavigationIcon(R.drawable.home_as_up_ltr);
+                    mToolbar.setNavigationIcon(R.drawable.ic_ltr_arrow);
                 }
             } else {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
