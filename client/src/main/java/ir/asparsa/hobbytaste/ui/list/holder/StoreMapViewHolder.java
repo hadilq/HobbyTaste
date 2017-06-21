@@ -67,7 +67,7 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
     public void onMapReady(GoogleMap googleMap) {
         L.i(this.getClass(), "On map ready called");
         mMap = googleMap;
-        mMap.getUiSettings().setScrollGesturesEnabled(false);
+        mMap.getUiSettings().setAllGesturesEnabled(false);
         fillMap();
     }
 
