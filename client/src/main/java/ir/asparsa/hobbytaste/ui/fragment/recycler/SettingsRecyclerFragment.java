@@ -31,7 +31,7 @@ import rx.subscriptions.CompositeSubscription;
 import javax.inject.Inject;
 
 /**
- * Created by hadi on 12/14/2016 AD.
+ * @author hadi
  */
 public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvider> {
 
@@ -39,6 +39,8 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
     AuthorizationManager mAuthorizationManager;
     @Inject
     PreferencesManager mPreferencesManager;
+    @Inject
+    LanguageUtil mLanguageUtil;
 
     private CompositeSubscription mSubscription = new CompositeSubscription();
     private Observer<Object> mContentObserver;
@@ -139,7 +141,7 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
             mAuthorizationManager.setToken(usernameEvent.getToken());
             mAuthorizationManager.setUsername(usernameEvent.getUsername());
         } else if (event instanceof LanguageDialogFragment.OnChangeLanguageDialogResultEvent) {
-            if (LanguageUtil.setDefaultLanguage(
+            if (mLanguageUtil.setDefaultLanguage(
                     mPreferencesManager,
                     ((LanguageDialogFragment.OnChangeLanguageDialogResultEvent) event).getLanguage())) {
 

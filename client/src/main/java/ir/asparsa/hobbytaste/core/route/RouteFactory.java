@@ -34,6 +34,9 @@ public class RouteFactory {
     private List<Route> mRoutes = new ArrayList<>();
 
     @Inject
+    LanguageUtil mLanguageUtil;
+
+    @Inject
     public RouteFactory() {
         for (int i = 0; i < NavigationAdapter.PAGE_COUNT; i++) {
             // Make them fixed size by not adding anything else
@@ -190,7 +193,7 @@ public class RouteFactory {
     }
 
     public int pageToPos(int page) {
-        return LanguageUtil.isRTL() ? NavigationAdapter.PAGE_COUNT - 1 - page : page;
+        return mLanguageUtil.isRTL() ? NavigationAdapter.PAGE_COUNT - 1 - page : page;
     }
 
     public int posToPage(int pos) {

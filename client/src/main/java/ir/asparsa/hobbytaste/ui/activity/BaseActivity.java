@@ -9,19 +9,21 @@ import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import javax.inject.Inject;
 
 /**
- * Created by hadi on 1/13/2017 AD.
+ * @author hadi
  */
 public class BaseActivity extends AppCompatActivity {
 
 
     @Inject
     PreferencesManager mPreferencesManager;
+    @Inject
+    LanguageUtil mLanguageUtil;
 
     @Override protected void onCreate(
             Bundle savedInstanceState
     ) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
-        LanguageUtil.setupDefaultLocale(mPreferencesManager, this);
+        mLanguageUtil.setupDefaultLocale(mPreferencesManager, this);
     }
 }

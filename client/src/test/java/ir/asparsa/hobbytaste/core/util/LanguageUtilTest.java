@@ -1,15 +1,12 @@
 package ir.asparsa.hobbytaste.core.util;
 
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
-import ir.asparsa.hobbytaste.core.util.LanguageUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -28,8 +25,8 @@ public class LanguageUtilTest {
         when(preferencesManager.getString(eq(PreferencesManager.KEY_DEFAULT_LANGUAGE), anyString()))
                 .thenReturn(LanguageUtil.LANGUAGE_FA);
 
-        LanguageUtil.reset();
-        assertEquals("", LanguageUtil.LANGUAGE_FA, LanguageUtil.getLocale(preferencesManager).getLanguage());
+        LanguageUtil languageUtil = new LanguageUtil();
+        assertEquals("", LanguageUtil.LANGUAGE_FA, languageUtil.getLocale(preferencesManager).getLanguage());
     }
 
     @Test
@@ -38,8 +35,8 @@ public class LanguageUtilTest {
         when(preferencesManager.getString(eq(PreferencesManager.KEY_DEFAULT_LANGUAGE), anyString()))
                 .thenReturn(LanguageUtil.LANGUAGE_EN);
 
-        LanguageUtil.reset();
-        assertEquals("", LanguageUtil.LANGUAGE_EN, LanguageUtil.getLocale(preferencesManager).getLanguage());
+        LanguageUtil languageUtil = new LanguageUtil();
+        assertEquals("", LanguageUtil.LANGUAGE_EN, languageUtil.getLocale(preferencesManager).getLanguage());
     }
 
     @Test
@@ -49,11 +46,11 @@ public class LanguageUtilTest {
                 .thenReturn(LanguageUtil.LANGUAGE_FA)
                 .thenReturn(LanguageUtil.LANGUAGE_EN);
 
-        LanguageUtil.reset();
-        assertEquals("", LanguageUtil.LANGUAGE_FA, LanguageUtil.getLocale(preferencesManager).getLanguage());
-        LanguageUtil.setDefaultLanguage(preferencesManager, LanguageUtil.LANGUAGE_EN);
+        LanguageUtil languageUtil = new LanguageUtil();
+        assertEquals("", LanguageUtil.LANGUAGE_FA, languageUtil.getLocale(preferencesManager).getLanguage());
+        languageUtil.setDefaultLanguage(preferencesManager, LanguageUtil.LANGUAGE_EN);
 
-        assertEquals("", LanguageUtil.LANGUAGE_EN, LanguageUtil.getLocale(preferencesManager).getLanguage());
+        assertEquals("", LanguageUtil.LANGUAGE_EN, languageUtil.getLocale(preferencesManager).getLanguage());
         verify(preferencesManager).put(eq(PreferencesManager.KEY_DEFAULT_LANGUAGE), eq(LanguageUtil.LANGUAGE_EN));
     }
 
@@ -64,11 +61,11 @@ public class LanguageUtilTest {
                 .thenReturn(LanguageUtil.LANGUAGE_EN)
                 .thenReturn(LanguageUtil.LANGUAGE_FA);
 
-        LanguageUtil.reset();
-        assertEquals("", LanguageUtil.LANGUAGE_EN, LanguageUtil.getLocale(preferencesManager).getLanguage());
-        LanguageUtil.setDefaultLanguage(preferencesManager, LanguageUtil.LANGUAGE_FA);
+        LanguageUtil languageUtil = new LanguageUtil();
+        assertEquals("", LanguageUtil.LANGUAGE_EN, languageUtil.getLocale(preferencesManager).getLanguage());
+        languageUtil.setDefaultLanguage(preferencesManager, LanguageUtil.LANGUAGE_FA);
 
-        assertEquals("", LanguageUtil.LANGUAGE_FA, LanguageUtil.getLocale(preferencesManager).getLanguage());
+        assertEquals("", LanguageUtil.LANGUAGE_FA, languageUtil.getLocale(preferencesManager).getLanguage());
         verify(preferencesManager).put(eq(PreferencesManager.KEY_DEFAULT_LANGUAGE), eq(LanguageUtil.LANGUAGE_FA));
     }
 
@@ -78,9 +75,9 @@ public class LanguageUtilTest {
         when(preferencesManager.getString(eq(PreferencesManager.KEY_DEFAULT_LANGUAGE), anyString()))
                 .thenReturn(LanguageUtil.LANGUAGE_EN);
 
-        LanguageUtil.reset();
-        assertEquals("", LanguageUtil.LANGUAGE_EN, LanguageUtil.getLocale(preferencesManager).getLanguage());
-        assertFalse("", LanguageUtil.isRTL());
+        LanguageUtil languageUtil = new LanguageUtil();
+        assertEquals("", LanguageUtil.LANGUAGE_EN, languageUtil.getLocale(preferencesManager).getLanguage());
+        assertFalse("", languageUtil.isRTL());
     }
 
 
@@ -90,8 +87,8 @@ public class LanguageUtilTest {
         when(preferencesManager.getString(eq(PreferencesManager.KEY_DEFAULT_LANGUAGE), anyString()))
                 .thenReturn(LanguageUtil.LANGUAGE_FA);
 
-        LanguageUtil.reset();
-        assertEquals("", LanguageUtil.LANGUAGE_FA, LanguageUtil.getLocale(preferencesManager).getLanguage());
-        assertTrue("", LanguageUtil.isRTL());
+        LanguageUtil languageUtil = new LanguageUtil();
+        assertEquals("", LanguageUtil.LANGUAGE_FA, languageUtil.getLocale(preferencesManager).getLanguage());
+        assertTrue("", languageUtil.isRTL());
     }
 }

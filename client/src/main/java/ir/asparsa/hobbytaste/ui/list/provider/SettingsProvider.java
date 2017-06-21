@@ -21,7 +21,6 @@ import java.util.Locale;
 
 /**
  * @author hadi
- * @since 12/14/2016 AD.
  */
 public class SettingsProvider extends AbsListProvider {
 
@@ -29,6 +28,8 @@ public class SettingsProvider extends AbsListProvider {
     AuthorizationManager mAuthorizationManager;
     @Inject
     Context mContext;
+    @Inject
+    LanguageUtil mLanguageUtil;
 
     public SettingsProvider(
             RecyclerListAdapter adapter,
@@ -47,7 +48,7 @@ public class SettingsProvider extends AbsListProvider {
         final Collection<BaseRecyclerData> collection = new ArrayDeque<>();
         collection.add(new UsernameData(mAuthorizationManager.getUsername()));
         collection.add(new LanguageData(
-                LanguageUtil.getLanguageTitle(mContext.getResources()),
+                mLanguageUtil.getLanguageTitle(mContext.getResources()),
                 Locale.getDefault().getLanguage()));
         collection.add(new AboutUsData());
 

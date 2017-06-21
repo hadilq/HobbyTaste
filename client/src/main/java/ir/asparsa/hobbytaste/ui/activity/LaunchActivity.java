@@ -46,6 +46,8 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
     RouteFactory mRouteFactory;
     @Inject
     NavigationUtil mNavigationUtil;
+    @Inject
+    LanguageUtil mLanguageUtil;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -223,7 +225,7 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
             if (fragment.hasHomeAsUp()) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowHomeEnabled(true);
-                if (LanguageUtil.isRTL()) {
+                if (mLanguageUtil.isRTL()) {
                     mToolbar.setNavigationIcon(R.drawable.ic_rtl_arrow);
                 } else {
                     mToolbar.setNavigationIcon(R.drawable.ic_ltr_arrow);
