@@ -9,6 +9,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import butterknife.BindView;
@@ -101,6 +102,8 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
 
     class ViewHolder extends RecyclerView.ViewHolder implements Callback {
 
+        @BindView(R.id.shot_layout)
+        FrameLayout mShotLayout;
         @BindView(R.id.shot)
         ImageView mScreenshot;
         @BindView(R.id.try_again)
@@ -134,7 +137,7 @@ public class GalleryViewHolder extends BaseViewHolder<GalleryData> {
             }
 
             if (imageSet) {
-                mScreenshot.setOnClickListener(new View.OnClickListener() {
+                mShotLayout.setOnClickListener(new View.OnClickListener() {
                     @Override public void onClick(View view) {
                         if (mObserver != null) {
                             mObserver.call(new OnScreenshotClick(banner));
