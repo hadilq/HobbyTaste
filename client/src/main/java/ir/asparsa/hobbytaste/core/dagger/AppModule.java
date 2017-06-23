@@ -2,6 +2,8 @@ package ir.asparsa.hobbytaste.core.dagger;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import dagger.Module;
 import dagger.Provides;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
@@ -37,6 +39,12 @@ public class AppModule {
     @Singleton
     Context providesContext() {
         return mApplication;
+    }
+
+    @Provides
+    @Singleton
+    Handler providesHandler() {
+        return new Handler(Looper.getMainLooper());
     }
 
 }
