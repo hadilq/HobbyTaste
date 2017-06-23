@@ -52,7 +52,6 @@ public class MainContentFragment extends BaseContentFragment {
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
-        setHasOptionsMenu(true);
         mPresenter = new StorePresenter(getDelegate());
         mHolder = new MainContentViewHolder(mPresenter);
     }
@@ -86,6 +85,8 @@ public class MainContentFragment extends BaseContentFragment {
             Menu menu,
             MenuInflater inflater
     ) {
+        menu.clear();
+
         inflater.inflate(R.menu.menu_share, menu);
         MenuItem share = menu.findItem(R.id.share);
         share.getIcon().mutate()
@@ -100,8 +101,6 @@ public class MainContentFragment extends BaseContentFragment {
         MenuItem refresh = menu.findItem(R.id.share);
         refresh.getIcon().mutate()
                .setColorFilter(getResources().getColor(R.color.background), PorterDuff.Mode.SRC_ATOP);
-
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {

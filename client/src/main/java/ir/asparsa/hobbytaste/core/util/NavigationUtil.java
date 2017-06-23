@@ -1,9 +1,16 @@
 package ir.asparsa.hobbytaste.core.util;
 
+import android.content.Context;
+import android.content.res.Resources;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.BaseFragment;
 import ir.asparsa.hobbytaste.R;
@@ -15,29 +22,66 @@ import javax.inject.Singleton;
 
 /**
  * @author hadi
- * @since 6/23/2016 AD
  */
 @Singleton
 public class NavigationUtil {
+
+    @Inject
+    LanguageUtil mLanguageUtil;
+    @Inject
+    Context mContext;
+    @Inject
+    Resources mResources;
+    @Inject
+    Handler mHandler;
 
     @Inject
     public NavigationUtil() {
     }
 
     public void startContentFragment(
-            @NonNull FragmentManager fragmentManager,
-            @NonNull BaseContentFragment fragment
+            @NonNull final FragmentManager fragmentManager,
+            @NonNull final BaseContentFragment fragment
     ) {
         try {
-            fragmentManager
-                    .beginTransaction()
-                    .setCustomAnimations(R.anim.come, 0, 0, R.anim.back)
-                    .replace(R.id.content, fragment, fragment.getTagName())
-                    .addToBackStack(fragment.getTagName())
-                    .commit();
+            FragmentTransaction t = fragmentManager.beginTransaction();
+            if (mLanguageUtil.isRTL()) {
+                t.setCustomAnimations(R.anim.enter_from_left, 0);
+            } else {
+                t.setCustomAnimations(R.anim.enter_from_right, 0);
+            }
+            t.add(R.id.content, fragment, fragment.getTagName())
+             .addToBackStack(fragment.getTagName())
+             .commit();
         } catch (Exception e) {
             L.e(NavigationUtil.class.getClass(), "start content problem!", e);
         }
+    }
+
+    public void popBackStack(
+            @NonNull final FragmentManager fragmentManager,
+            @NonNull final BaseContentFragment fragment
+    ) {
+        Animation animation;
+        if (mLanguageUtil.isRTL()) {
+            animation = AnimationUtils.loadAnimation(mContext, R.anim.exit_to_left);
+        } else {
+            animation = AnimationUtils.loadAnimation(mContext, R.anim.exit_to_right);
+        }
+        animation.setStartOffset(0);
+        View view = fragment.getView();
+        if (view != null) {
+            view.startAnimation(animation);
+        }
+        mHandler.postDelayed(new Runnable() {
+            @Override public void run() {
+                try {
+                    fragmentManager.popBackStack();
+                } catch (Exception e) {
+                    L.e(NavigationUtil.class.getClass(), "Back problem!", e);
+                }
+            }
+        }, mResources.getInteger(R.integer.fragment_transition_duration));
     }
 
     public void startNestedFragment(
@@ -45,20 +89,12 @@ public class NavigationUtil {
             @NonNull BaseFragment fragment
     ) {
         try {
-            fragmentManager.beginTransaction()
-                           .setCustomAnimations(R.anim.back, 0)
-                           .replace(R.id.content_nested, fragment, fragment.getTagName())
-                           .commit();
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.content_nested, fragment, fragment.getTagName())
+                    .commit();
         } catch (Exception e) {
             L.e(NavigationUtil.class.getClass(), "start nested problem!", e);
-        }
-    }
-
-    public void popBackStack(@NonNull FragmentManager activeFragmentManager) {
-        try {
-            activeFragmentManager.popBackStack();
-        } catch (Exception e) {
-            L.e(NavigationUtil.class.getClass(), "Back problem!", e);
         }
     }
 

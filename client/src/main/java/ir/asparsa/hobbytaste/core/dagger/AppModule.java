@@ -2,6 +2,7 @@ package ir.asparsa.hobbytaste.core.dagger;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Handler;
 import android.os.Looper;
 import dagger.Module;
@@ -39,6 +40,12 @@ public class AppModule {
     @Singleton
     Context providesContext() {
         return mApplication;
+    }
+
+    @Provides
+    @Singleton
+    Resources providesResources() {
+        return mApplication.getResources();
     }
 
     @Provides

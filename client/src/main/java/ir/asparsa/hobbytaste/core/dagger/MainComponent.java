@@ -102,4 +102,6 @@ public interface MainComponent {
     void inject(NavigationAdapter adapter);
 
     void inject(HorizontalSpaceItemDecoration horizontalSpaceItemDecoration);
+
+    void inject(BaseContentFragment baseContentFragment);
 }
