@@ -2,9 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical">
 
     <FrameLayout
+            android:id="@+id/dashboard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="@dimen/vertical_margin_quarter"
@@ -13,7 +15,6 @@
             android:foreground="@drawable/selectable_item_background">
 
         <RelativeLayout
-                android:id="@+id/dashboard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -24,7 +25,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="@dimen/horizontal_margin"
-                    android:src="@drawable/ic_heart"/>
+                    app:srcCompat="@drawable/ic_heart"/>
 
             <ImageView
                     android:id="@+id/arrow"
@@ -56,7 +57,7 @@
                         android:layout_width="@dimen/tail_size"
                         android:layout_height="@dimen/tail_size"
                         android:layout_marginStart="@dimen/horizontal_margin_eighth"
-                        android:src="@drawable/ic_heart"/>
+                        app:srcCompat="@drawable/ic_heart"/>
             </LinearLayout>
 
             <LinearLayout
@@ -80,7 +81,7 @@
                         android:layout_width="@dimen/tail_size"
                         android:layout_height="@dimen/tail_size"
                         android:layout_marginStart="@dimen/horizontal_margin_eighth"
-                        android:src="@drawable/ic_eye"/>
+                        app:srcCompat="@drawable/ic_eye"/>
             </LinearLayout>
 
         </RelativeLayout>
