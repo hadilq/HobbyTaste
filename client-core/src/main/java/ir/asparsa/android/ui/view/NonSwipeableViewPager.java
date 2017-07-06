@@ -7,7 +7,6 @@ import android.view.MotionEvent;
 
 /**
  * @author hadi
- * @since 3/8/2017 AD.
  */
 public class NonSwipeableViewPager extends ViewPager {
 

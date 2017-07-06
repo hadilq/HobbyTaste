@@ -3,7 +3,7 @@ package ir.asparsa.android.core.util;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by hadi on 12/11/2016 AD.
+ * @author hadi
  */
 public class ViewUtil {
     private static final AtomicInteger sNextGeneratedId = new AtomicInteger(1);

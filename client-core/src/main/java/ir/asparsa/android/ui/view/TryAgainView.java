@@ -32,6 +32,7 @@ public class TryAgainView extends RelativeLayout {
     FrameLayout mExtraLayout;
 
     private OnTryAgainListener mOnTryAgainListener;
+    private View mExtraView;
 
     public TryAgainView(Context context) {
         super(context);
@@ -85,12 +86,17 @@ public class TryAgainView extends RelativeLayout {
     public void onError(@Nullable String message) {
         if (!TextUtils.isEmpty(message)) {
             mMessageTextView.setText(message);
+            mMessageTextView.setVisibility(VISIBLE);
+        } else {
+            mMessageTextView.setVisibility(GONE);
         }
+        mExtraLayout.setVisibility(GONE);
         mProgressBar.setVisibility(GONE);
         mOnTryAgainLayout.setVisibility(VISIBLE);
     }
 
     public void setExtraView(@Nullable View view) {
+        this.mExtraView = view;
         if (view != null) {
             mExtraLayout.addView(view, new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -103,7 +109,9 @@ public class TryAgainView extends RelativeLayout {
     public void showExtraView() {
         mProgressBar.setVisibility(GONE);
         mOnTryAgainLayout.setVisibility(GONE);
-        mExtraLayout.setVisibility(VISIBLE);
+        if (mExtraView != null) {
+            mExtraLayout.setVisibility(VISIBLE);
+        }
     }
 
     public interface OnTryAgainListener {

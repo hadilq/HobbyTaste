@@ -32,6 +32,7 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
 
     private final StoreModel mStore;
     private final CompositeSubscription mSubscription = new CompositeSubscription();
+    private long mLastRequestedIndex;
 
     public StoreDetailsProvider(
             @NonNull RecyclerListAdapter adapter,
@@ -49,7 +50,7 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
         }
         headers.add(new RatingData(mStore.getRate(), mStore.getViewed(), mStore.getDescription(),
                                    mStore.isLiked(), mStore.getCreator()));
-        mOnInsertData.OnDataInserted(new DataObserver(headers.size()) {
+        mOnInsertData.onDataInserted(true, new DataObserver(false) {
             @Override public void onCompleted() {
                 for (; index < headers.size(); index++) {
                     deque.add(headers.get(index));
@@ -67,6 +68,7 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
             int limit
     ) {
         L.i(getClass(), "Provide data: " + offset + " " + limit);
+        mLastRequestedIndex = offset + limit;
         mSubscription.add(mCommentManager.loadComments(new CommentManager.Constraint(mStore, offset, limit), this));
     }
 
@@ -98,7 +100,7 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
             }
         });
 
-        final DataObserver dataHolder = new DataObserver(result.getTotalElements()) {
+        final DataObserver dataHolder = new DataObserver(result.getTotalElements() <= mLastRequestedIndex) {
             @Override public void onCompleted() {
                 for (; index < listModel.size(); index++) {
                     deque.add(new CommentData(listModel.get(index)));
@@ -143,7 +145,7 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
             }
         };
 
-        mOnInsertData.OnDataInserted(dataHolder);
+        mOnInsertData.onDataInserted(false, dataHolder);
     }
 
     public void addComment(CommentModel comment) {

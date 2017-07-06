@@ -19,7 +19,6 @@ import java.util.List;
 
 /**
  * @author hadi
- * @since 3/12/2017 AD.
  */
 @Singleton
 public class UiUtil {

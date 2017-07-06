@@ -13,10 +13,10 @@ import ir.asparsa.common.net.dto.StoreProto;
  * @since 12/7/2016 AD
  */
 @DatabaseTable(tableName = Banner.TABLE_NAME)
-public class BannerModel extends BaseModel implements Parcelable {
+public class BannerModel extends BaseModel<Long> implements Parcelable {
 
     @DatabaseField(columnName = Banner.Columns.ID, generatedId = true)
-    private long id;
+    private Long id;
 
     @DatabaseField(columnName = Banner.Columns.MAIN_URL)
     private String mainUrl;
@@ -44,8 +44,12 @@ public class BannerModel extends BaseModel implements Parcelable {
                 .build();
     }
 
-    public long getId() {
+    @Override public Long getId() {
         return id;
+    }
+
+    @Override public void setId(Long id) {
+        this.id = id;
     }
 
     public String getMainUrl() {

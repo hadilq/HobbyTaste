@@ -17,7 +17,7 @@ import java.util.List;
  * @since 11/30/2016 AD
  */
 @DatabaseTable(tableName = Store.TABLE_NAME)
-public class StoreModel extends BaseModel implements Parcelable {
+public class StoreModel extends BaseModel<Long> implements Parcelable {
 
     @DatabaseField(columnName = Store.Columns.ID, generatedId = true)
     private Long id;
@@ -107,11 +107,11 @@ public class StoreModel extends BaseModel implements Parcelable {
         return builder.build();
     }
 
-    public Long getId() {
+    @Override public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    @Override public void setId(Long id) {
         this.id = id;
     }
 

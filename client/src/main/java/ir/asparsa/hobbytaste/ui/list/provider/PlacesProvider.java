@@ -34,6 +34,7 @@ public class PlacesProvider extends AbsListProvider implements Observer<StoresMa
     private final CompositeSubscription mSubscription = new CompositeSubscription();
     private final double mLatitude;
     private final double mLongitude;
+    private long mLastRequestedIndex;
 
     public PlacesProvider(
             RecyclerListAdapter adapter,
@@ -51,6 +52,7 @@ public class PlacesProvider extends AbsListProvider implements Observer<StoresMa
             long offset,
             int limit
     ) {
+        mLastRequestedIndex = offset + limit;
         StoresManager.Constraint constraint = new StoresManager.Constraint(
                 mLatitude, mLongitude, (int) offset, STORES_LIMIT);
         mSubscription.add(mStoresManager.loadStores(constraint, this));
@@ -73,18 +75,19 @@ public class PlacesProvider extends AbsListProvider implements Observer<StoresMa
         for (StoreModel store : storesResult.getStores()) {
             stores.add(new PlaceData(store));
         }
-        mOnInsertData.OnDataInserted(new DataObserver(storesResult.getTotalElements()) {
+        mOnInsertData.onDataInserted(false, new DataObserver(storesResult.getTotalElements() <= mLastRequestedIndex) {
             @Override public void onCompleted() {
+                int initIndex = deque.size();
                 for (; index < stores.size(); index++) {
                     deque.add(stores.get(index));
-                    mAdapter.notifyItemInserted(deque.size() - 1);
+                }
+                if (initIndex <= deque.size() - 1) {
+                    mAdapter.notifyItemRangeInserted(initIndex, deque.size() - 1);
                 }
             }
 
             @Override public void onNext(BaseRecyclerData baseRecyclerData) {
-                if (stores.contains(baseRecyclerData)) {
-                    stores.remove(baseRecyclerData);
-                }
+                stores.remove(baseRecyclerData);
                 deque.add(baseRecyclerData);
             }
         });

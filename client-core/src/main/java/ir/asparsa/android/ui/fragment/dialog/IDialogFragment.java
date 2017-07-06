@@ -7,7 +7,6 @@ import ir.asparsa.android.ui.fragment.BaseFragment;
 
 /**
  * @author hadi
- * @since 12/15/2016 AD.
  */
 public interface IDialogFragment {
 

@@ -14,7 +14,7 @@ import ir.asparsa.common.net.dto.CommentProto;
  * @since 12/7/2016 AD
  */
 @DatabaseTable(tableName = Comment.TABLE_NAME)
-public class CommentModel extends BaseModel implements Parcelable {
+public class CommentModel extends BaseModel<Long> implements Parcelable {
 
 
     @DatabaseField(columnName = Comment.Columns.ID, generatedId = true)
@@ -86,11 +86,11 @@ public class CommentModel extends BaseModel implements Parcelable {
                 .build();
     }
 
-    public long getId() {
+    @Override public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    @Override public void setId(Long id) {
         this.id = id;
     }
 
