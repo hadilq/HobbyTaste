@@ -3,17 +3,23 @@ package ir.asparsa.hobbytaste.ui.fragment.content;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.SettingsRecyclerFragment;
 import ir.asparsa.hobbytaste.ui.list.holder.AboutUsViewHolder;
 import rx.Observer;
 
+import javax.inject.Inject;
+
 /**
  * @author hadi
  * @since 12/2/2016 AD
  */
 public class SettingsContentFragment extends BaseContentFragment {
+
+    @Inject
+    NavigationUtil mNavigationUtil;
 
     public static SettingsContentFragment instantiate() {
 
@@ -24,16 +30,21 @@ public class SettingsContentFragment extends BaseContentFragment {
         return fragment;
     }
 
+    @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ApplicationLauncher.mainComponent().inject(this);
+    }
+
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
+        Fragment fragment = mNavigationUtil.getActiveFragment(getChildFragmentManager());
         SettingsRecyclerFragment settingsRecyclerFragment;
 
         if (!(fragment instanceof SettingsRecyclerFragment)) {
             settingsRecyclerFragment = SettingsRecyclerFragment.instantiate();
 
-            NavigationUtil.startNestedFragment(
+            mNavigationUtil.startNestedFragment(
                     getChildFragmentManager(),
                     settingsRecyclerFragment
             );
@@ -69,7 +80,7 @@ public class SettingsContentFragment extends BaseContentFragment {
     }
 
     private void onAboutUsClick() {
-        NavigationUtil.startContentFragment(getFragmentManager(), AboutUsContentFragment.instantiate());
+        mNavigationUtil.startContentFragment(getFragmentManager(), AboutUsContentFragment.instantiate());
     }
 
 }

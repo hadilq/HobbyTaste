@@ -1,7 +1,6 @@
 package ir.asparsa.hobbytaste.ui.list.provider;
 
 import android.content.Context;
-import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
@@ -21,7 +20,6 @@ import java.util.Locale;
 
 /**
  * @author hadi
- * @since 12/14/2016 AD.
  */
 public class SettingsProvider extends AbsListProvider {
 
@@ -29,6 +27,8 @@ public class SettingsProvider extends AbsListProvider {
     AuthorizationManager mAuthorizationManager;
     @Inject
     Context mContext;
+    @Inject
+    LanguageUtil mLanguageUtil;
 
     public SettingsProvider(
             RecyclerListAdapter adapter,
@@ -37,21 +37,14 @@ public class SettingsProvider extends AbsListProvider {
 
         super(adapter, onInsertData);
         ApplicationLauncher.mainComponent().inject(this);
-    }
-
-    @Override public void provideData(
-            long offset,
-            int limit
-    ) {
-        L.i(getClass(), "New data needed: " + offset + " " + limit);
         final Collection<BaseRecyclerData> collection = new ArrayDeque<>();
         collection.add(new UsernameData(mAuthorizationManager.getUsername()));
         collection.add(new LanguageData(
-                LanguageUtil.getLanguageTitle(mContext.getResources()),
+                mLanguageUtil.getLanguageTitle(mContext.getResources()),
                 Locale.getDefault().getLanguage()));
         collection.add(new AboutUsData());
 
-        mOnInsertData.OnDataInserted(new DataObserver(collection.size()) {
+        mOnInsertData.onDataInserted(true, new DataObserver(true) {
             @Override public void onCompleted() {
                 for (BaseRecyclerData data : collection) {
                     deque.add(data);
@@ -61,5 +54,11 @@ public class SettingsProvider extends AbsListProvider {
             @Override public void onNext(BaseRecyclerData baseRecyclerData) {
             }
         });
+    }
+
+    @Override public void provideData(
+            long offset,
+            int limit
+    ) {
     }
 }

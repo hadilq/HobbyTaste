@@ -16,7 +16,6 @@ import ir.asparsa.android.R2;
 
 /**
  * @author hadi
- * @since 3/6/2017 AD.
  */
 public class LoadingProgressDialogFragment extends BaseDialogFragment {
 

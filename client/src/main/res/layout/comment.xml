@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
             android:id="@+id/heart"
@@ -13,7 +14,7 @@
             android:layout_marginBottom="@dimen/vertical_margin_half"
             android:layout_marginStart="@dimen/horizontal_margin_half"
             android:layout_marginEnd="@dimen/horizontal_margin_half"
-            android:src="@drawable/heart"/>
+            app:srcCompat="@drawable/ic_heart"/>
 
     <TextView
             android:id="@+id/creator"
@@ -60,7 +61,7 @@
                 android:layout_width="@dimen/tail_size"
                 android:layout_height="@dimen/tail_size"
                 android:layout_marginStart="@dimen/horizontal_margin_eighth"
-                android:src="@drawable/heart"/>
+                app:srcCompat="@drawable/ic_heart"/>
     </LinearLayout>
 
     <TextView

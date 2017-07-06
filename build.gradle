@@ -38,7 +38,7 @@ subprojects {
     // The implementation number of the current interface.
     def appRevision = 0
     // The difference between the newest and oldest interfaces that the library implements.
-    def appAge = 6
+    def appAge = 7
 
     ext.global_compileSdkVersion = 25
     ext.global_buildToolsVersion = "25.0.1"
@@ -77,9 +77,9 @@ subprojects {
     ext.global_productServerRealAddress = "hobbytaste.asparsa.ir"
     ext.global_productServerRealScheme = "https"
 
-    ext.global_jwtHeader= "Authorization"
-    ext.global_maxFileSize= "10MB"
-    ext.global_hashCodeExpirationTime= "30000"
+    ext.global_jwtHeader = "Authorization"
+    ext.global_maxFileSize = "10MB"
+    ext.global_hashCodeExpirationTime = "30000"
 
     afterEvaluate { project ->
         if (project.hasProperty("android")) {
@@ -92,6 +92,7 @@ subprojects {
                     targetSdkVersion global_targetSdkVersion
                     versionCode global_versionCode
                     versionName global_versionName
+                    vectorDrawables.useSupportLibrary = true
                 }
             }
         }

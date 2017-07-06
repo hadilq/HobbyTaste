@@ -18,8 +18,8 @@ import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.net.BannerService;
 import ir.asparsa.hobbytaste.ui.fragment.content.AddBannerContentFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.AddStoreContentFragment;
-import ir.asparsa.hobbytaste.ui.mvp.holder.AddBannerViewHolder;
 import ir.asparsa.hobbytaste.ui.fragment.content.FragmentDelegate;
+import ir.asparsa.hobbytaste.ui.mvp.holder.AddBannerViewHolder;
 import okhttp3.MultipartBody;
 import rx.Observable;
 import rx.Observer;
@@ -40,7 +40,6 @@ import java.io.IOException;
  */
 public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
     public static final String BUNDLE_KEY_BITMAP_FILE_PATH = "BUNDLE_KEY_BITMAP_FILE_PATH";
-    public static final String BUNDLE_KEY_BANNER = "BUNDLE_KEY_BANNER";
 
     private final FragmentDelegate mFragment;
     private final CompositeSubscription mSubscription = new CompositeSubscription();
@@ -52,7 +51,6 @@ public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
 
     private StoreModel mStore;
     private String mFilePath;
-    private BannerModel mBanner;
     private AddBannerViewHolder mHolder;
 
     public AddBannerPresenter(FragmentDelegate fragment) {
@@ -69,11 +67,6 @@ public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
         String filePath = mFragment.getArguments().getString(BUNDLE_KEY_BITMAP_FILE_PATH);
         if (filePath != null) {
             mFilePath = filePath;
-        }
-        BannerModel banner = mFragment.getArguments().getParcelable(BUNDLE_KEY_BANNER);
-        if (banner != null) {
-            mStore.getBanners().remove(banner);
-            mBanner = banner;
         }
         mHolder.setupControllerButtons(
                 mStore.getBanners().size() >= 2, mStore.getBanners().size() <= 8, getControllerListener());
@@ -98,9 +91,6 @@ public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
             mHolder.setImageBitmap(mFilePath);
             mHolder.setHintText(mFragment.getString(R.string.new_store_banner_successfully_prepared));
             mHolder.dismissProgressDialog();
-        }
-        if (mBanner != null) {
-            mHolder.setHintText(mFragment.getString(R.string.new_store_banner_successfully_sent));
             mHolder.dismissLoadingProgressDialog();
         }
     }
@@ -115,53 +105,49 @@ public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
     private DialogControlLayout.OnControlListener getControllerListener() {
         return new DialogControlLayout.OnControlListener() {
             @Override public void onCommit() {
-                // Finish adding new store
-                if (mBanner == null) {
-                    mHolder.setHintText(R.string.new_store_banner_is_not_sent);
-                    return;
-                }
-                mHolder.setHintText("");
-                mStore.getBanners().add(mBanner);
-                mSubscription.add(mStoresManager.saveStore(mStore, getStoreSaveObserver()));
-                mHolder.showProgressDialog(R.string.new_store_saving, mFragment.getFragmentManager());
+                sendBanner(true);
             }
 
             @Override public void onNeutral() {
-                // Adding more banner
-                if (mBanner == null) {
-                    mHolder.setHintText(R.string.new_store_banner_is_not_sent);
-                    return;
-                }
-                mHolder.setHintText("");
-                mStore.getBanners().add(mBanner);
-                AddStoreContentFragment.StoreSaveResultEvent
-                        event = mFragment.getArguments()
-                                         .getParcelable(AddBannerContentFragment.BUNDLE_KEY_DIALOG_RESULT_EVENT);
-                mFragment.onEvent(AddBannerContentFragment.EVENT_KEY_ADD_NEW_BANNER, event, mStore);
+                sendBanner(false);
             }
 
             @Override public void onCancel() {
-                // Send selected banner to the server
-                if (mFilePath == null) {
-                    mHolder.setHintText(R.string.new_store_banner_is_empty);
-                    return;
-                }
-                mHolder.setHintText("");
-                if (mBanner != null) {
-                    mStore.getBanners().remove(mBanner);
-                    mBanner = null;
-                }
-                File file = new File(mFilePath);
-                ProgressRequestBody requestFile = new ProgressRequestBody(file)
-                        .registerObserver(mHolder.getProgressObserver());
-                MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
-                mSubscription.add(mBannerService.handleFileUpload(body)
-                                                .subscribeOn(Schedulers.newThread())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribe(getFileUploadObserver()));
-                mHolder.showLoadingProgressDialog(R.string.new_store_uploading, mFragment.getFragmentManager());
             }
         };
+    }
+
+    private void sendBanner(boolean finished) {
+        if (mFilePath == null) {
+            mHolder.setHintText(R.string.new_store_banner_is_empty);
+            return;
+        }
+        mHolder.setHintText("");
+        File file = new File(mFilePath);
+        ProgressRequestBody requestFile = new ProgressRequestBody(file)
+                .registerObserver(mHolder.getProgressObserver());
+        MultipartBody.Part body = MultipartBody.Part.createFormData("file", file.getName(), requestFile);
+        mSubscription.add(mBannerService.handleFileUpload(body)
+                                        .subscribeOn(Schedulers.newThread())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe(getFileUploadObserver(finished)));
+        mHolder.showLoadingProgressDialog(R.string.new_store_uploading, mFragment.getFragmentManager());
+    }
+
+    private void finish(@NonNull BannerModel banner) {
+        mHolder.setHintText("");
+        mStore.getBanners().add(banner);
+        mSubscription.add(mStoresManager.saveStore(mStore, getStoreSaveObserver()));
+        mHolder.showProgressDialog(R.string.new_store_saving, mFragment.getFragmentManager());
+    }
+
+    private void nextBanner(@NonNull BannerModel banner) {
+        mHolder.setHintText("");
+        mStore.getBanners().add(banner);
+        AddStoreContentFragment.StoreSaveResultEvent
+                event = mFragment.getArguments()
+                                 .getParcelable(AddBannerContentFragment.BUNDLE_KEY_DIALOG_RESULT_EVENT);
+        mFragment.onEvent(AddBannerContentFragment.EVENT_KEY_ADD_NEW_BANNER, event, mStore);
     }
 
     private Observer<StoreModel> getStoreSaveObserver() {
@@ -190,7 +176,7 @@ public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
     }
 
 
-    private Observer<StoreProto.Banner> getFileUploadObserver() {
+    private Observer<StoreProto.Banner> getFileUploadObserver(final boolean finished) {
         return new Observer<StoreProto.Banner>() {
             @Override public void onCompleted() {
             }
@@ -205,10 +191,14 @@ public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
             }
 
             @Override public void onNext(StoreProto.Banner bannerDto) {
-                L.i(AddBannerContentFragment.class, "Banner is uploaded " + mBanner);
-                mBanner = new BannerModel(bannerDto.getMainUrl(), bannerDto.getThumbnailUrl());
-                mFragment.getArguments().putParcelable(BUNDLE_KEY_BANNER, mBanner);
+                BannerModel banner = new BannerModel(bannerDto.getMainUrl(), bannerDto.getThumbnailUrl());
+                L.i(AddBannerContentFragment.class, "Banner is uploaded " + bannerDto);
                 publish();
+                if (finished) {
+                    finish(banner);
+                } else {
+                    nextBanner(banner);
+                }
             }
         };
     }
@@ -284,8 +274,8 @@ public class AddBannerPresenter implements Presenter<AddBannerViewHolder> {
     }
 
     public void releaseBanner() {
-        if (mBanner != null) {
-            mStore.getBanners().remove(mBanner);
+        if (mStore != null && !mStore.getBanners().isEmpty()) {
+            mStore.getBanners().remove(mStore.getBanners().size() - 1);
         }
     }
 }

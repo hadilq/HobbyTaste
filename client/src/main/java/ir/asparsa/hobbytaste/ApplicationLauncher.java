@@ -23,6 +23,8 @@ public class ApplicationLauncher extends Application {
 
     @Inject
     PreferencesManager mPreferencesManager;
+    @Inject
+    LanguageUtil mLanguageUtil;
 
     @Override public void onCreate() {
         super.onCreate();
@@ -33,7 +35,7 @@ public class ApplicationLauncher extends Application {
     private void initialize() {
         sMainComponent = setupDagger();
         sMainComponent.inject(this);
-        LanguageUtil.setupDefaultLocale(mPreferencesManager, this);
+        mLanguageUtil.setupDefaultLocale(mPreferencesManager, this);
 
         Thread.setDefaultUncaughtExceptionHandler(
                 new UncaughtExceptionHandler(new UncaughtExceptionHandler.UncaughtExceptionController(

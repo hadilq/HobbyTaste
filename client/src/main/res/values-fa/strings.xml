@@ -1,10 +1,11 @@
 <resources>
     <string name="title_main">اصلی</string>
     <string name="title_settings">تنظیمات</string>
-    <string name="title_store_details">مکان</string>
+    <string name="title_place">مکان</string>
     <string name="title_add_banner">اضافه‌کردن تصویر</string>
     <string name="title_add_store">اضافه‌کردن مکان</string>
     <string name="title_about_us">درباره ما</string>
+    <string name="title_places">مکان‌ها</string>
 
     <string name="connection_error">مشکلی در برقراری ارتباط بوجود آمده‌است</string>
 
@@ -24,6 +25,9 @@
     <string name="send">بفرست</string>
 
     <string name="menu_share">اشتراک</string>
+    <string name="menu_share_place">اشتراک مکان</string>
+    <string name="menu_refresh">بارگذاری</string>
+    <string name="menu_list">لیست</string>
 
     <string name="comment_title">نظر</string>
     <string name="comment_hint">لطفا نظر خود را وارد نمایید</string>
@@ -37,8 +41,6 @@
     <string name="new_store_description_empty">لطفا توضیحاتی را اضافه نمایید</string>
     <string name="new_store_at_least_banner">حداقل سه تصویر لازم است. تصویر را انتخاب کنید</string>
     <string name="new_store_banner_is_empty">تصویری انتخاب نشده‌است یا تصویر آماده‌نشده‌است</string>
-    <string name="new_store_banner_is_not_sent">تصویر فرستاده نشده‌است</string>
-    <string name="new_store_banner_successfully_sent">تصویر با موفقیت فرستاده‌شده</string>
     <string name="new_store_banner_successfully_prepared">تصویر با موفقیت آماده شده</string>
     <string name="new_store_banner_choose_banner">تصویر را انتخاب کنید</string>
     <string name="new_store_banner_error_prepared">تصویر آماده نشده‌است! لطفا دوباره تلاش نمایید</string>

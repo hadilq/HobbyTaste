@@ -31,6 +31,8 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
 
     @Inject
     RouteFactory mRouteFactory;
+    @Inject
+    NavigationUtil mNavigationUtil;
 
     public static StoreDetailsContentFragment instantiate(StoreModel store) {
 
@@ -45,16 +47,15 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
-        setHasOptionsMenu(true);
     }
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
+        Fragment fragment = mNavigationUtil.getActiveFragment(getChildFragmentManager());
         if (!(fragment instanceof StoreDetailsRecyclerFragment)) {
 
-            NavigationUtil.startNestedFragment(
+            mNavigationUtil.startNestedFragment(
                     getChildFragmentManager(),
                     StoreDetailsRecyclerFragment.instantiate(new Bundle(getArguments()))
             );
@@ -65,16 +66,16 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
             Menu menu,
             MenuInflater inflater
     ) {
-        inflater.inflate(R.menu.menu_share, menu);
-        MenuItem share = menu.findItem(R.id.share);
+        menu.clear();
+        inflater.inflate(R.menu.menu_share_place, menu);
+        MenuItem share = menu.findItem(R.id.share_place);
         share.getIcon().mutate()
              .setColorFilter(getResources().getColor(R.color.background), PorterDuff.Mode.SRC_ATOP);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.share:
+            case R.id.share_place:
                 Uri.Builder uriBuilder = mRouteFactory.getShareUriBuilder(getResources(), PlaceRoute.class);
                 StoreModel store = getArguments().getParcelable(StoreDetailsRecyclerFragment.BUNDLE_KEY_STORE);
                 if (uriBuilder == null || store == null) {
@@ -97,7 +98,7 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
         if (store != null) {
             return store.getTitle();
         }
-        return getString(R.string.title_store_details);
+        return getString(R.string.title_place);
     }
 
     @Override public void onEvent(BaseEvent event) {
@@ -112,7 +113,7 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
             CommentDialogFragment.CommentDialogResultEvent commentEvent
                     = (CommentDialogFragment.CommentDialogResultEvent) event;
 
-            Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
+            Fragment fragment = mNavigationUtil.getActiveFragment(getChildFragmentManager());
             if (fragment instanceof StoreDetailsRecyclerFragment) {
                 ((StoreDetailsRecyclerFragment) fragment).addComment(commentEvent.getComment());
             }

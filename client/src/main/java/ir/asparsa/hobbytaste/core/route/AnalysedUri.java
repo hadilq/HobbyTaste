@@ -36,6 +36,10 @@ public class AnalysedUri {
         return mUri.getPathSegments();
     }
 
+    public String getQueryParameter(String key) {
+        return mUri.getQueryParameter(key);
+    }
+
     public List<String> getLowerCasePathSegments() {
         if (mLowerCasePathSegments == null) {
             mLowerCasePathSegments = new ArrayList<>();

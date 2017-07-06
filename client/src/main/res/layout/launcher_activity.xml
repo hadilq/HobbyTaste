@@ -51,7 +51,7 @@
                 android:layout_margin="@dimen/vertical_margin_quarter"
                 android:paddingBottom="@dimen/vertical_margin_double"
                 android:clickable="true"
-                android:src="@drawable/add"
+                app:srcCompat="@drawable/ic_add"
                 android:layout_gravity="top"
                 app:useCompatPadding="true"
                 app:layout_anchor="@id/view_pager"

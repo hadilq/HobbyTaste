@@ -1,6 +1,7 @@
 package ir.asparsa.hobbytaste.ui.mvp.presenter;
 
 import android.support.annotation.NonNull;
+import android.support.v4.util.Pair;
 import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -75,9 +76,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
             mTryAgainLater = false;
 
             mOffset = mFragment.getArguments().getInt(BUNDLE_KEY_OFFSET, 0);
-            StoresManager.Constraint constraint = new StoresManager.Constraint(
-                    lat, lng, mOffset, STORES_LIMIT);
-            mSubscription.add(mStoresManager.loadStores(constraint, getStoreObserver(constraint)));
+            startLoading(lat, lng, mOffset);
         } else {
             publish();
         }
@@ -142,14 +141,23 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
         }
     }
 
+    private void startLoading(
+            double lat,
+            double lng,
+            int offset
+    ) {
+        StoresManager.Constraint constraint = new StoresManager.Constraint(lat, lng, offset, STORES_LIMIT);
+        mSubscription.add(mStoresManager.loadStores(constraint, getStoreObserver(constraint)));
+    }
+
     public void onMapReady() {
         L.d(getClass(), "on map ready gets called.");
         mOnMapReady = true;
         publish();
     }
 
-    private Observer<StoresManager.SoresResult> getStoreObserver(final StoresManager.Constraint constraint) {
-        return new Observer<StoresManager.SoresResult>() {
+    private Observer<StoresManager.StoresResult> getStoreObserver(final StoresManager.Constraint constraint) {
+        return new Observer<StoresManager.StoresResult>() {
             @Override public void onCompleted() {
                 L.i(MainContentFragment.class, "Refresh request gets completed");
             }
@@ -160,7 +168,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
                 mTryAgainLater = true;
             }
 
-            @Override public void onNext(StoresManager.SoresResult result) {
+            @Override public void onNext(StoresManager.StoresResult result) {
                 if (result.getStores() == null || result.getStores().size() == 0) {
                     return;
                 }
@@ -168,7 +176,7 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
                 if (mOffset + STORES_LIMIT < result.getTotalElements()) {
                     mOffset += STORES_LIMIT;
                     double lat = constraint.getLatitude();
-                    double lng = constraint.getLatitude();
+                    double lng = constraint.getLongitude();
                     if (mHolder.getMap() != null) {
                         ArrayList<StoreModel> list = new ArrayList<>(result.getStores());
                         StoreModel lastModel = list.get(list.size() - 1);
@@ -176,14 +184,13 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
                                 .contains(new LatLng(lastModel.getLat(), lastModel.getLon()))) {
                             mCameraPosition = mHolder.getMap().getCameraPosition();
                             if (mCameraPosition != null && mCameraPosition.getTarget() != null) {
+                                mOffset = 0;
                                 lat = mCameraPosition.getTarget().getLatitude();
                                 lng = mCameraPosition.getTarget().getLongitude();
                             }
                         }
                     }
-                    StoresManager.Constraint newConstraint = new StoresManager.Constraint(
-                            lat, lng, mOffset, STORES_LIMIT);
-                    mSubscription.add(mStoresManager.loadStores(newConstraint, getStoreObserver(newConstraint)));
+                    startLoading(lat, lng, mOffset);
                 }
                 onSuccessfullyReceived(result.getStores());
             }
@@ -228,5 +235,31 @@ public class StorePresenter implements Presenter<MainContentViewHolder> {
         } else {
             mTryAgainLater = true;
         }
+    }
+
+    public void onRefreshStores() {
+        if (mHolder.getMap() != null) {
+            mCameraPosition = mHolder.getMap().getCameraPosition();
+            if (mCameraPosition != null && mCameraPosition.getTarget() != null) {
+                mStores.clear();
+                mOffset = 0;
+                double lat = mCameraPosition.getTarget().getLatitude();
+                double lng = mCameraPosition.getTarget().getLongitude();
+                startLoading(lat, lng, mOffset);
+            }
+        }
+    }
+
+    public Pair<Double, Double> getPosition() {
+        double lat = mPreferencesManager.getFloat(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LATITUDE, 0f);
+        double lng = mPreferencesManager.getFloat(PreferencesManager.KEY_DEFAULT_CAMERA_POSITION_LONGITUDE, 0f);
+        if (mHolder.getMap() != null) {
+            mCameraPosition = mHolder.getMap().getCameraPosition();
+            if (mCameraPosition != null && mCameraPosition.getTarget() != null) {
+                lat = mCameraPosition.getTarget().getLatitude();
+                lng = mCameraPosition.getTarget().getLongitude();
+            }
+        }
+        return new Pair<>(lat, lng);
     }
 }

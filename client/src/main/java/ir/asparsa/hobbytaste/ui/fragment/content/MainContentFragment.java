@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,6 +17,7 @@ import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.route.PlaceRoute;
+import ir.asparsa.hobbytaste.core.route.PlacesRoute;
 import ir.asparsa.hobbytaste.core.route.RouteFactory;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
@@ -35,6 +37,8 @@ public class MainContentFragment extends BaseContentFragment {
 
     @Inject
     RouteFactory mRouteFactory;
+    @Inject
+    NavigationUtil mNavigationUtil;
 
     private MainContentViewHolder mHolder;
     private StorePresenter mPresenter;
@@ -48,14 +52,13 @@ public class MainContentFragment extends BaseContentFragment {
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
-        setHasOptionsMenu(true);
         mPresenter = new StorePresenter(getDelegate());
         mHolder = new MainContentViewHolder(mPresenter);
     }
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Fragment fragment = NavigationUtil.getActiveFragment(getChildFragmentManager());
+        Fragment fragment = mNavigationUtil.getActiveFragment(getChildFragmentManager());
         SupportMapFragment mapFragment;
         if (fragment instanceof SupportMapFragment) {
             mapFragment = (SupportMapFragment) fragment;
@@ -82,11 +85,22 @@ public class MainContentFragment extends BaseContentFragment {
             Menu menu,
             MenuInflater inflater
     ) {
+        menu.clear();
+
         inflater.inflate(R.menu.menu_share, menu);
         MenuItem share = menu.findItem(R.id.share);
         share.getIcon().mutate()
              .setColorFilter(getResources().getColor(R.color.background), PorterDuff.Mode.SRC_ATOP);
-        super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.menu_list, menu);
+        MenuItem list = menu.findItem(R.id.list);
+        list.getIcon().mutate()
+            .setColorFilter(getResources().getColor(R.color.background), PorterDuff.Mode.SRC_ATOP);
+
+        inflater.inflate(R.menu.menu_refresh, menu);
+        MenuItem refresh = menu.findItem(R.id.share);
+        refresh.getIcon().mutate()
+               .setColorFilter(getResources().getColor(R.color.background), PorterDuff.Mode.SRC_ATOP);
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
@@ -99,6 +113,12 @@ public class MainContentFragment extends BaseContentFragment {
                 );
                 sendIntent.setType("text/plain");
                 startActivity(sendIntent);
+                return true;
+            case R.id.refresh:
+                mPresenter.onRefreshStores();
+                return true;
+            case R.id.list:
+                instantiatePlacesList();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -119,7 +139,7 @@ public class MainContentFragment extends BaseContentFragment {
                 if (map == null) {
                     return;
                 }
-                NavigationUtil.startContentFragment(
+                mNavigationUtil.startContentFragment(
                         getFragmentManager(), AddStoreContentFragment.instantiate(
                                 map.getCameraPosition().getRealCameraPosition(),
                                 new AddStoreContentFragment.StoreSaveResultEvent(getTagName())));
@@ -152,6 +172,19 @@ public class MainContentFragment extends BaseContentFragment {
         startActivity(new Intent(
                 Intent.ACTION_VIEW,
                 uriBuilder.appendPath(Long.toString(storeModel.getHashCode())).build()
+        ));
+    }
+
+    private void instantiatePlacesList() {
+        Uri.Builder uriBuilder = mRouteFactory.getInternalUriBuilder(getResources(), PlacesRoute.class);
+        if (uriBuilder == null) {
+            return;
+        }
+        Pair<Double, Double> position = mPresenter.getPosition();
+        startActivity(new Intent(
+                Intent.ACTION_VIEW,
+                uriBuilder.appendQueryParameter(PlacesRoute.LAT, Double.toString(position.first))
+                          .appendQueryParameter(PlacesRoute.LNG, Double.toString(position.second)).build()
         ));
     }
 }

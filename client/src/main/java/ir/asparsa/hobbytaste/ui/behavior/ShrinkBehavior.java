@@ -13,6 +13,7 @@ import android.view.View;
 public class ShrinkBehavior extends CoordinatorLayout.Behavior<FloatingActionButton> {
 
     private boolean mScrollToolbar;
+    private boolean mShowFloatingActionButton;
 
     public ShrinkBehavior(
             Context context,
@@ -43,6 +44,10 @@ public class ShrinkBehavior extends CoordinatorLayout.Behavior<FloatingActionBut
             final int dyUnconsumed
     ) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
+        if (!mShowFloatingActionButton) {
+            child.hide();
+            return;
+        }
         if (dyConsumed > 0 && child.getVisibility() == View.VISIBLE) {
             child.hide();
         } else if (dyConsumed < 0 && child.getVisibility() != View.VISIBLE) {
@@ -52,5 +57,9 @@ public class ShrinkBehavior extends CoordinatorLayout.Behavior<FloatingActionBut
 
     public void setScrollToolbar(boolean scrollToolbar) {
         this.mScrollToolbar = scrollToolbar;
+    }
+
+    public void setShowFloatingActionButton(boolean showFloatingActionButton) {
+        this.mShowFloatingActionButton = showFloatingActionButton;
     }
 }

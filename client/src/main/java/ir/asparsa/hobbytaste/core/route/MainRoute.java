@@ -48,6 +48,6 @@ public class MainRoute implements Route {
             @NonNull Uri.Builder builder,
             @NonNull Resources resources
     ) {
-        return builder.appendPath(resources.getString(R.string.path_segment_main));
+        return builder.appendPath(mSegment);
     }
 }

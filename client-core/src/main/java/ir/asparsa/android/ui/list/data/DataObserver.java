@@ -6,15 +6,14 @@ import java.util.Deque;
 
 /**
  * @author hadi
- * @since 12/22/2016 AD.
  */
 public abstract class DataObserver implements Observer<BaseRecyclerData> {
     protected Deque<BaseRecyclerData> deque;
     protected int index = 0;
-    private final long totalElements;
+    private final boolean endOfList;
 
-    public DataObserver(long totalElements) {
-        this.totalElements = totalElements;
+    public DataObserver(boolean endOfList) {
+        this.endOfList = endOfList;
     }
 
     @Override public void onError(Throwable e) {
@@ -25,7 +24,7 @@ public abstract class DataObserver implements Observer<BaseRecyclerData> {
         return this;
     }
 
-    public long getTotalElements() {
-        return totalElements;
+    public boolean isEndOfList() {
+        return endOfList;
     }
 }

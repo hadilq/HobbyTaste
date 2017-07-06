@@ -46,6 +46,6 @@ public class SettingsRoute implements Route {
             @NonNull Uri.Builder builder,
             @NonNull Resources resources
     ) {
-        return builder.appendPath(resources.getString(R.string.path_segment_settings));
+        return builder.appendPath(mSegment);
     }
 }

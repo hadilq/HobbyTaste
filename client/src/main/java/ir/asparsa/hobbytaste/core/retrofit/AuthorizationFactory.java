@@ -41,6 +41,8 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
     AuthorizationManager mAuthorizationManager;
     @Inject
     PreferencesManager mPreferencesManager;
+    @Inject
+    LanguageUtil mLanguageUtil;
 
     @Inject AuthorizationFactory() {
     }
@@ -84,7 +86,7 @@ public class AuthorizationFactory implements Authenticator, Interceptor {
         if (TextUtils.isEmpty(originalUrl.queryParameter(localeQueryParamKey))) {
             url = originalUrl
                     .newBuilder()
-                    .addQueryParameter(localeQueryParamKey, LanguageUtil.getLocale(mPreferencesManager).getLanguage())
+                    .addQueryParameter(localeQueryParamKey, mLanguageUtil.getLocale(mPreferencesManager).getLanguage())
                     .build();
         }
 

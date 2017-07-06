@@ -29,9 +29,15 @@ import java.util.List;
 @Singleton
 public class RouteFactory {
 
+    public static final int NO_POSITION = -1;
+
     private WeakReference<Collection<Route>> mRouts = new WeakReference<>(null);
     private List<WeakReference<ContainerFragment>> mContainers = new ArrayList<>();
     private List<Route> mRoutes = new ArrayList<>();
+    private int currentPosition = NO_POSITION;
+
+    @Inject
+    LanguageUtil mLanguageUtil;
 
     @Inject
     public RouteFactory() {
@@ -124,11 +130,16 @@ public class RouteFactory {
 
     @Nullable
     public FragmentManager getFragmentManager(int pos) {
+        this.currentPosition = pos;
         ContainerFragment containerFragment = mContainers.get(pos).get();
         if (containerFragment == null) {
             return null;
         }
         return containerFragment.getChildFragmentManager();
+    }
+
+    public int getCurrentPosition() {
+        return currentPosition;
     }
 
     public void addContainer(
@@ -149,6 +160,7 @@ public class RouteFactory {
             routes.add(new MainRoute(resources));
             routes.add(new SettingsRoute(resources));
             routes.add(new PlaceRoute(resources));
+            routes.add(new PlacesRoute(resources));
             mRouts = new WeakReference<>(routes);
         }
         return routes;
@@ -189,7 +201,7 @@ public class RouteFactory {
     }
 
     public int pageToPos(int page) {
-        return LanguageUtil.isRTL() ? NavigationAdapter.PAGE_COUNT - 1 - page : page;
+        return mLanguageUtil.isRTL() ? NavigationAdapter.PAGE_COUNT - 1 - page : page;
     }
 
     public int posToPage(int pos) {

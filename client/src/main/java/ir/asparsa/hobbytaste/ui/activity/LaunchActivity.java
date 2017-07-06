@@ -9,7 +9,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
@@ -17,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import ir.asparsa.android.core.logger.L;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.route.MainRoute;
@@ -44,6 +42,10 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
 
     @Inject
     RouteFactory mRouteFactory;
+    @Inject
+    NavigationUtil mNavigationUtil;
+    @Inject
+    LanguageUtil mLanguageUtil;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -83,6 +85,7 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
 
             @Override public void onPageSelected(int position) {
                 onBackStackChanged();
+                supportInvalidateOptionsMenu();
             }
 
             @Override public void onPageScrollStateChanged(int state) {
@@ -145,7 +148,7 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         if (fragmentManager == null) {
             return;
         }
-        BaseContentFragment fragment = NavigationUtil.findTopFragment(fragmentManager);
+        BaseContentFragment fragment = mNavigationUtil.findTopFragment(fragmentManager);
         if (fragment != null) {
             BaseContentFragment.BackState state = fragment.onBackPressed();
             switch (state) {
@@ -153,10 +156,10 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                     finish();
                     break;
                 case BACK_FRAGMENT:
-                    List<Fragment> fragments = fragmentManager.getFragments();
-                    NavigationUtil.popBackStack(fragmentManager);
-                    L.i(getClass(), "Fragments: " + fragments);
-                    if (fragments == null || fragments.size() <= 1) {
+                    int count = fragmentManager.getBackStackEntryCount();
+                    if (count > 1) {
+                        mNavigationUtil.popBackStack(fragmentManager, fragment);
+                    } else {
                         mRouteFactory.launchRoute(getResources(), pos);
                     }
                     break;
@@ -174,20 +177,21 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
         if (fragmentManager == null) {
             return;
         }
-        BaseContentFragment fragment = NavigationUtil.findTopFragment(fragmentManager);
+        BaseContentFragment fragment = mNavigationUtil.findTopFragment(fragmentManager);
         if (fragment != null) {
             fragment.onActivityResult(requestCode, resultCode, data);
         }
     }
 
     @Override public void onBackStackChanged() {
-        FragmentManager fragmentManager = mRouteFactory.getFragmentManager(mViewPager.getCurrentItem());
+        int currentPosition = mViewPager.getCurrentItem();
+        FragmentManager fragmentManager = mRouteFactory.getFragmentManager(currentPosition);
         if (fragmentManager == null) {
             return;
         }
-        BaseContentFragment fragment = NavigationUtil
-                .findTopFragment(fragmentManager);
+        BaseContentFragment fragment = mNavigationUtil.findTopFragment(fragmentManager);
         if (fragment != null) {
+            fragment.setCurrentPosition(currentPosition);
             mToolbar.setTitle(fragment.getHeaderTitle());
 
             final BaseContentFragment.FloatingActionButtonObserver fabObserver = fragment
@@ -199,30 +203,28 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
                         fabObserver.onNext(v);
                     }
                 });
+                mShrinkBehavior.setShowFloatingActionButton(true);
             } else {
                 mFloatingActionButton.hide();
+                mFloatingActionButton.setOnClickListener(null);
+                mShrinkBehavior.setShowFloatingActionButton(false);
             }
 
             boolean scrollToolbar = fragment.scrollToolbar();
             mShrinkBehavior.setScrollToolbar(scrollToolbar);
             AppBarLayout.LayoutParams tp =
                     (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
-            if (scrollToolbar) {
-                tp.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
-                                  AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS |
-                                  AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP
-                );
-            } else {
-                tp.setScrollFlags(0);
-            }
+            tp.setScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL |
+                              AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS |
+                              AppBarLayout.LayoutParams.SCROLL_FLAG_SNAP);
 
             if (fragment.hasHomeAsUp()) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowHomeEnabled(true);
-                if (LanguageUtil.isRTL()) {
-                    mToolbar.setNavigationIcon(R.drawable.home_as_up_rtl);
+                if (mLanguageUtil.isRTL()) {
+                    mToolbar.setNavigationIcon(R.drawable.ic_rtl_arrow);
                 } else {
-                    mToolbar.setNavigationIcon(R.drawable.home_as_up_ltr);
+                    mToolbar.setNavigationIcon(R.drawable.ic_ltr_arrow);
                 }
             } else {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);

@@ -9,6 +9,8 @@ import android.text.TextUtils;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.HashMap;
@@ -17,8 +19,8 @@ import java.util.Map;
 
 /**
  * @author hadi
- * @since 7/27/2016 AD
  */
+@Singleton
 public class LanguageUtil {
 
     public static final String LANGUAGE_FA = "fa";
@@ -26,8 +28,6 @@ public class LanguageUtil {
 
     private static final String COUNTRY_IR = "IR";
     private static final String COUNTRY_US = "US";
-
-    private static final Object sSync = new Object();
 
     private static final Map<String, String> COUNTRY_MAP = new HashMap<String, String>() {{
         put(LANGUAGE_FA, COUNTRY_IR);
@@ -40,12 +40,16 @@ public class LanguageUtil {
     public @interface Language {
     }
 
-    private static String sDefaultLanguage;
-    private static Locale sLocale;
+    private String sDefaultLanguage;
+    private Locale sLocale;
+
+    @Inject
+    public LanguageUtil() {
+    }
 
     @NonNull
-    public static Locale getLocale(@NonNull PreferencesManager preferencesManager) {
-        synchronized (sSync) {
+    public Locale getLocale(@NonNull PreferencesManager preferencesManager) {
+        synchronized (LanguageUtil.class) {
             loadDefaultLanguage(preferencesManager);
             String country = COUNTRY_MAP.get(sDefaultLanguage);
             if (sLocale == null) {
@@ -72,7 +76,7 @@ public class LanguageUtil {
     }
 
     @NonNull
-    public static String getLanguageTitle(@NonNull Resources resources) {
+    public String getLanguageTitle(@NonNull Resources resources) {
         String lang = Locale.getDefault().getLanguage();
         switch (lang) {
             case LANGUAGE_FA:
@@ -83,7 +87,7 @@ public class LanguageUtil {
         return "";
     }
 
-    public static void setupDefaultLocale(
+    public void setupDefaultLocale(
             @NonNull PreferencesManager preferencesManager,
             @NonNull Context context
     ) {
@@ -94,17 +98,17 @@ public class LanguageUtil {
         context.getResources().updateConfiguration(config, null);
     }
 
-    private static void loadDefaultLanguage(@NonNull PreferencesManager preferencesManager) {
+    private void loadDefaultLanguage(@NonNull PreferencesManager preferencesManager) {
         if (TextUtils.isEmpty(sDefaultLanguage) || sLocale == null) {
             sDefaultLanguage = preferencesManager.getString(PreferencesManager.KEY_DEFAULT_LANGUAGE, LANGUAGE_EN);
         }
     }
 
-    public static boolean setDefaultLanguage(
+    public boolean setDefaultLanguage(
             @NonNull PreferencesManager preferencesManager,
             @Language String language
     ) {
-        synchronized (sSync) {
+        synchronized (LanguageUtil.class) {
             if (!sDefaultLanguage.equals(language)) {
                 sDefaultLanguage = language;
                 preferencesManager.put(PreferencesManager.KEY_DEFAULT_LANGUAGE, language);
@@ -115,13 +119,8 @@ public class LanguageUtil {
         }
     }
 
-    public static void reset() {
-        sDefaultLanguage = "";
-        sLocale = null;
-    }
-
-    public static boolean isRTL() {
-        synchronized (sSync) {
+    public boolean isRTL() {
+        synchronized (LanguageUtil.class) {
             return LANGUAGE_FA.equals(sDefaultLanguage);
         }
     }

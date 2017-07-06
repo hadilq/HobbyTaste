@@ -5,7 +5,7 @@ import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import junit.framework.Assert;
 
 /**
- * Created by hadi on 12/14/2016 AD.
+ * @author hadi
  */
 public abstract class AbsListProvider {
 

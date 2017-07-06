@@ -13,7 +13,7 @@ import ir.asparsa.android.R;
 import ir.asparsa.android.R2;
 
 /**
- * Created by hadi on 12/15/2016 AD.
+ * @author hadi
  */
 public class DialogControlLayout extends RelativeLayout {
 

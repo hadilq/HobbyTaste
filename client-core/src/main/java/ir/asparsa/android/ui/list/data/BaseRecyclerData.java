@@ -1,12 +1,12 @@
 package ir.asparsa.android.ui.list.data;
 
 
-import ir.asparsa.android.core.model.BaseModel;
+import android.os.Parcelable;
 
 /**
  * @author hadi
  * @since 6/24/2016 AD
  */
-public abstract class BaseRecyclerData extends BaseModel {
+public abstract class BaseRecyclerData implements Parcelable {
     public abstract int getViewType();
 }

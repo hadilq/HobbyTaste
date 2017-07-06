@@ -40,7 +40,7 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
     @BindView(R.id.viewed_tail)
     ImageView mViewedTailImageView;
     @BindView(R.id.toggle)
-    ViewGroup mToogle;
+    ViewGroup mToggle;
     @BindView(R.id.store_creator)
     TextView mCreatorTextView;
 
@@ -55,8 +55,10 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
         super(itemView, observer, savedInstanceState);
         ButterKnife.bind(this, itemView);
 
-        mUpArrow = itemView.getContext().getResources().getDrawable(R.drawable.up_arrow).mutate();
-        mDownArrow = itemView.getContext().getResources().getDrawable(R.drawable.down_arrow).mutate();
+        mUpArrow = itemView.getContext().getResources().getDrawable(R.drawable.ic_arrow_drop_up);
+        mDownArrow = itemView.getContext().getResources().getDrawable(R.drawable.ic_arrow_drop_down);
+        mUpArrow.mutate().setColorFilter(itemView.getResources().getColor(R.color.refresh), PorterDuff.Mode.SRC_IN);
+        mDownArrow.mutate().setColorFilter(itemView.getResources().getColor(R.color.refresh), PorterDuff.Mode.SRC_IN);
         mUpArrow.setColorFilter(itemView.getResources().getColor(R.color.dark_background), PorterDuff.Mode.SRC_ATOP);
         mDownArrow.setColorFilter(itemView.getResources().getColor(R.color.dark_background), PorterDuff.Mode.SRC_ATOP);
 
@@ -88,10 +90,10 @@ public class RatingViewHolder extends BaseViewHolder<RatingData> {
         mCreatorTextView.setText(data.getCreator());
         if (data.isShowDescription()) {
             mArrowImageView.setImageDrawable(mUpArrow);
-            mToogle.setVisibility(View.VISIBLE);
+            mToggle.setVisibility(View.VISIBLE);
         } else {
             mArrowImageView.setImageDrawable(mDownArrow);
-            mToogle.setVisibility(View.GONE);
+            mToggle.setVisibility(View.GONE);
         }
         mDashboardView.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {

@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.SparseArrayCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -44,7 +45,7 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
     private static final String BUNDLE_KEY_NEXT_OFFSET = "BUNDLE_KEY_NEXT_OFFSET";
     private static final String BUNDLE_KEY_LIMIT = "BUNDLE_KEY_LIMIT";
     private static final String BUNDLE_KEY_LIST = "BUNDLE_KEY_LIST";
-    private static final int LIMIT_DEFAULT = 20;
+    private static final int LIMIT_DEFAULT = 10;
 
     protected RecyclerListAdapter mAdapter;
     protected P mProvider;
@@ -55,7 +56,7 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
     private int mLimit = LIMIT_DEFAULT;
     private long mNextOffset = 0;
     private long mLastTriedOffset = -1;
-    private long mInitialSize = 0;
+    private long mHeaderSize = 0;
     private boolean mLoading = true;
     private int mScrollPosition;
 
@@ -63,7 +64,8 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
     RecyclerView mRecyclerView;
     @BindView(R2.id.try_again)
     TryAgainView mTryAgainView;
-
+    @BindView(R2.id.swipe)
+    SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Nullable
     @Override
@@ -80,10 +82,17 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         mOnTryAgainListener = new TryAgainView.OnTryAgainListener() {
             @Override
             public void tryAgain() {
-                provideDataAndStart();
+                refresh();
             }
         };
         mTryAgainView.setTryAgainListener(mOnTryAgainListener);
+
+        mSwipeRefreshLayout.setEnabled(false);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override public void onRefresh() {
+                refresh();
+            }
+        });
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -105,6 +114,12 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         return rootView;
+    }
+
+    private void refresh() {
+        mSwipeRefreshLayout.setRefreshing(false);
+        mLastTriedOffset = mNextOffset - mLimit;
+        provideDataAndStart();
     }
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -136,12 +151,16 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
             mTryAgainView.start();
         } else {
             mTryAgainView.finish();
+            ArrayList<BaseRecyclerData> list = mAdapter.getList();
+            if (!list.isEmpty() && list.get(list.size() - 1).getViewType() == TryAgainData.VIEW_TYPE) {
+                list.remove(list.size() - 1);
+                mAdapter.notifyItemRemoved(list.size() - 1);
+            }
         }
     }
 
     private void provideData() {
         if (mLastTriedOffset == mNextOffset) {
-            mLoading = true;
             return;
         }
         mLastTriedOffset = mNextOffset;
@@ -191,97 +210,123 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         int pastVisiblesItems = mLayoutManager.findFirstVisibleItemPosition();
 
         if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
-            mLoading = false;
             provideData();
         }
     }
 
     public class OnInsertData {
-        public void OnDataInserted(
+        public void onDataInserted(
+                boolean isHeader,
                 @NonNull DataObserver dataObserver
         ) {
-            if (mLimit > LIMIT_DEFAULT) {
-                mLimit = LIMIT_DEFAULT;
-            }
-            mRecyclerView.setVisibility(View.VISIBLE);
-
-            final List<BaseRecyclerData> list = mAdapter.getList();
-            if (!list.isEmpty() && list.get(list.size() - 1).getViewType() == TryAgainData.VIEW_TYPE) {
-                list.remove(list.size() - 1);
-            }
-            final Deque<BaseRecyclerData> deque = new ArrayDeque<>();
-
-            dataObserver.setDeque(deque);
-            Observable.create(new Observable.OnSubscribe<BaseRecyclerData>() {
-                @Override public void call(Subscriber<? super BaseRecyclerData> subscriber) {
-                    for (BaseRecyclerData baseRecyclerData : list) {
-                        subscriber.onNext(baseRecyclerData);
-                    }
-                    subscriber.onCompleted();
-                }
-            }).subscribe(dataObserver);
-            dataObserver.setDeque(null);
-            list.clear();
-            list.addAll(deque);
-
-            boolean endOfList = dataObserver.getTotalElements() <= list.size() - mInitialSize;
-
-            mLoading = !endOfList;
-
-            if (mInitialSize <= 0) {
-                mInitialSize = list.size();
-            }
-
-            if (list.size() >= mNextOffset + mLimit + mInitialSize) {
-                mNextOffset += mLimit;
-                mLoading = true;
-            }
-
-            if (mLoading) {
-                list.add(new TryAgainData(true));
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        checkIfReadyToProvide();
-                    }
-                });
-            } else {
-                mAdapter.notifyItemRemoved(list.size());
-            }
-
-            if (!mAdapter.isEmpty()) {
-                mTryAgainView.finish();
-            } else if (!mLoading) {
-                mTryAgainView.showExtraView();
-            }
-
-            if (mScrollPosition > 0) {
-                // No need of scroll position any more
-                mScrollPosition = -1;
-                mHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mLayoutManager.scrollToPosition(mScrollPosition);
-                    }
-                });
-            }
-
+            BaseRecyclerFragment.this.onDataInserted(isHeader, dataObserver);
+            BaseRecyclerFragment.this.onNotifyToContinue();
         }
 
         public void onError(String message) {
-            List<BaseRecyclerData> list = mAdapter.getList();
-            if (list.isEmpty()) {
-                mTryAgainView.onError(message);
-            } else {
-                BaseRecyclerData data = list.get(list.size() - 1);
-                if (data instanceof TryAgainData) {
-                    TryAgainData tryAgainData = (TryAgainData) data;
-                    tryAgainData.setErrorMessage(message);
-                } else {
-                    Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+            BaseRecyclerFragment.this.onDataInsertedError(message);
+        }
+
+        public void onNotifyToContinue() {
+            mLoading = true;
+            mLastTriedOffset = mNextOffset - mLimit;
+            BaseRecyclerFragment.this.onNotifyToContinue();
+        }
+    }
+
+    private void onDataInserted(
+            boolean isHeader,
+            @NonNull DataObserver dataObserver
+    ) {
+        if (mLimit > LIMIT_DEFAULT) {
+            mLimit = LIMIT_DEFAULT;
+        }
+        mRecyclerView.setVisibility(View.VISIBLE);
+
+        final List<BaseRecyclerData> list = mAdapter.getList();
+        if (!list.isEmpty() && list.get(list.size() - 1).getViewType() == TryAgainData.VIEW_TYPE) {
+            list.remove(list.size() - 1);
+        }
+        final Deque<BaseRecyclerData> deque = new ArrayDeque<>();
+
+        dataObserver.setDeque(deque);
+        Observable.create(new Observable.OnSubscribe<BaseRecyclerData>() {
+            @Override public void call(Subscriber<? super BaseRecyclerData> subscriber) {
+                for (BaseRecyclerData baseRecyclerData : list) {
+                    subscriber.onNext(baseRecyclerData);
                 }
+                subscriber.onCompleted();
+            }
+        }).subscribe(dataObserver);
+        dataObserver.setDeque(null);
+        list.clear();
+        list.addAll(deque);
+
+        mLoading = !dataObserver.isEndOfList();
+
+        if (mHeaderSize <= 0 && isHeader) {
+            mHeaderSize = list.size();
+        }
+    }
+
+    private void onDataInsertedError(String message) {
+        List<BaseRecyclerData> list = mAdapter.getList();
+        if (list.isEmpty()) {
+            mTryAgainView.onError(message);
+        } else {
+            BaseRecyclerData data = list.get(list.size() - 1);
+            if (data instanceof TryAgainData) {
+                TryAgainData tryAgainData = (TryAgainData) data;
+                tryAgainData.setErrorMessage(message);
+                mAdapter.notifyItemChanged(list.size() - 1);
+            } else {
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void onNotifyToContinue() {
+        if (mAdapter.getList().size() >= mNextOffset + mLimit + mHeaderSize) {
+            mNextOffset += mLimit;
+            mLoading = true;
+        }
+
+        if (mLoading) {
+            mSwipeRefreshLayout.setEnabled(false);
+            mAdapter.getList().add(new TryAgainData(true));
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    provideData();
+                }
+            });
+        } else {
+            if (hasSwipeRefresh()) {
+                mSwipeRefreshLayout.setEnabled(true);
+            }
+            mAdapter.notifyItemRemoved(mAdapter.getList().size());
+        }
+
+        if (!mAdapter.isEmpty()) {
+            mTryAgainView.finish();
+        } else if (!mLoading) {
+            mTryAgainView.showExtraView();
+        }
+
+        if (mScrollPosition > 0) {
+            // No need of scroll position any more
+            mScrollPosition = -1;
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mLayoutManager.scrollToPosition(mScrollPosition);
+                }
+            });
+        }
+    }
+
+    protected boolean hasSwipeRefresh() {
+        return true;
     }
 
     public interface Event {

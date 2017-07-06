@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import junit.framework.Assert;
 
 /**
- * Created by hadi on 12/14/2016 AD.
+ * @author hadi
  */
 public class CorePreferencesManager {
 

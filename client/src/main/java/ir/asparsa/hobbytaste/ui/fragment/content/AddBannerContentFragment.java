@@ -10,11 +10,14 @@ import android.view.ViewGroup;
 import butterknife.ButterKnife;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.core.util.UiUtil;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.mvp.holder.AddBannerViewHolder;
 import ir.asparsa.hobbytaste.ui.mvp.presenter.AddBannerPresenter;
+
+import javax.inject.Inject;
 
 /**
  * Created by hadi
@@ -30,6 +33,9 @@ public class AddBannerContentFragment extends BaseContentFragment {
     public static final String EVENT_KEY_ADD_NEW_BANNER = "EVENT_KEY_ADD_NEW_BANNER";
     public static final String EVENT_KEY_SEND_STORE = "EVENT_KEY_SEND_STORE";
 
+    @Inject
+    NavigationUtil mNavigationUtil;
+
     private AddBannerPresenter mPresenter;
     private AddBannerViewHolder mHolder;
 
@@ -44,6 +50,11 @@ public class AddBannerContentFragment extends BaseContentFragment {
         AddBannerContentFragment fragment = new AddBannerContentFragment();
         fragment.setArguments(bundle);
         return fragment;
+    }
+
+    @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ApplicationLauncher.mainComponent().inject(this);
     }
 
     @Nullable @Override public View onCreateView(
@@ -111,7 +122,7 @@ public class AddBannerContentFragment extends BaseContentFragment {
         } else if (EVENT_KEY_ADD_NEW_BANNER.equals(event) && data != null && data.length == 2 &&
                    data[0] instanceof AddStoreContentFragment.StoreSaveResultEvent &&
                    data[1] instanceof StoreModel) {
-            NavigationUtil.startContentFragment(getFragmentManager(), AddBannerContentFragment
+            mNavigationUtil.startContentFragment(getFragmentManager(), AddBannerContentFragment
                     .instantiate((AddStoreContentFragment.StoreSaveResultEvent) data[0], (StoreModel) data[1]));
         } else if (EVENT_KEY_SEND_STORE.equals(event) && data != null && data.length == 1 &&
                    data[0] instanceof StoreModel) {

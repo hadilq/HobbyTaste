@@ -22,12 +22,6 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay"
-           parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
-    <style name="AppTheme.PopupOverlay"
-           parent="ThemeOverlay.AppCompat.Light"/>
-
     <style name="TextLabel"
            parent="ThemeOverlay.AppCompat.Light">
         <!-- Hint color and label color in FALSE state -->
@@ -39,7 +33,8 @@
         <item name="colorControlActivated">@color/text</item>
     </style>
 
-    <style name="Theme.AppCompat.Translucent" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme.AppCompat.Translucent"
+           parent="Theme.AppCompat.NoActionBar">
         <item name="android:background">@color/dark_background</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>

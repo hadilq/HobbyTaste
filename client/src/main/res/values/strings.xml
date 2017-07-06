@@ -23,5 +23,7 @@
             translatable="false">settings</string>
     <string name="path_segment_place"
             translatable="false">place</string>
+    <string name="path_segment_places"
+            translatable="false">places</string>
 
 </resources>
