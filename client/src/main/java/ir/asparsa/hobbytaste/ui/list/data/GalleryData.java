@@ -8,7 +8,7 @@ import ir.asparsa.hobbytaste.database.model.BannerModel;
 import java.util.List;
 
 /**
- * Created by hadi on 12/12/2016 AD.
+ * @author hadi
  */
 public class GalleryData extends BaseRecyclerData {
 

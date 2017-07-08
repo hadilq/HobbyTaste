@@ -4,11 +4,11 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import ir.asparsa.android.core.model.BaseModel;
 import ir.asparsa.hobbytaste.database.DatabaseHelper;
+import junit.framework.Assert;
 import rx.Observable;
 import rx.Subscriber;
 
 import java.sql.SQLException;
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,12 +16,12 @@ import java.util.List;
  * @author hadi
  * @since 11/30/2016 AD
  */
-public abstract class AbsDao<T extends BaseModel, ID> {
+public abstract class AbsDao<T extends BaseModel<ID>, ID> {
 
     DatabaseHelper mDatabaseHelper;
     public Dao<T, ID> dao;
 
-    public AbsDao(DatabaseHelper mDatabaseHelper) {
+    AbsDao(DatabaseHelper mDatabaseHelper) {
         this.mDatabaseHelper = mDatabaseHelper;
     }
 
@@ -48,11 +48,11 @@ public abstract class AbsDao<T extends BaseModel, ID> {
         });
     }
 
-    public Observable<Dao.CreateOrUpdateStatus> create(final T data) {
-        return Observable.create(new Observable.OnSubscribe<Dao.CreateOrUpdateStatus>() {
-            @Override public void call(Subscriber<? super Dao.CreateOrUpdateStatus> subscriber) {
+    public Observable<Boolean> create(final T data) {
+        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override public void call(Subscriber<? super Boolean> subscriber) {
                 try {
-                    subscriber.onNext(getDao().createOrUpdate(data));
+                    subscriber.onNext(createOrUpdate(data));
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);
@@ -61,11 +61,34 @@ public abstract class AbsDao<T extends BaseModel, ID> {
         });
     }
 
+    /**
+     * Due to not working OrmLite implementation of createOrUpdate method
+     * */
+    boolean createOrUpdate(T data) throws SQLException {
+        T found = null;
+        if (data.getId() != null) {
+            found = getDao().queryForId(data.getId());
+//            L.d(AbsDao.class, "found: " + found);
+        }
+        boolean created;
+        if (found == null) {
+            getDao().create(data);
+            created = true;
+        } else {
+            getDao().update(data);
+            created = false;
+        }
+        Assert.assertNotNull(data.getId());
+        return created;
+    }
+
     public Observable<T> createIfNotExists(final T data) {
         return Observable.create(new Observable.OnSubscribe<T>() {
             @Override public void call(Subscriber<? super T> subscriber) {
                 try {
-                    subscriber.onNext(getDao().createIfNotExists(data));
+                    T ifNotExists = getDao().createIfNotExists(data);
+                    Assert.assertNotNull(ifNotExists.getId());
+                    subscriber.onNext(ifNotExists);
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);
@@ -78,11 +101,10 @@ public abstract class AbsDao<T extends BaseModel, ID> {
         return Observable.create(new Observable.OnSubscribe<Collection<T>>() {
             @Override public void call(Subscriber<? super Collection<T>> subscriber) {
                 try {
-                    Collection<T> collection = new ArrayDeque<>();
                     for (T t : data) {
-                        collection.add(getDao().createIfNotExists(t));
+                        createOrUpdate(t);
                     }
-                    subscriber.onNext(collection);
+                    subscriber.onNext(data);
                     subscriber.onCompleted();
                 } catch (Exception e) {
                     subscriber.onError(e);

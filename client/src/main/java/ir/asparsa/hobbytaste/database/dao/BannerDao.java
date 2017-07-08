@@ -11,7 +11,7 @@ import javax.inject.Singleton;
  * @since 11/30/2016 AD
  */
 @Singleton
-public class BannerDao extends AbsDao<BannerModel, Integer> {
+public class BannerDao extends AbsDao<BannerModel, Long> {
 
     @Inject
     public BannerDao(DatabaseHelper mDatabaseHelper) {
