@@ -17,7 +17,7 @@ import java.util.List;
  * @since 11/30/2016 AD
  */
 @Singleton
-public class CommentDao extends AbsDao<CommentModel, Integer> {
+public class CommentDao extends AbsDao<CommentModel, Long> {
 
     @Inject
     public CommentDao(DatabaseHelper mDatabaseHelper) {

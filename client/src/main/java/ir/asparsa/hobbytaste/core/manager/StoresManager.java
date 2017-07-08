@@ -9,7 +9,6 @@ import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.net.StoreService;
 import rx.Observable;
 import rx.Observer;
-import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -40,16 +39,13 @@ public class StoresManager {
     }
 
     private Observable<StoreDao.Stores> getStoresObservable(Constraint constraint) {
-        return mStoreDao
-                .queryStores(constraint.latitude, constraint.longitude, constraint.offset, constraint.limit, mBannerDao)
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
+        return mStoreDao.queryStores(
+                constraint.latitude, constraint.longitude, constraint.offset, constraint.limit, mBannerDao);
     }
 
     private Observable<StoreModel> getSaveStoresObservable(@NonNull final StoreModel newModel) {
         return mStoreDao
-                .create(mBannerDao, null, newModel)
-                .subscribeOn(Schedulers.newThread());
+                .create(mBannerDao, null, newModel);
     }
 
     private Observable<StoreProto.Stores> getLoadServiceObservable(Constraint constraint) {
@@ -57,15 +53,13 @@ public class StoresManager {
                 .loadStoreModels(
                         constraint.latitude, constraint.longitude,
                         (int) (constraint.getOffset() / constraint.getLimit()), constraint.getLimit())
-                .retry(5)
-                .subscribeOn(Schedulers.newThread());
+                .retry(5);
     }
 
     private Observable<StoreProto.Store> getSaveServiceObservable(StoreProto.Store store) {
         return mStoreService
                 .saveStore(store)
-                .retry(5)
-                .subscribeOn(Schedulers.newThread());
+                .retry(5);
     }
 
     private Observable<StoreProto.Store> getLikeServiceObservable(
@@ -74,33 +68,14 @@ public class StoresManager {
     ) {
         return mStoreService
                 .like(storeHashCode, like)
-                .retry(5)
-                .subscribeOn(Schedulers.newThread());
+                .retry(5);
     }
 
     private Observable<StoreProto.Store> getViewServiceObservable(
             long storeHashCode
     ) {
         return mStoreService
-                .storeViewed(storeHashCode)
-                .subscribeOn(Schedulers.newThread());
-    }
-
-    private Observable<StoresResult> getLoadErrorObservable(final Throwable e) {
-        return Observable.create(new Observable.OnSubscribe<StoresResult>() {
-            @Override public void call(Subscriber<? super StoresResult> subscriber) {
-                subscriber.onError(e);
-            }
-        }).observeOn(AndroidSchedulers.mainThread());
-    }
-
-
-    private Observable<StoreModel> getSaveErrorObservable(final Throwable e) {
-        return Observable.create(new Observable.OnSubscribe<StoreModel>() {
-            @Override public void call(Subscriber<? super StoreModel> subscriber) {
-                subscriber.onError(e);
-            }
-        }).observeOn(AndroidSchedulers.mainThread());
+                .storeViewed(storeHashCode);
     }
 
     private void requestServer(
@@ -108,7 +83,16 @@ public class StoresManager {
             Observer<StoresResult> observer
     ) {
         getLoadServiceObservable(constraint)
-                .subscribe(onLoadObserver(observer));
+                .subscribe(onLoadObserver(constraint, observer));
+    }
+
+    private void loadFromDatabaseThenRequest(
+            Constraint constraint,
+            Observer<StoresResult> observer
+    ) {
+        getStoresObservable(constraint)
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(getLoadThenRequestObserver(constraint, observer));
     }
 
     private void loadFromDatabase(
@@ -125,11 +109,9 @@ public class StoresManager {
     ) {
         Subject<StoresResult, StoresResult> subject = new SerializedSubject<>(
                 PublishSubject.<StoresResult>create());
-        Subscription subscribe = subject.subscribe(observer);
+        Subscription subscribe = subject.observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
 
-        loadFromDatabase(constraint, subject);
-
-        requestServer(constraint, subject);
+        loadFromDatabaseThenRequest(constraint, subject);
 
         return subscribe;
     }
@@ -140,8 +122,9 @@ public class StoresManager {
             Observer<StoreModel> observer
     ) {
         Subject<StoreModel, StoreModel> subject = new SerializedSubject<>(PublishSubject.<StoreModel>create());
-        Subscription subscription = subject.subscribe(observer);
+        Subscription subscription = subject.observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
         getLikeServiceObservable(store.getHashCode(), store.isLiked())
+                .subscribeOn(Schedulers.newThread())
                 .subscribe(onNewStoreReceivedObserver(store, subject));
         return subscription;
     }
@@ -151,8 +134,10 @@ public class StoresManager {
             Observer<StoreModel> observer
     ) {
         Subject<StoreModel, StoreModel> subject = new SerializedSubject<>(PublishSubject.<StoreModel>create());
-        Subscription subscription = subject.subscribe(observer);
-        getViewServiceObservable(store.getHashCode()).subscribe(onNewStoreReceivedObserver(store, subject));
+        Subscription subscription = subject.observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+        getViewServiceObservable(store.getHashCode())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(onNewStoreReceivedObserver(store, subject));
         return subscription;
     }
 
@@ -161,8 +146,10 @@ public class StoresManager {
             Observer<StoreModel> observer
     ) {
         Subject<StoreModel, StoreModel> subject = new SerializedSubject<>(PublishSubject.<StoreModel>create());
-        Subscription subscription = subject.subscribe(observer);
-        getSaveStoresObservable(store).subscribe(onSaveStoreObserver(subject));
+        Subscription subscription = subject.observeOn(AndroidSchedulers.mainThread()).subscribe(observer);
+        getSaveStoresObservable(store)
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(onSaveStoreObserver(subject));
         return subscription;
     }
 
@@ -172,7 +159,7 @@ public class StoresManager {
             }
 
             @Override public void onError(Throwable e) {
-                getSaveErrorObservable(e).subscribe(observer);
+                observer.onError(e);
             }
 
             @Override public void onNext(StoreModel storeModel) {
@@ -197,7 +184,6 @@ public class StoresManager {
             @Override public void onNext(StoreProto.Store storeDto) {
                 StoreModel newStore = StoreModel.instantiate(storeDto);
                 mStoreDao.create(mBannerDao, oldStore, newStore)
-                         .subscribeOn(AndroidSchedulers.mainThread())
                          .subscribe(onFinishSavingObserver(observer));
             }
         };
@@ -213,12 +199,32 @@ public class StoresManager {
 
             @Override public void onError(Throwable ee) {
                 ee.initCause(e);
-                getSaveErrorObservable(ee).subscribe(observer);
+                observer.onError(ee);
             }
 
             @Override public void onNext(Integer integer) {
                 L.i(StoresManager.class, "Successfully deleted from local database, the unsaved store on server.");
-                getSaveErrorObservable(e).subscribe(observer);
+                observer.onError(e);
+            }
+        };
+    }
+
+    private Observer<? super StoreDao.Stores> getLoadThenRequestObserver(
+            final Constraint constraint,
+            final Observer<StoresResult> observer
+    ) {
+        return new Observer<StoreDao.Stores>() {
+            @Override public void onCompleted() {
+            }
+
+            @Override public void onError(Throwable e) {
+                observer.onError(e);
+            }
+
+            @Override public void onNext(StoreDao.Stores stores) {
+                observer.onNext(new StoresResult(stores.getStores(), stores.getTotalElements()));
+
+                requestServer(constraint, observer);
             }
         };
     }
@@ -226,7 +232,6 @@ public class StoresManager {
     private Observer<? super StoreDao.Stores> getLoadObserver(final Observer<StoresResult> observer) {
         return new Observer<StoreDao.Stores>() {
             @Override public void onCompleted() {
-                // Don't call observer's on completed method
             }
 
             @Override public void onError(Throwable e) {
@@ -248,13 +253,12 @@ public class StoresManager {
             }
 
             @Override public void onError(Throwable e) {
-                getSaveErrorObservable(e).subscribe(observer);
+                observer.onError(e);
             }
 
             @Override public void onNext(StoreProto.Store storeDto) {
                 StoreModel newStore = StoreModel.instantiate(storeDto);
                 mStoreDao.create(mBannerDao, oldStore, newStore)
-                         .subscribeOn(AndroidSchedulers.mainThread())
                          .subscribe(onFinishSavingObserver(observer));
             }
         };
@@ -265,7 +269,6 @@ public class StoresManager {
     ) {
         return new Observer<StoreModel>() {
             @Override public void onCompleted() {
-                // Don't call observer's on completed method
             }
 
             @Override public void onError(Throwable e) {
@@ -279,7 +282,10 @@ public class StoresManager {
     }
 
 
-    private Observer<StoreProto.Stores> onLoadObserver(final Observer<StoresResult> observer) {
+    private Observer<StoreProto.Stores> onLoadObserver(
+            final Constraint constraint,
+            final Observer<StoresResult> observer
+    ) {
         return new Observer<StoreProto.Stores>() {
             @Override public void onCompleted() {
                 L.i(StoresManager.class, "Refresh request gets completed");
@@ -287,7 +293,7 @@ public class StoresManager {
 
             @Override public void onError(Throwable e) {
                 L.w(StoresManager.class, "Refresh request gets error", e);
-                getLoadErrorObservable(e).subscribe(observer);
+                observer.onError(e);
             }
 
             @Override public void onNext(StoreProto.Stores stores) {
@@ -300,16 +306,14 @@ public class StoresManager {
                     collection.add(StoreModel.instantiate(store));
                 }
                 mStoreDao.createAll(mBannerDao, collection)
-                         .subscribeOn(AndroidSchedulers.mainThread())
-                         .subscribe(onFinishObserver(observer, collection, stores.getTotalElements()));
+                         .subscribe(onFinishObserver(constraint, observer));
             }
         };
     }
 
     private Observer<? super Collection<StoreModel>> onFinishObserver(
-            final Observer<StoresResult> observer,
-            final Collection<StoreModel> stores,
-            final long totalElements
+            final Constraint constraint,
+            final Observer<StoresResult> observer
     ) {
         return new Observer<Collection<StoreModel>>() {
             @Override public void onCompleted() {
@@ -322,7 +326,7 @@ public class StoresManager {
 
             @Override public void onNext(Collection<StoreModel> list) {
                 L.i(StoresManager.class, "Stores completely saved");
-                observer.onNext(new StoresResult(stores, totalElements));
+                loadFromDatabase(constraint, observer);
             }
         };
     }

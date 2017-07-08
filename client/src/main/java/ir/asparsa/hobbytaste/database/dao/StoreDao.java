@@ -22,7 +22,7 @@ import java.util.*;
  * @since 11/30/2016 AD
  */
 @Singleton
-public class StoreDao extends AbsDao<StoreModel, Integer> {
+public class StoreDao extends AbsDao<StoreModel, Long> {
 
     @Inject
     public StoreDao(DatabaseHelper mDatabaseHelper) {
@@ -68,12 +68,12 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
 
                     List<StoreModel> models = new ArrayList<>();
                     for (StoreHolder holder : holders.subList(offset, Math.min(offset + limit, holders.size()))) {
-                        holder.storeModel.setBanners(bannerDao.getDao().query(
+                        holder.storeModel.setBanners(
                                 bannerDao.getDao()
                                          .queryBuilder()
                                          .where()
                                          .eq(Banner.Columns.STORE, holder.storeModel.getId())
-                                         .prepare()));
+                                         .query());
 
                         models.add(holder.storeModel);
                     }
@@ -184,11 +184,11 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
 
             List<BannerModel> oldBannerList;
             if (oldModel == null) {
-                oldBannerList = bannerDao.getDao().query(
+                oldBannerList =
                         bannerDao.getDao().queryBuilder()
                                  .where()
                                  .eq(Banner.Columns.STORE, newModel.getId())
-                                 .prepare());
+                                 .query();
             } else {
                 oldBannerList = oldModel.getBanners();
                 for (BannerModel bannerModel : oldBannerList) {
@@ -200,6 +200,7 @@ public class StoreDao extends AbsDao<StoreModel, Integer> {
                 for (BannerModel newBanner : newModel.getBanners()) {
                     if (oldBanner.equals(newBanner)) {
                         isFound = true;
+                        newBanner.setId(oldBanner.getId());
                         break;
                     }
                 }

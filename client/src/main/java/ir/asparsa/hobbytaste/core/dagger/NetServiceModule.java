@@ -14,6 +14,7 @@ import ir.asparsa.hobbytaste.net.BannerService;
 import ir.asparsa.hobbytaste.net.FeedbackService;
 import ir.asparsa.hobbytaste.net.StoreService;
 import ir.asparsa.hobbytaste.net.UserService;
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -105,6 +106,7 @@ public class NetServiceModule {
             Context context,
             OkHttpClient.Builder httpClient
     ) {
+        httpClient.cache(new Cache(context.getCacheDir(), Integer.MAX_VALUE));
         return new Picasso.Builder(context)
                 .downloader(new OkHttp3Downloader(httpClient.build()))
                 .build();
