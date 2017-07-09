@@ -2,6 +2,8 @@ package ir.asparsa.hobbytaste.ui.mvp.presenter.dagger;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.res.Resources;
+import android.os.Handler;
 import dagger.Module;
 import dagger.Provides;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
@@ -9,6 +11,7 @@ import ir.asparsa.hobbytaste.core.dagger.AppModule;
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
+import org.mockito.Mockito;
 
 import javax.inject.Singleton;
 
@@ -23,7 +26,7 @@ public class PresenterMockAppModule extends AppModule {
     StoresManager storesManager;
     PreferencesManager preferencesManager;
     MapUtil mapUtil;
-    ApplicationLauncher application;
+    ApplicationLauncher mApplication;
 
     public PresenterMockAppModule(
             ApplicationLauncher application,
@@ -40,19 +43,31 @@ public class PresenterMockAppModule extends AppModule {
     @Provides
     @Singleton
     Application providesApplication() {
-        return application;
+        return mApplication;
     }
 
     @Provides
     @Singleton
     ApplicationLauncher providesApplicationLauncher() {
-        return application;
+        return mApplication;
     }
 
     @Provides
     @Singleton
     Context providesContext() {
-        return application;
+        return mApplication;
+    }
+
+    @Provides
+    @Singleton
+    Resources providesResources() {
+        return mApplication.getResources();
+    }
+
+    @Provides
+    @Singleton
+    Handler providesHandler() {
+        return Mockito.mock(Handler.class);
     }
 
     @Provides
