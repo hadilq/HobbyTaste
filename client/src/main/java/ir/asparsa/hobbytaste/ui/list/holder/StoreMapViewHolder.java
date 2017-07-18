@@ -11,20 +11,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.*;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.core.util.UiUtil;
-import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.list.data.StoreMapData;
-import rx.functions.Action1;
 
 import javax.inject.Inject;
 
 /**
  * @author hadi
- * @since 12/7/2016 AD
  */
 public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements OnMapReadyCallback {
 
@@ -42,25 +39,26 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
     private boolean mIsCameraMovedBefore = false;
 
     public StoreMapViewHolder(
-            View itemView,
-            Action1<BaseRecyclerFragment.Event> observer,
-            Bundle savedInstanceState
+            View itemView
     ) {
-        super(itemView, observer, savedInstanceState);
+        super(itemView);
         ApplicationLauncher.mainComponent().inject(this);
         ButterKnife.bind(this, itemView);
-
-        // TODO why savedInstanceState is not working here?
-        mMapView.onCreate(null);
-        mMapView.onResume();
-        mMapView.getMapAsync(this);
     }
 
     @Override
     public void onBindView(StoreMapData data) {
+        super.onBindView(data);
         mStore = data.getStore();
         fillMap();
         L.i(this.getClass(), "Bound");
+    }
+
+    @Override public void onCreate(Bundle savedInstanceState) {
+        // TODO why savedInstanceState is not working here?
+        mMapView.onCreate(null);
+        mMapView.onResume();
+        mMapView.getMapAsync(this);
     }
 
     @Override

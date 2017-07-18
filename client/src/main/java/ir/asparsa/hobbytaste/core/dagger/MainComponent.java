@@ -10,6 +10,7 @@ import ir.asparsa.hobbytaste.core.route.PlacesRoute;
 import ir.asparsa.hobbytaste.ui.activity.BaseActivity;
 import ir.asparsa.hobbytaste.ui.activity.CrashReportActivity;
 import ir.asparsa.hobbytaste.ui.activity.LaunchActivity;
+import ir.asparsa.hobbytaste.ui.activity.ScreenshotActivity;
 import ir.asparsa.hobbytaste.ui.adapter.NavigationAdapter;
 import ir.asparsa.hobbytaste.ui.fragment.ContainerFragment;
 import ir.asparsa.hobbytaste.ui.fragment.content.*;
@@ -19,6 +20,7 @@ import ir.asparsa.hobbytaste.ui.fragment.recycler.PlacesRecyclerFragment;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.SettingsRecyclerFragment;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.StoreDetailsRecyclerFragment;
 import ir.asparsa.hobbytaste.ui.list.HorizontalSpaceItemDecoration;
+import ir.asparsa.hobbytaste.ui.list.holder.GalleryViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.PlaceViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.StoreMapViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.PlacesProvider;
@@ -42,6 +44,8 @@ public interface MainComponent {
     void inject(ApplicationLauncher applicationLauncher);
 
     void inject(BaseActivity baseActivity);
+
+    void inject(ScreenshotActivity screenshotActivity);
 
     void inject(LaunchActivity launchActivity);
 
@@ -104,4 +108,6 @@ public interface MainComponent {
     void inject(HorizontalSpaceItemDecoration horizontalSpaceItemDecoration);
 
     void inject(BaseContentFragment baseContentFragment);
+
+    void inject(GalleryViewHolder galleryViewHolder);
 }

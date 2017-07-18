@@ -7,8 +7,9 @@ import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.SettingsRecyclerFragment;
+import ir.asparsa.hobbytaste.ui.list.data.AboutUsData;
 import ir.asparsa.hobbytaste.ui.list.holder.AboutUsViewHolder;
-import rx.Observer;
+import rx.functions.Action1;
 
 import javax.inject.Inject;
 
@@ -55,21 +56,16 @@ public class SettingsContentFragment extends BaseContentFragment {
         settingsRecyclerFragment.setContentObserver(geRecyclerObserver());
     }
 
-    private <T> Observer<T> geRecyclerObserver() {
-        return new Observer<T>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-            }
-
-            @Override public void onNext(T t) {
-                if (t instanceof AboutUsViewHolder.AboutUsClick) {
-                    onAboutUsClick();
+    private <T> Action1<T> geRecyclerObserver() {
+        return new Action1<T>() {
+            @Override public void call(T t) {
+                if (t instanceof AboutUsViewHolder) {
+                    ((AboutUsViewHolder) t).clickStream().subscribe(getOnAboutUsClickObserver());
                 }
             }
         };
     }
+
 
     @Override protected String setHeaderTitle() {
         return getString(R.string.title_settings);
@@ -79,8 +75,13 @@ public class SettingsContentFragment extends BaseContentFragment {
         return BackState.CLOSE_APP;
     }
 
-    private void onAboutUsClick() {
-        mNavigationUtil.startContentFragment(getFragmentManager(), AboutUsContentFragment.instantiate());
+
+    private Action1<? super AboutUsData> getOnAboutUsClickObserver() {
+        return new Action1<AboutUsData>() {
+            @Override public void call(AboutUsData aboutUsData) {
+                mNavigationUtil.startContentFragment(getFragmentManager(), AboutUsContentFragment.instantiate());
+            }
+        };
     }
 
 }

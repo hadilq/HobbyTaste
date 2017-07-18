@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 def keystorePropertiesFile = rootProject.file("keystore.properties")
 def keystoreProperties = new Properties()
@@ -63,6 +64,10 @@ android {
 
     }
 
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
     testOptions {
         unitTests.returnDefaultValues = true
     }
@@ -82,6 +87,7 @@ dependencies {
         exclude group: 'com.google.dagger'
         exclude group: 'com.jakewharton'
         exclude group: 'io.reactivex'
+        exclude group: 'com.github.kittinunf.reactiveandroid'
     }
     compile(project(':common'))
     compile 'com.android.support:multidex:1.0.1'
@@ -114,6 +120,17 @@ dependencies {
     // Picasso
     compile "com.squareup.picasso:picasso:$global_picassoVersion"
     compile "com.jakewharton.picasso:picasso2-okhttp3-downloader:$global_picassoDownloaderVersion"
+    // Kotlin
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
+    // Reactive Android
+    //for base UI
+    compile "com.github.kittinunf.reactiveandroid:reactiveandroid-ui:$global_reactiveAndroidVersion"
+    //for appcompat-v7 module
+    compile "com.github.kittinunf.reactiveandroid:reactiveandroid-appcompat-v7:$global_reactiveAndroidVersion"
+    //for support-v4 module
+    compile "com.github.kittinunf.reactiveandroid:reactiveandroid-support-v4:$global_reactiveAndroidVersion"
+    //for design support module
+    compile "com.github.kittinunf.reactiveandroid:reactiveandroid-design:$global_reactiveAndroidVersion"
 
     // Test
     testCompile "junit:junit:$global_junitVersion"

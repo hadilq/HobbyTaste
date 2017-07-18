@@ -3,28 +3,31 @@ package ir.asparsa.android.ui.list.holder;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
-import rx.functions.Action1;
 
 /**
  * @author hadi
- * @since 6/24/2016 AD
  */
 public abstract class BaseViewHolder<DATA extends BaseRecyclerData> extends RecyclerView.ViewHolder {
 
-    protected final Action1<BaseRecyclerFragment.Event> mObserver;
+    private DATA mData;
 
     public BaseViewHolder(
-            View itemView,
-            Action1<BaseRecyclerFragment.Event> observer,
-            Bundle savedInstanceState
+            View itemView
     ) {
         super(itemView);
-        mObserver = observer;
     }
 
-    public abstract void onBindView(DATA data);
+    public void onBindView(DATA data) {
+        mData = data;
+    }
+
+    public void onCreate(Bundle savedInstanceState) {
+    }
+
+    public DATA getData() {
+        return mData;
+    }
 
     public void onResume() {
     }

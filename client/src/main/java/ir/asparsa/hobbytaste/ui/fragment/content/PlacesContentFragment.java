@@ -11,7 +11,7 @@ import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
 import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.PlacesRecyclerFragment;
-import rx.Observer;
+import rx.functions.Action1;
 
 import javax.inject.Inject;
 
@@ -66,15 +66,9 @@ public class PlacesContentFragment extends BaseContentFragment {
         placesRecyclerFragment.setContentObserver(geRecyclerObserver());
     }
 
-    private <T> Observer<T> geRecyclerObserver() {
-        return new Observer<T>() {
-            @Override public void onCompleted() {
-            }
-
-            @Override public void onError(Throwable e) {
-            }
-
-            @Override public void onNext(T t) {
+    private <T> Action1<T> geRecyclerObserver() {
+        return new Action1<T>() {
+            @Override public void call(T t) {
             }
         };
     }

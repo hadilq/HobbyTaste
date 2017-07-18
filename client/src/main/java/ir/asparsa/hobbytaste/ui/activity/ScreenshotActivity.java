@@ -11,15 +11,21 @@ import butterknife.ButterKnife;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 
+import javax.inject.Inject;
+
 /**
- * Created by hadi on 1/13/2017 AD.
+ * @author hadi
  */
 public class ScreenshotActivity extends BaseActivity {
 
     public static final String BUNDLE_KEY_MAIN_URL = "BUNDLE_KEY_MAIN_URL";
     public static final String BUNDLE_KEY_THUMBNAIL_URL = "BUNDLE_KEY_THUMBNAIL_URL";
+
+    @Inject
+    Picasso mPicasso;
 
     @BindView(R.id.image)
     ImageView mScreenshotImageView;
@@ -32,6 +38,7 @@ public class ScreenshotActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.screenshot_full);
 
+        ApplicationLauncher.mainComponent().inject(this);
         ButterKnife.bind(this);
 
         mCloseButton.setOnClickListener(new View.OnClickListener() {
@@ -49,8 +56,7 @@ public class ScreenshotActivity extends BaseActivity {
             requestCreator = Picasso.with(this)
                                     .load(mainUrl);
         } else if (!TextUtils.isEmpty(thumbnailUrl)) {
-            requestCreator = Picasso.with(this)
-                                    .load(thumbnailUrl);
+            requestCreator = mPicasso.load(thumbnailUrl);
         }
 
         if (requestCreator != null) {

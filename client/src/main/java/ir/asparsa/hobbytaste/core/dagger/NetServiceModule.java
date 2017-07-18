@@ -107,7 +107,11 @@ public class NetServiceModule {
             OkHttpClient.Builder httpClient
     ) {
         httpClient.cache(new Cache(context.getCacheDir(), Integer.MAX_VALUE));
-        return new Picasso.Builder(context)
+        Picasso.Builder builder = new Picasso.Builder(context);
+        if (BuildConfig.DEBUG) {
+            builder.loggingEnabled(true);
+        }
+        return builder
                 .downloader(new OkHttp3Downloader(httpClient.build()))
                 .build();
     }

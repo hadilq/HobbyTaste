@@ -10,15 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import ir.asparsa.android.core.logger.L;
-import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
+import ir.asparsa.android.ui.list.holder.BaseViewHolderFactory;
 import ir.asparsa.android.ui.list.holder.EmptyViewHolder;
 import junit.framework.Assert;
 import rx.functions.Action1;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,18 +31,21 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
     private final RecyclerView mRecyclerView;
     private ArrayList<BaseRecyclerData> mList = new ArrayList<>();
     private final SparseArrayCompat<Class<? extends BaseViewHolder>> mHoldersMap;
-    private final Action1<BaseRecyclerFragment.Event> mObserver;
+    private final Action1<BaseViewHolder> mObserver;
+    private final BaseViewHolderFactory mFactory;
 
     public RecyclerListAdapter(
             @NonNull RecyclerView recyclerView,
             @NonNull LinearLayoutManager layoutManager,
             @Nullable Bundle savedInstanceState,
             @NonNull SparseArrayCompat<Class<? extends BaseViewHolder>> holdersMap,
-            @Nullable Action1<BaseRecyclerFragment.Event> observer
+            @NonNull BaseViewHolderFactory factory,
+            @NonNull Action1<BaseViewHolder> observer
     ) {
         this.mRecyclerView = recyclerView;
         this.mLayoutManager = layoutManager;
         this.mHoldersMap = holdersMap;
+        this.mFactory = factory;
         this.mObserver = observer;
         this.mSavedInstanceState = savedInstanceState;
     }
@@ -61,33 +62,17 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
 
                 View view = LayoutInflater.from(parent.getContext()).inflate(viewType, parent, false);
 
-                Class<? extends BaseViewHolder> clazz = mHoldersMap.get(key);
-                Constructor<? extends BaseViewHolder> constructor;
-                try {
-                    constructor = clazz.getConstructor(View.class, Action1.class, Bundle.class);
-                    baseViewHolder = constructor.newInstance(view, mObserver, mSavedInstanceState);
-                } catch (NoSuchMethodException e) {
-                    L.e(this.getClass(), "View Holder don't have necessary constructor: " + clazz.getName(), e);
-                    continue;
-                } catch (IllegalAccessException e) {
-                    L.e(this.getClass(), "View Holder don't have necessary constructor: " + clazz.getName(), e);
-                    continue;
-                } catch (InstantiationException e) {
-                    L.e(this.getClass(), "View Holder don't have necessary constructor: " + clazz.getName(), e);
-                    continue;
-                } catch (InvocationTargetException e) {
-                    L.e(this.getClass(), "View Holder don't have necessary constructor: " + clazz.getName(), e);
-                    continue;
-                }
+                baseViewHolder = mFactory.create(mHoldersMap.get(key), view);
                 break;
             }
         }
 
         if (baseViewHolder == null) {
             // Shouldn't happen
-            L.w(this.getClass(), "baseViewHolder become null!");
-            baseViewHolder = new EmptyViewHolder(new View(parent.getContext()), mObserver, mSavedInstanceState);
+            L.w(this.getClass(), "baseViewHolder becomes null!");
+            baseViewHolder = new EmptyViewHolder(new View(parent.getContext()));
         }
+        mObserver.call(baseViewHolder);
         return baseViewHolder;
     }
 
@@ -100,6 +85,7 @@ public class RecyclerListAdapter extends RecyclerView.Adapter {
             BaseViewHolder baseHolder = (BaseViewHolder) holder;
             final BaseRecyclerData data = mList.get(position);
 
+            baseHolder.onCreate(mSavedInstanceState);
             onBindData(baseHolder, data);
         } else {
             Assert.fail("All view holders must be extended of BaseViewHolder");

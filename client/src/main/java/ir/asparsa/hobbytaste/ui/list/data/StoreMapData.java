@@ -7,7 +7,6 @@ import ir.asparsa.hobbytaste.database.model.StoreModel;
 
 /**
  * @author hadi
- * @since 12/7/2016 AD
  */
 public class StoreMapData extends BaseRecyclerData {
 

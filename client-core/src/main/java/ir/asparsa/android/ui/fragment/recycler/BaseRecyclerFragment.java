@@ -23,9 +23,11 @@ import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.data.DataObserver;
 import ir.asparsa.android.ui.list.data.TryAgainData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
+import ir.asparsa.android.ui.list.holder.BaseViewHolderFactory;
 import ir.asparsa.android.ui.list.holder.TryAgainViewHolder;
 import ir.asparsa.android.ui.list.provider.AbsListProvider;
 import ir.asparsa.android.ui.view.TryAgainView;
+import org.jetbrains.annotations.NotNull;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action1;
@@ -98,22 +100,37 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setOnScrollListener(new LoadingListener());
 
-        final Action1<Event> observer = getObserver();
+        final Action1<BaseViewHolder> observer = getObserver();
         mAdapter = new RecyclerListAdapter(
-                mRecyclerView, mLayoutManager, savedInstanceState, getViewHoldersList(), new Action1<Event>() {
-            @Override public void call(Event event) {
-                if (event instanceof TryAgainViewHolder.OnTryAgainEvent) {
-                    mOnTryAgainListener.tryAgain();
-                } else {
-                    observer.call(event);
-                }
-            }
-        });
+                mRecyclerView, mLayoutManager, savedInstanceState, getViewHoldersList(), getViewHolderFactory(),
+                getObserver(observer));
 
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         return rootView;
+    }
+
+    @NotNull private Action1<BaseViewHolder> getObserver(final Action1<BaseViewHolder> observer) {
+        return new Action1<BaseViewHolder>() {
+            @Override public void call(BaseViewHolder holder) {
+                if (holder instanceof TryAgainViewHolder) {
+                    ((TryAgainViewHolder) holder).clickStream().subscribe(getTryAgainObserver());
+                } else {
+                    observer.call(holder);
+                }
+            }
+        };
+    }
+
+    protected abstract BaseViewHolderFactory getViewHolderFactory();
+
+    @NotNull private Action1<TryAgainData> getTryAgainObserver() {
+        return new Action1<TryAgainData>() {
+            @Override public void call(TryAgainData tryAgainData) {
+                mOnTryAgainListener.tryAgain();
+            }
+        };
     }
 
     private void refresh() {
@@ -185,7 +202,7 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
             OnInsertData insertData
     );
 
-    protected abstract <T extends Event> Action1<T> getObserver();
+    protected abstract <T extends BaseViewHolder> Action1<T> getObserver();
 
     private class LoadingListener extends RecyclerView.OnScrollListener {
         @Override
@@ -329,7 +346,8 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         return true;
     }
 
-    public interface Event {
+    public interface Registerer<I> {
+        Observable<I> getObservable();
     }
 
     @Override

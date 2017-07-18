@@ -11,6 +11,7 @@ import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
+import ir.asparsa.android.ui.list.holder.BaseViewHolderFactory;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
@@ -19,8 +20,9 @@ import ir.asparsa.hobbytaste.core.route.RouteFactory;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.list.data.PlaceData;
 import ir.asparsa.hobbytaste.ui.list.holder.PlaceViewHolder;
+import ir.asparsa.hobbytaste.ui.list.holder.ViewHolderFactory;
 import ir.asparsa.hobbytaste.ui.list.provider.PlacesProvider;
-import rx.Observer;
+import org.jetbrains.annotations.NotNull;
 import rx.functions.Action1;
 
 import javax.inject.Inject;
@@ -39,8 +41,10 @@ public class PlacesRecyclerFragment extends BaseRecyclerFragment<PlacesProvider>
     PreferencesManager mPreferencesManager;
     @Inject
     RouteFactory mRouteFactory;
+    @Inject
+    ViewHolderFactory mViewHolderFactory;
 
-    private Observer<Object> mContentObserver;
+    private Action1<Object> mContentObserver;
 
     public static PlacesRecyclerFragment instantiate(Bundle bundle) {
         PlacesRecyclerFragment fragment = new PlacesRecyclerFragment();
@@ -51,6 +55,10 @@ public class PlacesRecyclerFragment extends BaseRecyclerFragment<PlacesProvider>
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
+    }
+
+    @Override protected BaseViewHolderFactory getViewHolderFactory() {
+        return mViewHolderFactory;
     }
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -76,12 +84,20 @@ public class PlacesRecyclerFragment extends BaseRecyclerFragment<PlacesProvider>
         return new PlacesProvider(adapter, insertData, lat, lng);
     }
 
-    @Override protected <T extends Event> Action1<T> getObserver() {
+    @Override protected <T extends BaseViewHolder> Action1<T> getObserver() {
         return new Action1<T>() {
             @Override public void call(T t) {
-                if (t instanceof PlaceViewHolder.OnPlaceClickEvent) {
-                    instantiateStoreDetail(((PlaceViewHolder.OnPlaceClickEvent) t).getStoreModel());
+                if (t instanceof PlaceViewHolder) {
+                    ((PlaceViewHolder) t).clickStream().subscribe(getPlaceObserver());
                 }
+            }
+        };
+    }
+
+    @NotNull private Action1<PlaceData> getPlaceObserver() {
+        return new Action1<PlaceData>() {
+            @Override public void call(PlaceData placeData) {
+                instantiateStoreDetail(placeData.getStoreModel());
             }
         };
     }
@@ -92,7 +108,7 @@ public class PlacesRecyclerFragment extends BaseRecyclerFragment<PlacesProvider>
         return array;
     }
 
-    public void setContentObserver(Observer<Object> contentObserver) {
+    public void setContentObserver(Action1<Object> contentObserver) {
         mContentObserver = contentObserver;
     }
 

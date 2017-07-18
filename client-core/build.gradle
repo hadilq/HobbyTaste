@@ -1,8 +1,13 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
     publishNonDefault true
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
 }
 
 dependencies {
@@ -20,8 +25,18 @@ dependencies {
     // RxAndroid
     compile "io.reactivex:rxandroid:$global_rxandroidVersion"
     compile "io.reactivex:rxjava:$global_rxjavaVersion"
+    // Reactive Android
+    //for base UI
+    compile "com.github.kittinunf.reactiveandroid:reactiveandroid-ui:$global_reactiveAndroidVersion"
+    //for appcompat-v7 module
+    compile "com.github.kittinunf.reactiveandroid:reactiveandroid-appcompat-v7:$global_reactiveAndroidVersion"
+    //for support-v4 module
+    compile "com.github.kittinunf.reactiveandroid:reactiveandroid-support-v4:$global_reactiveAndroidVersion"
+    //for design support module
+    compile "com.github.kittinunf.reactiveandroid:reactiveandroid-design:$global_reactiveAndroidVersion"
 
     // Test
     testCompile "junit:junit:$global_junitVersion"
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
 
 }

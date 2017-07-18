@@ -10,6 +10,7 @@ import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
+import ir.asparsa.android.ui.list.holder.BaseViewHolderFactory;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
@@ -23,8 +24,8 @@ import ir.asparsa.hobbytaste.ui.list.data.UsernameData;
 import ir.asparsa.hobbytaste.ui.list.holder.AboutUsViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.LanguageViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.UserNameViewHolder;
+import ir.asparsa.hobbytaste.ui.list.holder.ViewHolderFactory;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
-import rx.Observer;
 import rx.functions.Action1;
 import rx.subscriptions.CompositeSubscription;
 
@@ -41,9 +42,11 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
     PreferencesManager mPreferencesManager;
     @Inject
     LanguageUtil mLanguageUtil;
+    @Inject
+    ViewHolderFactory mViewHolderFactory;
 
     private CompositeSubscription mSubscription = new CompositeSubscription();
-    private Observer<Object> mContentObserver;
+    private Action1<Object> mContentObserver;
 
     public static SettingsRecyclerFragment instantiate() {
         Bundle bundle = new Bundle();
@@ -55,6 +58,10 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ApplicationLauncher.mainComponent().inject(this);
+    }
+
+    @Override protected BaseViewHolderFactory getViewHolderFactory() {
+        return mViewHolderFactory;
     }
 
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -83,15 +90,17 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
         return new SettingsProvider(adapter, insertData);
     }
 
-    @Override protected <T extends Event> Action1<T> getObserver() {
+    @Override protected <T extends BaseViewHolder> Action1<T> getObserver() {
         return new Action1<T>() {
             @Override public void call(T t) {
-                if (t instanceof UserNameViewHolder.UsernameClick) {
-                    onUsernameClick(((UserNameViewHolder.UsernameClick) t).getUsername());
-                } else if (t instanceof LanguageViewHolder.LanguageClick) {
-                    onLanguageClick(((LanguageViewHolder.LanguageClick) t).getLangAbbreviation());
-                } else if (t instanceof AboutUsViewHolder.AboutUsClick) {
-                    runItOnContentFragment(t);
+                if (t instanceof UserNameViewHolder) {
+                    ((UserNameViewHolder) t).clickStream().subscribe(getUsernameClickObserver());
+                } else if (t instanceof LanguageViewHolder) {
+                    ((LanguageViewHolder) t).clickStream().subscribe(getLanguageClickObserver());
+                } else if (t instanceof AboutUsViewHolder) {
+                    if (mContentObserver != null) {
+                        mContentObserver.call(t);
+                    }
                 }
             }
         };
@@ -105,24 +114,26 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
         return array;
     }
 
-    private void onUsernameClick(String username) {
-        SetUsernameDialogFragment.instantiate(
-                username,
-                new SetUsernameDialogFragment.OnSetUsernameDialogResultEvent(getTagName())
-        ).show(getFragmentManager());
+    private Action1<UsernameData> getUsernameClickObserver() {
+        return new Action1<UsernameData>() {
+            @Override public void call(UsernameData usernameData) {
+                SetUsernameDialogFragment.instantiate(
+                        usernameData.getUsername(),
+                        new SetUsernameDialogFragment.OnSetUsernameDialogResultEvent(getTagName())
+                ).show(getFragmentManager());
+            }
+        };
     }
 
-    private void onLanguageClick(String language) {
-        LanguageDialogFragment.instantiate(
-                language,
-                new LanguageDialogFragment.OnChangeLanguageDialogResultEvent(getTagName())
-        ).show(getFragmentManager());
-    }
-
-    private <T> void runItOnContentFragment(T t) {
-        if (mContentObserver != null) {
-            mContentObserver.onNext(t);
-        }
+    private Action1<LanguageData> getLanguageClickObserver() {
+        return new Action1<LanguageData>() {
+            @Override public void call(LanguageData languageData) {
+                LanguageDialogFragment.instantiate(
+                        languageData.getLanguage(),
+                        new LanguageDialogFragment.OnChangeLanguageDialogResultEvent(getTagName())
+                ).show(getFragmentManager());
+            }
+        };
     }
 
     @Override public void onEvent(BaseEvent event) {
@@ -164,7 +175,7 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
         }
     }
 
-    public void setContentObserver(Observer<Object> contentObserver) {
+    public void setContentObserver(Action1<Object> contentObserver) {
         mContentObserver = contentObserver;
     }
 }
