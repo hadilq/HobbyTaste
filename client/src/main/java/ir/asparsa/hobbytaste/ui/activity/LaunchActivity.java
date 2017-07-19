@@ -143,6 +143,9 @@ public class LaunchActivity extends BaseActivity implements FragmentManager.OnBa
     }
 
     @Override public void onBackPressed() {
+        if (mNavigationUtil.isAnimatingPopBackStack()) {
+            return;
+        }
         int pos = mViewPager.getCurrentItem();
         FragmentManager fragmentManager = mRouteFactory.getFragmentManager(pos);
         if (fragmentManager == null) {

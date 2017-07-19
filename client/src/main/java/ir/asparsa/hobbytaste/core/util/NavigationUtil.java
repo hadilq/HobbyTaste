@@ -35,6 +35,8 @@ public class NavigationUtil {
     @Inject
     Handler mHandler;
 
+    private boolean animatingPopBackStack = false;
+
     @Inject
     public NavigationUtil() {
     }
@@ -73,6 +75,7 @@ public class NavigationUtil {
         if (view != null) {
             view.startAnimation(animation);
         }
+        animatingPopBackStack = true;
         mHandler.postDelayed(new Runnable() {
             @Override public void run() {
                 try {
@@ -80,8 +83,13 @@ public class NavigationUtil {
                 } catch (Exception e) {
                     L.e(NavigationUtil.class.getClass(), "Back problem!", e);
                 }
+                animatingPopBackStack = false;
             }
         }, mResources.getInteger(R.integer.fragment_transition_duration));
+    }
+
+    public boolean isAnimatingPopBackStack() {
+        return animatingPopBackStack;
     }
 
     public void startNestedFragment(
