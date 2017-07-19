@@ -141,11 +141,11 @@ class GalleryViewHolder(
         override fun onBitmapFailed(errorDrawable: Drawable?) {
             mProgressBar.visibility = View.GONE
             mTryAgain.visibility = View.VISIBLE
-            mTryAgain.setOnClickListener {
+            mTryAgain.rx_click().subscribe({
                 mProgressBar.visibility = View.VISIBLE
                 mTryAgain.visibility = View.GONE
                 setupScreenshot(urlString!!)
-            }
+            })
         }
 
         override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
