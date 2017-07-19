@@ -8,14 +8,16 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.*;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.core.util.UiUtil;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
-import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.list.data.StoreMapData;
 
 import javax.inject.Inject;
@@ -34,8 +36,6 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
     MapView mMapView;
 
     private GoogleMap mMap;
-    private StoreModel mStore;
-    private Marker mMarker;
     private boolean mIsCameraMovedBefore = false;
 
     public StoreMapViewHolder(
@@ -49,7 +49,6 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
     @Override
     public void onBindView(StoreMapData data) {
         super.onBindView(data);
-        mStore = data.getStore();
         fillMap();
         L.i(this.getClass(), "Bound");
     }
@@ -70,15 +69,15 @@ public class StoreMapViewHolder extends BaseViewHolder<StoreMapData> implements 
     }
 
     private void fillMap() {
-        if (mMap != null && mStore != null) {
-            LatLng latLng = new LatLng(mStore.getLat(), mStore.getLon());
+        if (mMap != null && getData() != null) {
+            LatLng latLng = new LatLng(getData().getStore().getLat(), getData().getStore().getLon());
             BitmapDescriptor icon = BitmapDescriptorFactory
                     .fromBitmap(mUiUtil.getBitmapFromVectorDrawable(R.drawable.ic_placeholder));
 
-            mMarker = mMap.addMarker(
+            mMap.addMarker(
                     new MarkerOptions()
                             .position(latLng)
-                            .title(mStore.getTitle())
+                            .title(getData().getStore().getTitle())
                             .icon(icon)
             );
 
