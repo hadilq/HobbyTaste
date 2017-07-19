@@ -4,14 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.util.SparseArrayCompat;
-import android.view.View;
 import android.widget.Toast;
 import ir.asparsa.android.core.logger.L;
-import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
-import ir.asparsa.android.ui.list.holder.BaseViewHolderFactory;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.CommentManager;
 import ir.asparsa.hobbytaste.core.manager.StoresManager;
@@ -23,21 +20,22 @@ import ir.asparsa.hobbytaste.ui.list.data.CommentData;
 import ir.asparsa.hobbytaste.ui.list.data.GalleryData;
 import ir.asparsa.hobbytaste.ui.list.data.RatingData;
 import ir.asparsa.hobbytaste.ui.list.data.StoreMapData;
-import ir.asparsa.hobbytaste.ui.list.holder.*;
+import ir.asparsa.hobbytaste.ui.list.holder.CommentViewHolder;
+import ir.asparsa.hobbytaste.ui.list.holder.GalleryViewHolder;
+import ir.asparsa.hobbytaste.ui.list.holder.RatingViewHolder;
+import ir.asparsa.hobbytaste.ui.list.holder.StoreMapViewHolder;
 import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
 import junit.framework.Assert;
 import rx.Observer;
 import rx.functions.Action1;
-import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
 import java.util.List;
 
 /**
  * @author hadi
- * @since 12/7/2016 AD
  */
-public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDetailsProvider> {
+public class StoreDetailsRecyclerFragment extends AbsRecyclerFragment<StoreDetailsProvider> {
 
     public static final String BUNDLE_KEY_STORE = "BUNDLE_KEY_STORE";
 
@@ -45,10 +43,6 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
     StoresManager mStoresManager;
     @Inject
     CommentManager mCommentManager;
-    @Inject
-    ViewHolderFactory mViewHolderFactory;
-
-    private CompositeSubscription mSubscription = new CompositeSubscription();
 
     public static StoreDetailsRecyclerFragment instantiate(Bundle bundle) {
         StoreDetailsRecyclerFragment fragment = new StoreDetailsRecyclerFragment();
@@ -61,11 +55,6 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
         ApplicationLauncher.mainComponent().inject(this);
 
         mSubscription.add(mStoresManager.viewed(getStoreModel(), getViewedObserver()));
-    }
-
-    @Override
-    protected View getEmptyView() {
-        return null;
     }
 
     @Override
@@ -99,16 +88,6 @@ public class StoreDetailsRecyclerFragment extends BaseRecyclerFragment<StoreDeta
                 }
             }
         };
-    }
-
-    @Override protected BaseViewHolderFactory getViewHolderFactory() {
-        return mViewHolderFactory;
-    }
-
-    @Override public void onDestroyView() {
-        mProvider.clear();
-        mSubscription.clear();
-        super.onDestroyView();
     }
 
     private StoreModel getStoreModel() {

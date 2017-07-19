@@ -22,7 +22,6 @@ import java.util.List;
 
 /**
  * @author hadi
- * @since 6/24/2016 AD
  */
 public class RecyclerListAdapter extends RecyclerView.Adapter {
 

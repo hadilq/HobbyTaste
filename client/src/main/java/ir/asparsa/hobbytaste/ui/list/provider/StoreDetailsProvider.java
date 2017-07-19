@@ -16,14 +16,12 @@ import ir.asparsa.hobbytaste.ui.list.data.GalleryData;
 import ir.asparsa.hobbytaste.ui.list.data.RatingData;
 import ir.asparsa.hobbytaste.ui.list.data.StoreMapData;
 import rx.Observer;
-import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
 import java.util.*;
 
 /**
  * @author hadi
- * @since 12/7/2016 AD
  */
 public class StoreDetailsProvider extends AbsListProvider implements Observer<CommentManager.CommentsResult> {
 
@@ -31,7 +29,6 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
     CommentManager mCommentManager;
 
     private final StoreModel mStore;
-    private final CompositeSubscription mSubscription = new CompositeSubscription();
     private long mLastRequestedIndex;
 
     public StoreDetailsProvider(
@@ -150,9 +147,5 @@ public class StoreDetailsProvider extends AbsListProvider implements Observer<Co
 
     public void addComment(CommentModel comment) {
         provideData(0L, 5);
-    }
-
-    public void clear() {
-        mSubscription.clear();
     }
 }

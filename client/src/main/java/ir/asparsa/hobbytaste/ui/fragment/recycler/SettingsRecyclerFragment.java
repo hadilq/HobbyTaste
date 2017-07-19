@@ -6,11 +6,9 @@ import android.support.v4.util.SparseArrayCompat;
 import android.view.View;
 import ir.asparsa.android.core.logger.L;
 import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
-import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.data.BaseRecyclerData;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
-import ir.asparsa.android.ui.list.holder.BaseViewHolderFactory;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
@@ -24,17 +22,15 @@ import ir.asparsa.hobbytaste.ui.list.data.UsernameData;
 import ir.asparsa.hobbytaste.ui.list.holder.AboutUsViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.LanguageViewHolder;
 import ir.asparsa.hobbytaste.ui.list.holder.UserNameViewHolder;
-import ir.asparsa.hobbytaste.ui.list.holder.ViewHolderFactory;
 import ir.asparsa.hobbytaste.ui.list.provider.SettingsProvider;
 import rx.functions.Action1;
-import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
 
 /**
  * @author hadi
  */
-public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvider> {
+public class SettingsRecyclerFragment extends AbsRecyclerFragment<SettingsProvider> {
 
     @Inject
     AuthorizationManager mAuthorizationManager;
@@ -42,11 +38,6 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
     PreferencesManager mPreferencesManager;
     @Inject
     LanguageUtil mLanguageUtil;
-    @Inject
-    ViewHolderFactory mViewHolderFactory;
-
-    private CompositeSubscription mSubscription = new CompositeSubscription();
-    private Action1<Object> mContentObserver;
 
     public static SettingsRecyclerFragment instantiate() {
         Bundle bundle = new Bundle();
@@ -60,10 +51,6 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
         ApplicationLauncher.mainComponent().inject(this);
     }
 
-    @Override protected BaseViewHolderFactory getViewHolderFactory() {
-        return mViewHolderFactory;
-    }
-
     @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         L.d(getClass(), "On activity created");
         super.onActivityCreated(savedInstanceState);
@@ -72,15 +59,6 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
                 changeUsername(s);
             }
         }));
-    }
-
-    @Override public void onDestroyView() {
-        mSubscription.clear();
-        super.onDestroyView();
-    }
-
-    @Nullable @Override protected View getEmptyView() {
-        return null;
     }
 
     @Override protected SettingsProvider provideDataList(
@@ -173,9 +151,5 @@ public class SettingsRecyclerFragment extends BaseRecyclerFragment<SettingsProvi
                 mAdapter.notifyItemChanged(index);
             }
         }
-    }
-
-    public void setContentObserver(Action1<Object> contentObserver) {
-        mContentObserver = contentObserver;
     }
 }

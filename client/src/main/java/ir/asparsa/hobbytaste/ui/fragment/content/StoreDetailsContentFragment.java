@@ -15,24 +15,16 @@ import ir.asparsa.android.ui.fragment.dialog.BaseDialogFragment;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.route.PlaceRoute;
-import ir.asparsa.hobbytaste.core.route.RouteFactory;
-import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.fragment.dialog.CommentDialogFragment;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.StoreDetailsRecyclerFragment;
-
-import javax.inject.Inject;
+import ir.asparsa.hobbytaste.ui.list.provider.StoreDetailsProvider;
 
 /**
  * @author hadi
- * @since 12/2/2016 AD
  */
-public class StoreDetailsContentFragment extends BaseContentFragment {
-
-    @Inject
-    RouteFactory mRouteFactory;
-    @Inject
-    NavigationUtil mNavigationUtil;
+public class StoreDetailsContentFragment
+        extends AbsRecyclerContentFragment<StoreDetailsProvider, StoreDetailsRecyclerFragment> {
 
     public static StoreDetailsContentFragment instantiate(StoreModel store) {
 
@@ -49,17 +41,8 @@ public class StoreDetailsContentFragment extends BaseContentFragment {
         ApplicationLauncher.mainComponent().inject(this);
     }
 
-    @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Fragment fragment = mNavigationUtil.getActiveFragment(getChildFragmentManager());
-        if (!(fragment instanceof StoreDetailsRecyclerFragment)) {
-
-            mNavigationUtil.startNestedFragment(
-                    getChildFragmentManager(),
-                    StoreDetailsRecyclerFragment.instantiate(new Bundle(getArguments()))
-            );
-        }
+    @Override Class<StoreDetailsRecyclerFragment> onRecyclerFragmentClass() {
+        return StoreDetailsRecyclerFragment.class;
     }
 
     @Override public void onCreateOptionsMenu(

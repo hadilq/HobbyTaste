@@ -9,19 +9,16 @@ import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.R;
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
 import ir.asparsa.hobbytaste.core.util.MapUtil;
-import ir.asparsa.hobbytaste.core.util.NavigationUtil;
 import ir.asparsa.hobbytaste.ui.fragment.recycler.PlacesRecyclerFragment;
-import rx.functions.Action1;
+import ir.asparsa.hobbytaste.ui.list.provider.PlacesProvider;
 
 import javax.inject.Inject;
 
 /**
  * @author hadi
  */
-public class PlacesContentFragment extends BaseContentFragment {
+public class PlacesContentFragment extends AbsRecyclerContentFragment<PlacesProvider, PlacesRecyclerFragment> {
 
-    @Inject
-    NavigationUtil mNavigationUtil;
     @Inject
     PreferencesManager mPreferencesManager;
     @Inject
@@ -46,31 +43,8 @@ public class PlacesContentFragment extends BaseContentFragment {
         ApplicationLauncher.mainComponent().inject(this);
     }
 
-    @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        Fragment fragment = mNavigationUtil.getActiveFragment(getChildFragmentManager());
-        PlacesRecyclerFragment placesRecyclerFragment;
-
-        if (!(fragment instanceof PlacesRecyclerFragment)) {
-            placesRecyclerFragment = PlacesRecyclerFragment.instantiate(new Bundle(getArguments()));
-
-            mNavigationUtil.startNestedFragment(
-                    getChildFragmentManager(),
-                    placesRecyclerFragment
-            );
-        } else {
-            placesRecyclerFragment = (PlacesRecyclerFragment) fragment;
-        }
-
-        placesRecyclerFragment.setContentObserver(geRecyclerObserver());
-    }
-
-    private <T> Action1<T> geRecyclerObserver() {
-        return new Action1<T>() {
-            @Override public void call(T t) {
-            }
-        };
+    @Override Class<PlacesRecyclerFragment> onRecyclerFragmentClass() {
+        return PlacesRecyclerFragment.class;
     }
 
     @Override protected String setHeaderTitle() {

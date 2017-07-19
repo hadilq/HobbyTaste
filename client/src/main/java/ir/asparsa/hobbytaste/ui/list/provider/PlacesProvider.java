@@ -12,7 +12,6 @@ import ir.asparsa.hobbytaste.core.manager.StoresManager;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.list.data.PlaceData;
 import rx.Observer;
-import rx.subscriptions.CompositeSubscription;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -31,7 +30,6 @@ public class PlacesProvider extends AbsListProvider implements Observer<StoresMa
     @Inject
     Context mContext;
 
-    private final CompositeSubscription mSubscription = new CompositeSubscription();
     private final double mLatitude;
     private final double mLongitude;
     private long mLastRequestedIndex;

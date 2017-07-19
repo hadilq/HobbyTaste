@@ -51,6 +51,7 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
 
     protected RecyclerListAdapter mAdapter;
     protected P mProvider;
+    protected Action1<BaseViewHolder> mContentObserver;
     private LinearLayoutManager mLayoutManager;
     private TryAgainView.OnTryAgainListener mOnTryAgainListener;
 
@@ -61,6 +62,7 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
     private long mHeaderSize = 0;
     private boolean mLoading = true;
     private int mScrollPosition;
+
 
     @BindView(R2.id.list)
     RecyclerView mRecyclerView;
@@ -346,8 +348,8 @@ public abstract class BaseRecyclerFragment<P extends AbsListProvider> extends Ba
         return true;
     }
 
-    public interface Registerer<I> {
-        Observable<I> getObservable();
+    public void setContentObserver(Action1<BaseViewHolder> contentObserver) {
+        mContentObserver = contentObserver;
     }
 
     @Override

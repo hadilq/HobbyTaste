@@ -7,11 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.SparseArrayCompat;
 import android.view.View;
-import ir.asparsa.android.core.logger.L;
-import ir.asparsa.android.ui.fragment.recycler.BaseRecyclerFragment;
 import ir.asparsa.android.ui.list.adapter.RecyclerListAdapter;
 import ir.asparsa.android.ui.list.holder.BaseViewHolder;
-import ir.asparsa.android.ui.list.holder.BaseViewHolderFactory;
 import ir.asparsa.hobbytaste.ApplicationLauncher;
 import ir.asparsa.hobbytaste.core.manager.AuthorizationManager;
 import ir.asparsa.hobbytaste.core.manager.PreferencesManager;
@@ -20,7 +17,6 @@ import ir.asparsa.hobbytaste.core.route.RouteFactory;
 import ir.asparsa.hobbytaste.database.model.StoreModel;
 import ir.asparsa.hobbytaste.ui.list.data.PlaceData;
 import ir.asparsa.hobbytaste.ui.list.holder.PlaceViewHolder;
-import ir.asparsa.hobbytaste.ui.list.holder.ViewHolderFactory;
 import ir.asparsa.hobbytaste.ui.list.provider.PlacesProvider;
 import org.jetbrains.annotations.NotNull;
 import rx.functions.Action1;
@@ -30,7 +26,7 @@ import javax.inject.Inject;
 /**
  * @author hadi
  */
-public class PlacesRecyclerFragment extends BaseRecyclerFragment<PlacesProvider> {
+public class PlacesRecyclerFragment extends AbsRecyclerFragment<PlacesProvider> {
 
     public static final String BUNDLE_KEY_LAT = "BUNDLE_KEY_LAT";
     public static final String BUNDLE_KEY_LNG = "BUNDLE_KEY_LNG";
@@ -41,10 +37,6 @@ public class PlacesRecyclerFragment extends BaseRecyclerFragment<PlacesProvider>
     PreferencesManager mPreferencesManager;
     @Inject
     RouteFactory mRouteFactory;
-    @Inject
-    ViewHolderFactory mViewHolderFactory;
-
-    private Action1<Object> mContentObserver;
 
     public static PlacesRecyclerFragment instantiate(Bundle bundle) {
         PlacesRecyclerFragment fragment = new PlacesRecyclerFragment();
@@ -57,22 +49,9 @@ public class PlacesRecyclerFragment extends BaseRecyclerFragment<PlacesProvider>
         ApplicationLauncher.mainComponent().inject(this);
     }
 
-    @Override protected BaseViewHolderFactory getViewHolderFactory() {
-        return mViewHolderFactory;
-    }
-
-    @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        L.d(getClass(), "On activity created");
-        super.onActivityCreated(savedInstanceState);
-    }
-
     @Override public void onDestroyView() {
         mProvider.clear();
         super.onDestroyView();
-    }
-
-    @Nullable @Override protected View getEmptyView() {
-        return null;
     }
 
     @Override protected PlacesProvider provideDataList(
@@ -106,10 +85,6 @@ public class PlacesRecyclerFragment extends BaseRecyclerFragment<PlacesProvider>
         SparseArrayCompat<Class<? extends BaseViewHolder>> array = super.getViewHoldersList();
         array.put(PlaceData.VIEW_TYPE, PlaceViewHolder.class.asSubclass(BaseViewHolder.class));
         return array;
-    }
-
-    public void setContentObserver(Action1<Object> contentObserver) {
-        mContentObserver = contentObserver;
     }
 
     public void onInsertNewPlace(StoreModel store) {
